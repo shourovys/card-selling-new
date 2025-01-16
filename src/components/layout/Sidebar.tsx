@@ -1,77 +1,145 @@
-import { cn } from '@/lib/utils';
-import { useMenu } from '@/hooks/useMenu';
-import { MenuItem } from '@/types/navigation';
-import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useMenu } from '@/hooks/useMenu';
+import { cn } from '@/lib/utils';
+import { MenuItem } from '@/types/navigation';
+import { ChevronDown, Menu } from 'lucide-react';
+import { useCallback, useEffect } from 'react';
 
 interface SidebarProps {
   items: MenuItem[];
+  className?: string;
 }
 
-export function Sidebar({ items }: SidebarProps) {
-  const { menuState, toggleExpanded, toggleMenuItem } = useMenu();
+interface MenuItemProps extends MenuItem {
+  level?: number;
+  onSelect?: (id: string) => void;
+}
 
-  const renderMenuItem = (item: MenuItem, level = 0) => {
-    const hasChildren = item.children && item.children.length > 0;
-    const isOpen = menuState.openItems.includes(item.id);
+const MenuItemComponent = ({
+  id,
+  label,
+  icon: Icon,
+  path,
+  children = [],
+  level = 0,
+  onSelect,
+}: MenuItemProps) => {
+  const { menuState, toggleMenuItem, isItemActive, isItemExpanded } = useMenu();
+  const expanded = isItemExpanded(id);
+  const active = isItemActive(id);
 
-    return (
-      <div key={item.id} className="w-full">
-        <Button
-          variant="ghost"
+  const handleClick = useCallback(() => {
+    if (children.length) {
+      toggleMenuItem(id);
+    }
+    if (path) {
+      window.location.href = path;
+    }
+    onSelect?.(id);
+  }, [children.length, id, onSelect, path, toggleMenuItem]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleClick();
+      }
+    },
+    [handleClick]
+  );
+
+  return (
+    <div className='w-full'>
+      <div
+        role='button'
+        tabIndex={0}
+        className={cn(
+          'flex items-center w-full px-3 py-2 transition-colors duration-300',
+          'hover:bg-accent/50 rounded-lg cursor-pointer',
+          active && 'bg-accent',
+          level > 0 && 'ml-4'
+        )}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+      >
+        {Icon && <span className='mr-2 w-4 h-4'>{Icon}</span>}
+        <span
           className={cn(
-            'w-full justify-between px-4 hover:bg-accent hover:text-accent-foreground',
-            'transition-all duration-300 ease-in-out',
-            level > 0 && 'pl-8',
-            !menuState.expanded && 'px-2'
+            'flex-grow transition-all duration-300',
+            !menuState.expanded && 'opacity-0 w-0'
           )}
-          onClick={() => hasChildren && toggleMenuItem(item.id)}
         >
-          <span className="flex items-center gap-2">
-            {item.icon && <span className="w-4 h-4">{item.icon}</span>}
-            {menuState.expanded && <span>{item.label}</span>}
-          </span>
-          {hasChildren && menuState.expanded && (
-            <span className="ml-2">
-              {isOpen ? (
-                <ChevronDown className="h-4 w-4" />
-              ) : (
-                <ChevronRight className="h-4 w-4" />
-              )}
-            </span>
-          )}
-        </Button>
-        {hasChildren && isOpen && menuState.expanded && (
-          <div className="ml-4 border-l">
-            {item.children.map((child) => renderMenuItem(child, level + 1))}
-          </div>
+          {label}
+        </span>
+        {children.length > 0 && menuState.expanded && (
+          <ChevronDown
+            className={cn(
+              'h-4 w-4 transition-transform duration-300',
+              expanded && 'transform rotate-180'
+            )}
+          />
         )}
       </div>
-    );
-  };
+      {children.length > 0 && expanded && menuState.expanded && (
+        <div
+          className={cn(
+            'overflow-hidden transition-all duration-300',
+            'transform origin-top',
+            expanded ? 'scale-y-100' : 'scale-y-0'
+          )}
+        >
+          {children.map((item) => (
+            <MenuItemComponent
+              key={item.id}
+              {...item}
+              level={level + 1}
+              onSelect={onSelect}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export function Sidebar({ items, className }: SidebarProps) {
+  const { menuState, toggleMenu } = useMenu();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'b') {
+        e.preventDefault();
+        toggleMenu();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleMenu]);
 
   return (
     <div
       className={cn(
-        'h-screen bg-background border-r flex flex-col transition-all duration-300 ease-in-out',
-        menuState.expanded ? 'w-64' : 'w-16'
+        'flex flex-col h-full border-r transition-all duration-300',
+        menuState.expanded ? 'w-64' : 'w-16',
+        className
       )}
     >
-      <div className="p-4 border-b flex items-center justify-between">
-        {menuState.expanded && <span className="font-semibold">Dashboard</span>}
+      <div className='flex items-center px-4 h-16'>
         <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleExpanded}
-          className="h-8 w-8"
+          variant='ghost'
+          size='icon'
+          onClick={toggleMenu}
+          className='hover:bg-accent/50'
         >
-          <Menu className="h-4 w-4" />
+          <Menu className='w-5 h-5' />
         </Button>
       </div>
-      <ScrollArea className="flex-1">
-        <nav className="p-2 space-y-1">{items.map((item) => renderMenuItem(item))}</nav>
-      </ScrollArea>
+      <nav className='overflow-y-auto flex-1'>
+        {items.map((item) => (
+          <MenuItemComponent key={item.id} {...item} />
+        ))}
+      </nav>
     </div>
   );
 }

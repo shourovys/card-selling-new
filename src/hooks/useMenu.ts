@@ -1,45 +1,73 @@
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { useCallback } from 'react';
-import { MenuState } from '@/types/navigation';
+import { MenuAction, MenuState, UseMenuReturn } from '@/types/navigation';
+import { useEffect, useReducer } from 'react';
 
-const MENU_STATE_KEY = 'dashboard_menu_state';
+const STORAGE_KEY = 'dashboard_menu_state';
 
 const initialState: MenuState = {
   expanded: true,
-  openItems: [],
+  activeItem: null,
+  expandedItems: new Set(),
 };
 
-export function useMenu() {
-  const [menuState, setMenuState] = useLocalStorage<MenuState>(
-    MENU_STATE_KEY,
-    initialState
-  );
+function menuReducer(state: MenuState, action: MenuAction): MenuState {
+  switch (action.type) {
+    case 'TOGGLE_MENU':
+      return { ...state, expanded: !state.expanded };
+    case 'TOGGLE_ITEM': {
+      const newExpandedItems = new Set(state.expandedItems);
+      if (newExpandedItems.has(action.payload)) {
+        newExpandedItems.delete(action.payload);
+      } else {
+        newExpandedItems.add(action.payload);
+      }
+      return { ...state, expandedItems: newExpandedItems };
+    }
+    case 'SET_ACTIVE_ITEM':
+      return { ...state, activeItem: action.payload };
+    case 'RESTORE_STATE':
+      return { ...state, ...action.payload };
+    default:
+      return state;
+  }
+}
 
-  const toggleExpanded = useCallback(() => {
-    setMenuState((prev) => ({
-      ...prev,
-      expanded: !prev.expanded,
-    }));
-  }, [setMenuState]);
+export function useMenu(): UseMenuReturn {
+  const [menuState, dispatch] = useReducer(menuReducer, initialState);
 
-  const toggleMenuItem = useCallback(
-    (itemId: string) => {
-      setMenuState((prev) => {
-        const isOpen = prev.openItems.includes(itemId);
-        return {
-          ...prev,
-          openItems: isOpen
-            ? prev.openItems.filter((id) => id !== itemId)
-            : [...prev.openItems, itemId],
-        };
-      });
-    },
-    [setMenuState]
-  );
+  // Load state from localStorage on mount
+  useEffect(() => {
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      try {
+        const parsed = JSON.parse(savedState);
+        dispatch({
+          type: 'RESTORE_STATE',
+          payload: {
+            ...parsed,
+            expandedItems: new Set(parsed.expandedItems),
+          },
+        });
+      } catch (error) {
+        console.error('Failed to parse menu state:', error);
+      }
+    }
+  }, []);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    const stateToSave = {
+      ...menuState,
+      expandedItems: Array.from(menuState.expandedItems),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+  }, [menuState]);
 
   return {
     menuState,
-    toggleExpanded,
-    toggleMenuItem,
+    toggleMenu: () => dispatch({ type: 'TOGGLE_MENU' }),
+    toggleMenuItem: (id: string) =>
+      dispatch({ type: 'TOGGLE_ITEM', payload: id }),
+    isItemActive: (id: string) => menuState.activeItem === id,
+    isItemExpanded: (id: string) => menuState.expandedItems.has(id),
   };
 }

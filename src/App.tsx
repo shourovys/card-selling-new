@@ -1,18 +1,18 @@
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { Layout } from '@/components/layout/Layout';
+import { ThemeProvider } from '@/components/theme-provider';
+import { queryClient } from '@/lib/query';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 function App() {
   return (
-    <ErrorBoundary>
-      <DashboardLayout>
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold">Welcome to Dashboard</h1>
-          <p className="text-muted-foreground">
-            Select an option from the sidebar to get started.
-          </p>
-        </div>
-      </DashboardLayout>
-    </ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme='light' storageKey='ui-theme'>
+        <Router>
+          <Layout>hello</Layout>
+        </Router>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 
