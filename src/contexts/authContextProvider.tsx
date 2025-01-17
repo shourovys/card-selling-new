@@ -1,4 +1,4 @@
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/hooks/use-toast';
 import authReducer, { initialState } from '@/reducers/authReducer';
 import { routePaths } from '@/routes/routePaths';
 import {
@@ -28,7 +28,6 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
   const [state, dispatch] = useReducer(authReducer, initialState);
-  const { toast } = useToast();
 
   const initialize = useCallback(async () => {
     try {
@@ -56,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast({
           title: 'Login Success',
           description: 'You have successfully logged in.',
-          variant: 'success',
+          variant: 'default',
         });
         navigate(routePaths.dashboard);
       } catch (error) {
@@ -73,7 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw error;
       }
     },
-    [navigate, toast]
+    [navigate]
   );
 
   const logout = useCallback(async () => {
@@ -86,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         title: 'Logout Success',
         description: 'Your session has been logged out.',
         duration: 3000,
-        variant: 'success',
+        variant: 'default',
       });
     } catch (error) {
       const errorMessage =
@@ -100,26 +99,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         variant: 'destructive',
       });
     }
-  }, [navigate, toast]);
+  }, [navigate]);
 
-  const updateUser = useCallback(
-    (user: IUser) => {
-      try {
-        dispatch({ type: 'UPDATE_USER', payload: { user } });
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Failed to update user information.';
-        toast({
-          title: 'Update Failed',
-          description: errorMessage,
-          variant: 'destructive',
-        });
-      }
-    },
-    [toast]
-  );
+  const updateUser = useCallback((user: IUser) => {
+    try {
+      dispatch({ type: 'UPDATE_USER', payload: { user } });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to update user information.';
+      toast({
+        title: 'Update Failed',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    }
+  }, []);
 
   const setAuthenticationStatus = useCallback((status: IAuthStatus) => {
     dispatch({ type: 'SET_STATUS', payload: { status } });
