@@ -1,7 +1,10 @@
+import useAuth from '@/hooks/useAuth';
 import React from 'react';
 import PageLayout from '../components/common/PageLayout';
 
 const Dashboard: React.FC = () => {
+  const { user } = useAuth();
+  console.log('🚀 ~ user:', user);
   return (
     <PageLayout showBreadcrumbs>
       <div className='space-y-6'>

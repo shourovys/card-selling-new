@@ -1,14 +1,17 @@
 import BACKEND_ENDPOINTS from '@/api/urls';
-import { LOCAL_STORAGE_KEYS } from '@/config/config';
+import api from '@/config/apiConfig';
+import { CLIENT_ID, CLIENT_SECRET, LOCAL_STORAGE_KEYS } from '@/config/config';
+import { getMetaInfo } from '@/getMetaInfo';
 import {
   ILoginCredentials,
+  ILoginResponse,
   IRefreshTokenResponse,
   ITokenData,
   IUser,
 } from '@/types/auth.types';
 import { IApiResponse } from '@/types/common';
 import { localStorageUtil } from '@/utils/localStorageUtil';
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 
 class AuthService {
   private static instance: AuthService;
@@ -17,17 +20,6 @@ class AuthService {
     resolve: (token: ITokenData) => void;
     reject: (error: Error) => void;
   }> = [];
-  private axiosInstance: AxiosInstance;
-
-  private constructor() {
-    this.axiosInstance = axios.create({
-      baseURL:
-        import.meta.env.VITE_BACKEND_BASE_URL || 'http://34.244.192.41/api/v1',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }
 
   public static getInstance(): AuthService {
     if (!AuthService.instance) {
@@ -39,20 +31,24 @@ class AuthService {
   // Auth Methods
   public async login(credentials: ILoginCredentials): Promise<IUser> {
     try {
-      const response = await this.axiosInstance.post<
-        IApiResponse<{ user: IUser }>
-      >(BACKEND_ENDPOINTS.LOGIN, {
-        attributes: {
-          ...credentials,
-          client_id: import.meta.env.VITE_CLIENT_ID || 'mobile-app',
-          client_secret:
-            import.meta.env.VITE_CLIENT_SECRET ||
-            'buNPXnZxttP26Sccmi4S65S0pys3lFK5',
-          grant_type: 'password',
-        },
-      });
+      const response = await api.post<IApiResponse<ILoginResponse>>(
+        BACKEND_ENDPOINTS.LOGIN,
+        {
+          metaInfo: getMetaInfo(),
+          attributes: credentials,
+        }
+      );
 
-      const { user } = response.data.data;
+      const { data, type } = response.data.data;
+      const user: IUser = {
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_in: data.expires_in,
+        refresh_expires_in: data.refresh_expires_in,
+        role: [type],
+        name: type,
+        email: credentials.email,
+      };
       this.saveUser(user);
       return user;
     } catch (error) {
@@ -172,18 +168,17 @@ class AuthService {
     this.isRefreshing = true;
 
     try {
-      const response = await this.axiosInstance.post<
-        IApiResponse<IRefreshTokenResponse>
-      >(BACKEND_ENDPOINTS.REFRESH_TOKEN, {
-        attributes: {
-          grant_type: 'refresh_token',
-          client_id: import.meta.env.VITE_CLIENT_ID || 'mobile-app',
-          client_secret:
-            import.meta.env.VITE_CLIENT_SECRET ||
-            'buNPXnZxttP26Sccmi4S65S0pys3lFK5',
-          refresh_token: refreshToken,
-        },
-      });
+      const response = await api.post<IApiResponse<IRefreshTokenResponse>>(
+        BACKEND_ENDPOINTS.REFRESH_TOKEN,
+        {
+          attributes: {
+            grant_type: 'refresh_token',
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
+            refresh_token: refreshToken,
+          },
+        }
+      );
 
       const { accessTokenResponse } = response.data.data;
       this.saveTokens(accessTokenResponse);
@@ -214,10 +209,6 @@ class AuthService {
       this.isRefreshing = false;
       this.refreshQueue = [];
     }
-  }
-
-  public getAxiosInstance(): AxiosInstance {
-    return this.axiosInstance;
   }
 }
 

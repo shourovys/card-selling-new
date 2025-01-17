@@ -1,8 +1,15 @@
 import BACKEND_ENDPOINTS from '@/api/urls';
 import { authService } from '@/utils/authService';
-import { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { BACKEND_BASE_URL } from './config';
 
-const api = authService.getAxiosInstance();
+// Create axios instance
+const api = axios.create({
+  baseURL: BACKEND_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 // Request interceptor
 api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
@@ -30,7 +37,10 @@ api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   }
 
   // Add token to request if available
-  config.headers.Authorization = `Bearer ${accessToken}`;
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
   return config;
 });
 

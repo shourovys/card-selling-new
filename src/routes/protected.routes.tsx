@@ -16,7 +16,7 @@ export const protectedRoutes: AppRoute[] = [
         element: React.createElement(Dashboard),
         title: 'Dashboard',
         breadcrumb: 'Dashboard',
-        roles: ['admin', 'user', 'manager'],
+        roles: ['System Admin', 'Distributor', 'Sub Distributor'],
         auth: true,
       },
     ],

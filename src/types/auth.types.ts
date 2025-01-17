@@ -5,8 +5,13 @@ export interface ITokenData {
   refresh_expires_in: number;
 }
 
+export interface ILoginResponse {
+  data: ITokenData;
+  type: IUserRole;
+}
+
 export interface IUser {
-  id: string;
+  // id: string;
   email: string;
   name: string;
   role: IUserRole[];
@@ -25,9 +30,9 @@ export const AUTH_STATUS = {
 export type IAuthStatus = (typeof AUTH_STATUS)[keyof typeof AUTH_STATUS];
 
 export const USER_ROLES = {
-  ADMIN: 'admin',
-  USER: 'user',
-  MANAGER: 'manager',
+  SYSTEM_ADMIN: 'System Admin',
+  DISTRIBUTOR: 'Distributor',
+  SUB_DISTRIBUTOR: 'Sub Distributor',
 } as const;
 
 export type IUserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
