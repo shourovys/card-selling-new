@@ -27,8 +27,8 @@ const Login: React.FC = () => {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: 'admin@cardselling.com',
+      password: 'Password100@',
     },
   });
 
@@ -41,8 +41,8 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className='w-full max-w-md mx-auto p-6'>
-      <h2 className='text-2xl font-bold text-center mb-6'>Login</h2>
+    <div className='p-6 mx-auto w-full max-w-md'>
+      <h2 className='mb-6 text-2xl font-bold text-center'>Login</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
           <FormField

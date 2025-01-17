@@ -101,7 +101,7 @@ class AuthService {
 
   public async logout(): Promise<void> {
     try {
-      await this.axiosInstance.post(BACKEND_ENDPOINTS.LOGOUT);
+      // await this.axiosInstance.post(BACKEND_ENDPOINTS.LOGOUT);
     } catch (error) {
       console.error('Error during logout:', error);
     } finally {
