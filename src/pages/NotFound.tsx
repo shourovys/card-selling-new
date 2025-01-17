@@ -17,10 +17,10 @@ const NotFound: React.FC = () => {
           </p>
           <div className='mt-8'>
             <Link
-              to={routePaths.home}
-              className='inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700'
+              to={routePaths.dashboard}
+              className='inline-flex items-center px-4 py-2 text-base font-medium text-white bg-indigo-600 rounded-md border border-transparent shadow-sm hover:bg-indigo-700'
             >
-              Return to Home
+              Return to Dashboard
             </Link>
           </div>
         </div>

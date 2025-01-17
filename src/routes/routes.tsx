@@ -1,3 +1,4 @@
+import { IUserRole } from '@/types/auth.types';
 import React, { lazy } from 'react';
 import { protectedRoutes } from './protected.routes';
 import { publicRoutes } from './public.routes';
@@ -5,14 +6,12 @@ import { routePaths } from './routePaths';
 
 const NotFound = lazy(() => import('../pages/NotFound'));
 
-export type UserRole = 'admin' | 'user' | 'manager';
-
 type BaseRoute = {
   element?: React.ReactNode;
   title?: string;
   breadcrumb?: string;
   auth?: boolean;
-  roles?: UserRole[];
+  roles?: IUserRole[];
   children?: AppRoute[];
 };
 

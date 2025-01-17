@@ -7,19 +7,13 @@ const DashboardLayout: React.FC = () => {
     <div className='min-h-screen bg-gray-100'>
       <header className='bg-white shadow'>
         <nav className='px-4 mx-auto max-w-7xl sm:px-6 lg:px-8'>
-          <div className='flex items-center justify-between h-16'>
+          <div className='flex justify-between items-center h-16'>
             <div className='flex space-x-8'>
               <Link
                 to={routePaths.dashboard}
                 className='px-3 py-2 text-sm font-medium text-gray-900 rounded-md hover:text-gray-600'
               >
                 Dashboard
-              </Link>
-              <Link
-                to={routePaths.settings}
-                className='px-3 py-2 text-sm font-medium text-gray-900 rounded-md hover:text-gray-600'
-              >
-                Settings
               </Link>
             </div>
           </div>

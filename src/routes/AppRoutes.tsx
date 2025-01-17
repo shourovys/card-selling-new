@@ -1,23 +1,23 @@
+import useAuth from '@/hooks/useAuth';
 import React, { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
 import ErrorBoundary from './ErrorBoundary';
 import RoleBasedRoute from './RoleBasedRoute';
 import { AppRoute, routeConfig } from './routes';
 
 const LoadingFallback = () => (
-  <div className='flex items-center justify-center h-screen'>
-    <div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary'></div>
+  <div className='flex justify-center items-center h-screen'>
+    <div className='w-8 h-8 rounded-full border-t-2 border-b-2 animate-spin border-primary'></div>
   </div>
 );
 
 const AppRoutes: React.FC = () => {
-  const { isAuthenticated, userRoles } = useAuth();
+  const { status, userRoles } = useAuth();
 
   const renderRouteElement = (route: AppRoute) => {
     const element = route.auth ? (
       <RoleBasedRoute
-        isAuthenticated={isAuthenticated}
+        isAuthenticated={status === 'AUTHENTICATED'}
         userRoles={userRoles}
         allowedRoles={route.roles || []}
       >

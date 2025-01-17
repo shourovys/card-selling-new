@@ -28,19 +28,6 @@ export const useBreadcrumbs = (): Breadcrumb[] => {
     if (currentPath.startsWith('/dashboard')) {
       if (currentPath === routePaths.dashboard) {
         label = 'Dashboard';
-      } else if (currentPath === routePaths.settings) {
-        label = 'Settings';
-      }
-    }
-
-    // Special case for nested concert routes
-    if (currentPath.startsWith('/concerts')) {
-      if (currentPath === routePaths.concerts) {
-        label = 'Concerts';
-      } else if (currentPath === routePaths.trending) {
-        label = 'Trending';
-      } else if (currentPath.includes('/city/')) {
-        label = 'City Events';
       }
     }
 

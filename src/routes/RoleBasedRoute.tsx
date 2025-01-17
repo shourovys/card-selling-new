@@ -1,11 +1,11 @@
+import { IUserRole } from '@/types/auth.types';
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import type { UserRole } from './routes';
 
 interface RoleBasedRouteProps {
   isAuthenticated: boolean;
-  userRoles: UserRole[];
-  allowedRoles: UserRole[];
+  userRoles: IUserRole[];
+  allowedRoles: IUserRole[];
   children: React.ReactNode;
 }
 
