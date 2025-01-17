@@ -1,45 +1,89 @@
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import useAuth from '@/hooks/useAuth';
+import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
+  const { login } = useAuth();
+
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      await login(data);
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
+  };
+
   return (
-    <div>
-      <h2 className='mb-6 text-2xl font-bold text-center'>Login</h2>
-      <form className='space-y-6'>
-        <div>
-          <label
-            htmlFor='email'
-            className='block text-sm font-medium text-gray-700'
-          >
-            Email
-          </label>
-          <input
-            type='email'
-            id='email'
+    <div className='w-full max-w-md mx-auto p-6'>
+      <h2 className='text-2xl font-bold text-center mb-6'>Login</h2>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+          <FormField
+            control={form.control}
             name='email'
-            className='block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='Enter your email'
+                    {...field}
+                    type='email'
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div>
-          <label
-            htmlFor='password'
-            className='block text-sm font-medium text-gray-700'
-          >
-            Password
-          </label>
-          <input
-            type='password'
-            id='password'
+          <FormField
+            control={form.control}
             name='password'
-            className='block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='Enter your password'
+                    {...field}
+                    type='password'
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <button
-          type='submit'
-          className='flex justify-center px-4 py-2 w-full text-sm font-medium text-white bg-blue-600 rounded-md border border-transparent shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-        >
-          Sign in
-        </button>
-      </form>
+          <Button type='submit' className='w-full'>
+            Sign in
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 };
