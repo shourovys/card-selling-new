@@ -1,13 +1,6 @@
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Form } from '@/components/ui/form';
+import { InputField } from '@/components/ui/form/input-field';
 import useAuth from '@/hooks/useAuth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
@@ -45,39 +38,12 @@ const Login: React.FC = () => {
       <h2 className='mb-6 text-2xl font-bold text-center'>Login</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-          <FormField
-            control={form.control}
-            name='email'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Enter your email'
-                    {...field}
-                    type='email'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
+          <InputField name='email' form={form} label='Email' />
+          <InputField
             name='password'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Enter your password'
-                    {...field}
-                    type='password'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            form={form}
+            label='Password'
+            type='password'
           />
           <Button type='submit' className='w-full'>
             Sign in

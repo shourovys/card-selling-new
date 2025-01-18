@@ -1,3 +1,4 @@
+import { TestForm } from '@/components/test-form';
 import useAuth from '@/hooks/useAuth';
 import React from 'react';
 import PageLayout from '../components/common/PageLayout';
@@ -24,6 +25,9 @@ const Dashboard: React.FC = () => {
             </h2>
           </div>
         </div>
+      </div>
+      <div className='container py-6'>
+        <TestForm />
       </div>
     </PageLayout>
   );
