@@ -1,4 +1,4 @@
-import { TABLE_ROW_HEIGHT } from '../../utils/config';
+import { TABLE_ROW_HEIGHT } from '@/config/config';
 
 interface IProps {
   emptyRows: number;

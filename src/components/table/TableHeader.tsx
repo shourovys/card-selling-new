@@ -1,16 +1,8 @@
 // TableHeader.tsx
-import Checkbox from '@/components/atomic/Checkbox';
 import { cn } from '@/lib/utils';
 import { ITableHead } from '@/types/components/table';
-import Icon, { downArrowIcon, upArrowIcon } from '@/utils/icons';
-import { PlusIcon } from '@radix-ui/react-icons';
-import {
-  Tooltip,
-  TooltipArrow,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../common/Tooltip';
+import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
+import { Checkbox } from '../ui/checkbox';
 
 interface IProps {
   order: 'asc' | 'desc';
@@ -43,8 +35,8 @@ const TableHeader: React.FC<IProps> = ({
             <Checkbox
               value='select-all-row'
               checked={rowCount !== 0 && rowCount === numSelected}
-              onChange={(checked) => {
-                selectAllRow(checked);
+              onChange={() => {
+                selectAllRow(true);
               }}
               disabled={rowCount === 0}
             />
@@ -72,15 +64,13 @@ const TableHeader: React.FC<IProps> = ({
               {/* Sorting icons displayed conditionally based on sort order */}
               {item.filter && (
                 <>
-                  <Icon
-                    icon={upArrowIcon}
+                  <ChevronUpIcon
                     className={cn(
                       'w-2 ml-1',
                       orderBy === item.id && order === 'asc' && 'text-primary'
                     )}
                   />
-                  <Icon
-                    icon={downArrowIcon}
+                  <ChevronDownIcon
                     className={cn(
                       'w-2',
                       orderBy === item.id && order === 'desc' && 'text-primary'
@@ -91,21 +81,6 @@ const TableHeader: React.FC<IProps> = ({
             </span>
           </th>
         ))}
-
-        {/* Action column with a tooltip for adding a field */}
-        <th scope='col' className='pr-3 md:pr-5 w-[70px]'>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <PlusIcon className='text-[#0E1521] h-4 w-4 mt-[5px]' />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Add field</p>
-                <TooltipArrow />
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </th>
       </tr>
     </thead>
   );

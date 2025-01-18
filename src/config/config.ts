@@ -18,3 +18,6 @@ export const LOCAL_STORAGE_KEYS = {
 } as const;
 
 export type LocalStorageKey = keyof typeof LOCAL_STORAGE_KEYS;
+
+export const TABLE_ROW_HEIGHT = 92;
+export const TABLE_ROW_PER_PAGE = 10;

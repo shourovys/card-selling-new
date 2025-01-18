@@ -3,7 +3,6 @@ import DisplayComponent from './DisplayComponent';
 import PageNumberButton from './PageNumberButton';
 import PaginationControls from './PaginationControls';
 import PaginationPrevNextControls from './PaginationPrevNextControlsProps ';
-import RowsPerPageSelector from './RowsPerPageSelector';
 
 export type TDirection = 1 | -1;
 
@@ -21,8 +20,6 @@ export default function Pagination({
   currentPage,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange,
-  rowsPerPageDisabled,
 }: IPaginationProps) {
   const totalPages = Math.ceil(totalRows / rowsPerPage);
   const pageNumbers = Array.from(Array(totalPages).keys(), (x) => x + 1);
@@ -72,9 +69,9 @@ export default function Pagination({
   const to = Math.min(currentPage * rowsPerPage, totalRows);
 
   return (
-    <div className='flex items-center justify-between p-3 md:p-5 mb-5 pb-1 sm:px-6 text-sm font-medium'>
+    <div className='flex justify-between items-center p-3 pb-1 mb-5 text-sm font-medium md:p-5 sm:px-6'>
       {/* Mobile view controls */}
-      <div className='flex justify-between flex-1 sm:hidden'>
+      <div className='flex flex-1 justify-between sm:hidden'>
         <PaginationPrevNextControls
           onClick={() => handlePrevNextPaginate(-1)}
           direction={-1}
@@ -96,7 +93,7 @@ export default function Pagination({
         <DisplayComponent from={from} to={to} totalRows={totalRows} />
 
         <nav
-          className='relative z-0 inline-flex gap-x-1 rounded-md'
+          className='inline-flex relative z-0 gap-x-1 rounded-md'
           aria-label='Pagination'
         >
           <PaginationControls
@@ -146,14 +143,14 @@ export default function Pagination({
             disabled={isNextDisabled}
           />
         </nav>
-        {onRowsPerPageChange && (
+        {/* {onRowsPerPageChange && (
           <RowsPerPageSelector
             totalRows={totalRows}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={onRowsPerPageChange}
             disabled={rowsPerPageDisabled}
           />
-        )}
+        )} */}
       </div>
     </div>
   );

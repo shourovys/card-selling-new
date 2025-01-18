@@ -16,7 +16,7 @@ import {
   IOrderApiQueryParams,
   IOrderFilter,
   IOrderResponse,
-} from '@/types/pages/order';
+} from '@/types/features/order';
 import QueryString from 'qs';
 import { useEffect } from 'react';
 import useSWR from 'swr';

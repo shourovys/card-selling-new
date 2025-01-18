@@ -1,4 +1,4 @@
-import { TABLE_ROW_PER_PAGE } from '@/utils/config';
+import { TABLE_ROW_PER_PAGE } from '@/config/config';
 import { useState } from 'react';
 
 interface IProps {

@@ -1,5 +1,3 @@
-import Image from 'next/image';
-
 interface IProps {
   title: string;
   description?: string;
@@ -7,12 +5,12 @@ interface IProps {
 }
 export default function EmptyContent({ title, description, img }: IProps) {
   return (
-    <div className='flex items-center justify-center flex-1'>
-      <div className='space-y-2 text-center pt-1'>
-        <Image
-          className='w-40 h-full mx-auto'
+    <div className='flex flex-1 justify-center items-center'>
+      <div className='pt-1 space-y-2 text-center'>
+        <img
+          className='mx-auto w-40 h-full'
           alt='empty content'
-          src={img || '/empty-folder.png'}
+          src={img || '/assets/images/empty-folder.png'}
           width={200}
           height={200}
         />

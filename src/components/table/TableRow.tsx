@@ -1,5 +1,5 @@
+import { TABLE_ROW_HEIGHT } from '@/config/config';
 import { cn } from '@/lib/utils';
-import { TABLE_ROW_HEIGHT } from '@/utils/config';
 import { ReactNode } from 'react';
 
 interface IProps {

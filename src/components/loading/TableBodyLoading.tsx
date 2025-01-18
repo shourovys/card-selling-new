@@ -1,5 +1,5 @@
+import { TABLE_ROW_HEIGHT, TABLE_ROW_PER_PAGE } from '@/config/config';
 import { cn } from '@/lib/utils';
-import { TABLE_ROW_HEIGHT, TABLE_ROW_PER_PAGE } from '@/utils/config';
 import createArray from '@/utils/createArray';
 
 interface IProps {

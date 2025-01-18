@@ -1,34 +1,57 @@
-'use client';
-
-import { categoryApi, CategoryResponse } from '@/api/category';
+import { fetcher, sendPostRequest, sendPutRequest } from '@/api/swrConfig';
+import BACKEND_ENDPOINTS from '@/api/urls';
+import TableBodyLoading from '@/components/loading/TableBodyLoading';
 import { CategoryModal } from '@/components/modals/category-modal';
+import CategoryTableRow from '@/components/pages/category/CategoryTableRow';
+import Pagination from '@/components/table/pagination/Pagination';
+import TableEmptyRows from '@/components/table/TableEmptyRows';
+import TableHeader from '@/components/table/TableHeader';
+import TableNoData from '@/components/table/TableNoData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { getMetaInfo } from '@/getMetaInfo';
 import { toast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+import { useFilter } from '@/hooks/useFilter';
+import useTable, { emptyRows } from '@/hooks/useTable';
+import { CategoryResponse } from '@/lib/api/category';
 import { Category, CategoryFormValues } from '@/lib/validations/category';
 import { IApiResponse } from '@/types/common';
-import { Edit, Eye, MoreVertical, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { ITableHead } from '@/types/components/table';
+import {
+  CategoryApiQueryParams,
+  CategoryFilter,
+  ICategoryPayload,
+} from '@/types/features/category';
+import { Plus } from 'lucide-react';
+import QueryString from 'qs';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 export default function CategoryManagement() {
-  const [searchQuery, setSearchQuery] = useState('');
+  // Table state management
+  const {
+    page,
+    rowsPerPage,
+    order,
+    orderBy,
+    selected,
+    handleChangePage,
+    handleSort,
+    handleChangeRowsPerPage,
+  } = useTable({});
+
+  // Define table head columns
+  const TABLE_HEAD: ITableHead[] = [
+    { id: 'name', label: 'Categories' },
+    { id: 'status', label: 'Status' },
+    { id: 'createdAt', label: 'Created At' },
+    { id: 'actions', label: 'Actions' },
+  ];
+
+  // Modal state
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
@@ -37,15 +60,39 @@ export default function CategoryManagement() {
     mode: 'add' | 'edit' | 'view';
   }>({ open: false, mode: 'add' });
 
+  // Filter state management
+  const initialFilterState: CategoryFilter = {
+    search: '',
+  };
+
+  const { filterState, handleFilterInputChange } =
+    useFilter(initialFilterState);
+
+  // Create query params for API
+  const apiQueryParamsString: CategoryApiQueryParams = {
+    // offset: (page - 1) * rowsPerPage,
+    // limit: rowsPerPage,
+    // sort_by: orderBy,
+    // order,
+    ...(filterState.search && { search: filterState.search }),
+  };
+
   // Fetch categories using SWR
   const { data, error, mutate, isLoading } = useSWR<
     IApiResponse<CategoryResponse>
-  >('/api/v1/private/all/categories');
-
-  // Filter categories based on search
-  const filteredCategories = data?.data.categories.filter((category) =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase())
+  >(
+    BACKEND_ENDPOINTS.CATEGORY.LIST(
+      QueryString.stringify(apiQueryParamsString)
+    ),
+    fetcher
   );
+
+  const categories = data?.data?.categories || [];
+
+  // Reset pagination when filter changes
+  useEffect(() => {
+    handleChangePage(1);
+  }, [filterState]);
 
   // Modal handlers
   const handleModalOpen = (
@@ -61,17 +108,37 @@ export default function CategoryManagement() {
     setSelectedCategory(null);
   };
 
+  const { trigger: createTrigger } = useSWRMutation(
+    BACKEND_ENDPOINTS.CATEGORY.CREATE,
+    sendPostRequest
+  );
+
+  const { trigger: updateTrigger } = useSWRMutation(
+    BACKEND_ENDPOINTS.CATEGORY.UPDATE(selectedCategory?.id || 0),
+    sendPutRequest
+  );
+
   // API handlers
   const handleSubmit = async (values: CategoryFormValues) => {
     try {
       if (modalState.mode === 'edit' && selectedCategory) {
-        await categoryApi.update(selectedCategory.id, values);
+        await updateTrigger(values);
         toast({
           title: 'Success',
           description: 'Category updated successfully',
         });
       } else {
-        await categoryApi.create(values);
+        const payload: ICategoryPayload = {
+          metaInfo: getMetaInfo(),
+          attribute: {
+            name: values.name,
+            description: values.description,
+            status: values.status === 'active',
+            icon: values.icon,
+            position: values.position ? parseInt(values.position) + 1 : null,
+          },
+        };
+        await createTrigger(payload);
         toast({
           title: 'Success',
           description: 'Category created successfully',
@@ -88,23 +155,16 @@ export default function CategoryManagement() {
     }
   };
 
-  const handleDelete = async (category: Category) => {
-    try {
-      await categoryApi.delete(category.id);
-      toast({
-        title: 'Success',
-        description: 'Category deleted successfully',
-      });
-      mutate(); // Refresh the categories list
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
-    }
+  const onDelete = () => {
+    mutate(); // Refresh the categories list
   };
+
+  // Check if no data is found
+  const isNotFound = !categories.length && !isLoading && !error;
+  console.log(
+    '🚀 ~ CategoryManagement ~ categories.length:',
+    categories.length
+  );
 
   return (
     <div className='container py-6'>
@@ -121,8 +181,10 @@ export default function CategoryManagement() {
             <div className='flex-1 max-w-sm'>
               <Input
                 placeholder='Search categories...'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={filterState.search}
+                onChange={(e) =>
+                  handleFilterInputChange('search', e.target.value)
+                }
                 className='h-9'
               />
             </div>
@@ -130,115 +192,61 @@ export default function CategoryManagement() {
 
           <div className='rounded-md border'>
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className='w-[50px]'>S.NO</TableHead>
-                  <TableHead>CATEGORIES</TableHead>
-                  <TableHead className='w-[100px]'>STATUS</TableHead>
-                  <TableHead className='w-[180px]'>CREATED AT</TableHead>
-                  <TableHead className='w-[70px] text-right'>ACTIONS</TableHead>
-                </TableRow>
-              </TableHeader>
+              <TableHeader
+                order={order}
+                orderBy={orderBy}
+                numSelected={selected.length}
+                rowCount={categories.length || 0}
+                handleSort={handleSort}
+                headerData={TABLE_HEAD}
+              />
               <TableBody>
                 {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className='h-24 text-center'>
-                      Loading...
-                    </TableCell>
-                  </TableRow>
+                  <TableBodyLoading
+                    isLoading={isLoading}
+                    tableRowPerPage={rowsPerPage}
+                  />
                 ) : error ? (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={4}
                       className='h-24 text-center text-muted-foreground'
                     >
                       Error loading categories
                     </TableCell>
                   </TableRow>
-                ) : filteredCategories?.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className='h-24 text-center text-muted-foreground'
-                    >
-                      No categories found
-                    </TableCell>
-                  </TableRow>
+                ) : isNotFound ? (
+                  <TableNoData isNotFound={isNotFound} />
                 ) : (
-                  filteredCategories?.map((category, index) => (
-                    <TableRow key={category.id}>
-                      <TableCell className='font-medium'>{index + 1}</TableCell>
-                      <TableCell>
-                        <div className='flex items-center space-x-3'>
-                          <div className='flex-shrink-0 w-10 h-10'>
-                            <img
-                              src={category.icon}
-                              alt={category.name}
-                              className='object-contain p-1 w-full h-full rounded-md border'
-                            />
-                          </div>
-                          <div className='flex-1 min-w-0'>
-                            <p className='font-medium truncate'>
-                              {category.name}
-                            </p>
-                            <p className='text-sm truncate text-muted-foreground'>
-                              Category for {category.type}
-                            </p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div
-                          className={cn(
-                            'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
-                            category.status
-                              ? 'bg-success/10 text-success'
-                              : 'bg-destructive/10 text-destructive'
-                          )}
-                        >
-                          {category.status ? 'Active' : 'Inactive'}
-                        </div>
-                      </TableCell>
-                      <TableCell className='text-muted-foreground'>
-                        {new Date(category.createdAt).toLocaleString()}
-                      </TableCell>
-                      <TableCell className='text-right'>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant='ghost' className='p-0 w-8 h-8'>
-                              <span className='sr-only'>Open menu</span>
-                              <MoreVertical className='w-4 h-4' />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align='end'>
-                            <DropdownMenuItem
-                              onClick={() => handleModalOpen('view', category)}
-                            >
-                              <Eye className='mr-2 w-4 h-4' />
-                              View
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleModalOpen('edit', category)}
-                            >
-                              <Edit className='mr-2 w-4 h-4' />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleDelete(category)}
-                              className='text-destructive focus:text-destructive'
-                            >
-                              <Trash2 className='mr-2 w-4 h-4' />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  <>
+                    {categories.map((category) => (
+                      <CategoryTableRow
+                        key={category.id}
+                        category={category}
+                        handleModalOpen={handleModalOpen}
+                        onDelete={onDelete}
+                      />
+                    ))}
+                    <TableEmptyRows
+                      emptyRows={
+                        data
+                          ? emptyRows(page, rowsPerPage, categories.length)
+                          : 0
+                      }
+                    />
+                  </>
                 )}
               </TableBody>
             </Table>
           </div>
+
+          <Pagination
+            totalRows={categories.length || 0}
+            currentPage={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </CardContent>
       </Card>
 
@@ -248,7 +256,7 @@ export default function CategoryManagement() {
         onSubmit={handleSubmit}
         mode={modalState.mode}
         category={selectedCategory || undefined}
-        categories={data?.data.categories || []}
+        categories={categories || []}
       />
     </div>
   );

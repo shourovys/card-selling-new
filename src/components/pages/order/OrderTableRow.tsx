@@ -4,10 +4,9 @@ import TableData from '@/components/table/TableData';
 import TableDataAction from '@/components/table/TableDataAction';
 import TableRow from '@/components/table/TableRow';
 import { cn } from '@/lib/utils';
-import { IOrder } from '@/types/pages/order';
+import { IOrder } from '@/types/features/order';
 import Icon, { checkIcon, copyIcon, threeDotsIcon } from '@/utils/icons';
 import { format } from 'date-fns';
-import Image from 'next/image';
 import { useState } from 'react';
 
 interface IProps {
@@ -84,11 +83,11 @@ const OrderTableRow: React.FC<IProps> = ({
       {/* Shipping information */}
       <TableData>
         <p>{row.shipping.name}</p>
-        <div className='flex items-center gap-2'>
+        <div className='flex gap-2 items-center'>
           <p className='text-[#E46A11]'>{row.shipping.phone}</p>
           <Icon
             icon={copiedField === 'phone' ? checkIcon : copyIcon}
-            className='text-primary text-base cursor-pointer'
+            className='text-base cursor-pointer text-primary'
             onClick={() => handleCopyToClipboard(row.shipping.phone, 'phone')}
           />
         </div>
@@ -119,7 +118,7 @@ const OrderTableRow: React.FC<IProps> = ({
 
       {/* Delivery partner */}
       <TableData>
-        <Image
+        <img
           src='/pathao.png'
           alt='Pathao Logo'
           height={32}
@@ -144,7 +143,7 @@ const OrderTableRow: React.FC<IProps> = ({
       {/* Action buttons */}
       <TableData className='pr-3 md:pr-5'>
         <div className='flex justify-end'>
-          <div className='flex items-center justify-center w-9 aspect-square text-base bg-primaryLight text-primary rounded-full'>
+          <div className='flex justify-center items-center w-9 text-base rounded-full aspect-square bg-primaryLight text-primary'>
             <Icon icon={threeDotsIcon} />
           </div>
         </div>

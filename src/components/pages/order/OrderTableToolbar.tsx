@@ -1,7 +1,7 @@
 // OrderTableToolbar.tsx
 import useDebounce from '@/hooks/useDebounce';
 import { THandleFilterInputChange } from '@/types/components/common';
-import { IOrderFilter, IOrderResponse } from '@/types/pages/order';
+import { IOrderFilter, IOrderResponse } from '@/types/features/order';
 import Icon, { searchIcon } from '@/utils/icons';
 import React, { useEffect, useState } from 'react';
 

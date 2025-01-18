@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import Icon, { leftArrowIcon, rightArrowIcon } from '@/utils/icons';
+import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import React from 'react';
 
 interface PaginationControlsProps {
@@ -26,8 +26,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
     >
       {direction === -1 ? (
         <>
-          <Icon
-            icon={leftArrowIcon}
+          <ChevronLeftIcon
             className='w-3.5 h-3.5 font-light'
             aria-hidden='true'
           />
@@ -36,8 +35,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
       ) : (
         <>
           <span>Next</span>
-          <Icon
-            icon={rightArrowIcon}
+          <ChevronRightIcon
             className='w-3.5 h-3.5 font-light'
             aria-hidden='true'
           />

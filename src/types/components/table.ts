@@ -1,4 +1,3 @@
-import { TIcon } from '@/utils/icons';
 import React from 'react';
 
 export type TIconButtonColor = 'primary' | 'red' | 'gray' | 'black';
@@ -9,7 +8,7 @@ interface ITableHeadBase {
 }
 
 export interface ITableHeadWithFilter extends ITableHeadBase {
-  filter: boolean;
+  filter?: boolean;
   checkboxValue?: never;
   checkboxAction?: never;
 }
@@ -23,7 +22,7 @@ export interface ITableHeadWithCheckbox extends ITableHeadBase {
 export type ITableHead = ITableHeadWithFilter | ITableHeadWithCheckbox;
 
 export interface ITableAction {
-  icon: TIcon;
+  // icon: TIcon;
   tooltip: string;
   color?: TIconButtonColor;
   iconClass?: string;
