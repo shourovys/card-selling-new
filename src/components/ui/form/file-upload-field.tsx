@@ -124,7 +124,6 @@ export function FileUploadField<T extends FieldValues>({
                 disabled && 'opacity-50 cursor-not-allowed',
                 !disabled && 'hover:border-primary/50 hover:bg-primary/5'
               )}
-              style={{ height }}
             >
               {preview && value ? (
                 <div className='flex justify-center items-center p-4 h-full'>
@@ -184,11 +183,11 @@ export function FileUploadField<T extends FieldValues>({
               ) : (
                 <div
                   {...getRootProps()}
-                  className='flex justify-center items-center p-8 h-full'
+                  className='flex justify-center items-center p-2 h-full'
                 >
                   <input {...inputProps} accept={acceptedTypes.join(',')} />
                   <div className='flex flex-col gap-2 items-center text-center'>
-                    <UploadCloud className='w-12 h-12 text-muted-foreground' />
+                    <UploadCloud className='size-10 text-muted-foreground' />
                     <div className='space-y-1'>
                       <p className='text-base font-medium text-muted-foreground'>
                         {disabled
