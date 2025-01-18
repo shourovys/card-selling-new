@@ -6,7 +6,7 @@ const PublicLayout = lazy(() => import('../layouts/PublicLayout'));
 const AuthLayout = lazy(() => import('../layouts/AuthLayout'));
 
 const Unauthorized = lazy(() => import('../pages/Unauthorized'));
-const Login = lazy(() => import('../pages/Login'));
+const Login = lazy(() => import('../pages/auth/Login'));
 
 export const publicRoutes: AppRoute[] = [
   {
