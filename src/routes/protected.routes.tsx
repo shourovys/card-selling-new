@@ -8,6 +8,9 @@ const AdditionalCategory = lazy(
   () => import('../pages/category/additional-category')
 );
 const Product = lazy(() => import('../pages/product/product'));
+const ProductBundle = lazy(
+  () => import('../pages/product-bundle/product-bundle')
+);
 
 export const protectedRoutes: AppRoute[] = [
   {
@@ -43,6 +46,14 @@ export const protectedRoutes: AppRoute[] = [
         element: React.createElement(Product),
         title: 'Product',
         breadcrumb: 'Product',
+        roles: ['System Admin', 'Distributor', 'Sub Distributor'],
+        auth: true,
+      },
+      {
+        path: '/product-bundle',
+        element: React.createElement(ProductBundle),
+        title: 'Product Bundle',
+        breadcrumb: 'Product Bundle',
         roles: ['System Admin', 'Distributor', 'Sub Distributor'],
         auth: true,
       },

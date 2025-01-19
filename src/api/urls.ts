@@ -43,6 +43,20 @@ const BACKEND_ENDPOINTS = {
     UPDATE: (id: number) => `/api/v1/private/update/product/${id}`,
     DELETE: (id: number) => `/api/v1/private/delete/product/${id}`,
   },
+
+  PRODUCT_BUNDLE: {
+    LIST: (queryString: string) =>
+      `/api/v1/private/all/product/bundles${
+        queryString ? `?${queryString}` : ''
+      }`,
+    CREATE: '/api/v1/private/save/product/bundles',
+    UPDATE: (id: number) => `/api/v1/private/update/product/bundles/${id}`,
+    DELETE: (id: number) => `/api/v1/private/delete/product/bundles/${id}`,
+  },
+
+  CURRENCY: {
+    LIST: '/api/v1/private/all/currency',
+  },
 } as const;
 
 export default BACKEND_ENDPOINTS;
