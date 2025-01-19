@@ -9,11 +9,8 @@ export interface CategoryApiQueryParams {
   search?: string;
 }
 
-export interface CategoryResponse {
-  data: {
-    categories: Category[];
-    count: number;
-  };
+export interface ICategoryResponse {
+  categories: Category[];
 }
 
 export interface CategoryFilter {

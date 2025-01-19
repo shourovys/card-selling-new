@@ -6,6 +6,7 @@ export const routePaths = {
   // Protected routes
   dashboard: '/dashboard',
   category: '/category',
+  additionalCategory: '/additional-category',
 
   // Catch-all
   notFound: '*',

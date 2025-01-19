@@ -123,7 +123,7 @@ export function MultiSelectField<T extends FieldValues>({
       <div className='space-y-[1px]'>
         {items.map((item) => (
           <div
-            key={item.value}
+            key={item.value.toString()}
             onClick={() => !disabled && !item.disabled && onSelect(item)}
             className={cn(
               'px-4 py-3 text-sm transition-colors border-b border-border',

@@ -2,8 +2,8 @@ import { sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
-import { CategoryModal } from '@/components/modals/category-modal';
-import CategoryTableRow from '@/components/pages/category/CategoryTableRow';
+import { AdditionalCategoryModal } from '@/components/modals/additional-category-modal';
+import AdditionalCategoryTableRow from '@/components/pages/category/AdditionalCategoryTableRow';
 import Pagination from '@/components/table/pagination/Pagination';
 import Table from '@/components/table/Table';
 import TableEmptyRows from '@/components/table/TableEmptyRows';
@@ -15,23 +15,24 @@ import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
 import useTable, { emptyRows } from '@/hooks/useTable';
-import { Category } from '@/lib/validations/category';
+import { IAdditionalCategory } from '@/lib/validations/additional-category';
 import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import {
-  CategoryApiQueryParams,
-  CategoryFilter,
-  ICategoryPayload,
-  ICategoryResponse,
-} from '@/types/features/category';
+  AdditionalCategoryApiQueryParams,
+  AdditionalCategoryFilter,
+  IAdditionalCategoryPayload,
+  IAdditionalCategoryResponse,
+} from '@/types/features/additional-category';
+import { ICategoryResponse } from '@/types/features/category';
 import { Plus } from 'lucide-react';
 import QueryString from 'qs';
 import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-export default function CategoryManagement() {
+export default function AdditionalCategoryManagement() {
   // Table state management
   const {
     page,
@@ -49,21 +50,21 @@ export default function CategoryManagement() {
     { id: 'sno', label: 'S.NO', align: 'left' },
     { id: 'name', label: 'CATEGORIES', align: 'left' },
     { id: 'status', label: 'STATUS', align: 'left' },
-    { id: 'createdAt', label: 'CREATED AT', align: 'left' },
+    { id: 'position', label: 'POSITION', align: 'left' },
+    { id: 'createdBy', label: 'CREATED BY', align: 'left' },
     { id: 'actions', label: 'ACTIONS', align: 'right' },
   ];
 
   // Modal state
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
+  const [selectedCategory, setSelectedCategory] =
+    useState<IAdditionalCategory | null>(null);
   const [modalState, setModalState] = useState<{
     open: boolean;
     mode: 'add' | 'edit' | 'view';
   }>({ open: false, mode: 'add' });
 
   // Filter state management
-  const initialFilterState: CategoryFilter = {
+  const initialFilterState: AdditionalCategoryFilter = {
     search: '',
   };
 
@@ -71,23 +72,33 @@ export default function CategoryManagement() {
     useFilter(initialFilterState);
 
   // Create query params for API
-  const apiQueryParamsString: CategoryApiQueryParams = {
+  const apiQueryParamsString: AdditionalCategoryApiQueryParams = {
+    page: page - 1,
+    size: rowsPerPage,
     ...(filterState.search && { search: filterState.search }),
   };
 
   // Fetch categories using SWR
-  const { data, error, mutate, isLoading } = useSWR<
-    IApiResponse<ICategoryResponse>
-  >(
-    BACKEND_ENDPOINTS.CATEGORY.LIST(QueryString.stringify(apiQueryParamsString))
+  const { data: categoriesData } = useSWR<IApiResponse<ICategoryResponse>>(
+    BACKEND_ENDPOINTS.CATEGORY.LIST('')
   );
 
-  const categories = data?.data?.categories || [];
+  const { data, error, mutate, isLoading } = useSWR<
+    IApiResponse<IAdditionalCategoryResponse>
+  >(
+    BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.LIST(
+      QueryString.stringify(apiQueryParamsString)
+    )
+  );
+
+  const additionalCategories =
+    data?.data?.additionalCategoriesData?.additionalCategories || [];
+  const categories = categoriesData?.data.categories || [];
 
   // Modal handlers
   const handleModalOpen = (
     mode: 'add' | 'edit' | 'view',
-    category?: Category
+    category?: IAdditionalCategory
   ) => {
     setSelectedCategory(category || null);
     setModalState({ open: true, mode });
@@ -99,29 +110,29 @@ export default function CategoryManagement() {
   };
 
   const { trigger: createTrigger, isMutating: isCreating } = useSWRMutation(
-    BACKEND_ENDPOINTS.CATEGORY.CREATE,
+    BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.CREATE,
     sendPostRequest
   );
 
   const { trigger: updateTrigger, isMutating: isUpdating } = useSWRMutation(
-    BACKEND_ENDPOINTS.CATEGORY.UPDATE(selectedCategory?.id || 0),
+    BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.UPDATE(selectedCategory?.id || 0),
     sendPutRequest
   );
 
   // API handlers
-  const handleSubmit = async (payload: ICategoryPayload) => {
+  const handleSubmit = async (payload: IAdditionalCategoryPayload) => {
     try {
       if (modalState.mode === 'edit' && selectedCategory) {
         await updateTrigger(payload);
         toast({
           title: 'Success',
-          description: 'Category updated successfully',
+          description: 'Additional category updated successfully',
         });
       } else {
         await createTrigger(payload);
         toast({
           title: 'Success',
-          description: 'Category created successfully',
+          description: 'Additional category created successfully',
         });
       }
       mutate(); // Refresh the categories list
@@ -140,17 +151,21 @@ export default function CategoryManagement() {
   };
 
   // Check if no data is found
-  const isNotFound = !categories.length && !isLoading && !error;
+  const isNotFound =
+    !data?.data?.additionalCategoriesData?.totalItems && !isLoading && !error;
 
   const breadcrumbItems = [
     { label: 'Dashboard', href: routePaths.dashboard },
-    { label: 'Category' },
+    { label: 'Additional Category' },
   ];
 
   return (
     <div className='min-h-screen bg-gray-50/50'>
       <div className=''>
-        <Breadcrumbs items={breadcrumbItems} title='Category Management' />
+        <Breadcrumbs
+          items={breadcrumbItems}
+          title='Additional Category Management'
+        />
 
         <Card className='bg-white shadow-sm p-6'>
           <div className='flex justify-between items-center mb-6'>
@@ -168,7 +183,7 @@ export default function CategoryManagement() {
               className='bg-rose-500 hover:bg-rose-600 text-white h-10 px-4'
             >
               <Plus className='mr-2 w-4 h-4' />
-              Add Category
+              Add Additional Category
             </Button>
           </div>
 
@@ -177,24 +192,30 @@ export default function CategoryManagement() {
               order={order}
               orderBy={orderBy}
               numSelected={selected.length}
-              rowCount={categories.length || 0}
+              rowCount={additionalCategories.length || 0}
               handleSort={handleSort}
               headerData={TABLE_HEAD}
             />
             <tbody>
               {!isLoading &&
-                categories.map((category, index) => (
-                  <CategoryTableRow
+                additionalCategories.map((category, index) => (
+                  <AdditionalCategoryTableRow
                     key={category.id}
                     category={category}
-                    index={index}
+                    index={(page - 1) * 10 + index}
                     handleModalOpen={handleModalOpen}
                     onDelete={onDelete}
                   />
                 ))}
               <TableEmptyRows
                 emptyRows={
-                  data ? emptyRows(page, rowsPerPage, categories.length) : 0
+                  data
+                    ? emptyRows(
+                        page,
+                        rowsPerPage,
+                        data?.data?.additionalCategoriesData?.totalItems
+                      )
+                    : 0
                 }
               />
             </tbody>
@@ -208,7 +229,7 @@ export default function CategoryManagement() {
           />
 
           <Pagination
-            totalRows={categories.length || 0}
+            totalRows={data?.data?.additionalCategoriesData?.totalItems || 0}
             currentPage={page}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
@@ -217,13 +238,13 @@ export default function CategoryManagement() {
         </Card>
       </div>
 
-      <CategoryModal
+      <AdditionalCategoryModal
         open={modalState.open}
         onClose={handleModalClose}
         onSubmit={handleSubmit}
         mode={modalState.mode}
         category={selectedCategory || undefined}
-        categories={categories || []}
+        categories={categories}
         isSubmitting={isCreating || isUpdating}
       />
     </div>

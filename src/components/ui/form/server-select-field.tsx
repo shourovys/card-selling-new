@@ -37,6 +37,7 @@ type BaseFieldProps<T extends FieldValues> = {
 interface ServerSelectFieldProps<T extends FieldValues>
   extends BaseFieldProps<T> {
   placeholder?: string;
+  smallLabel?: string;
   disabled?: boolean;
   loadingMessage?: string;
   noOptionsMessage?: string;
@@ -45,7 +46,7 @@ interface ServerSelectFieldProps<T extends FieldValues>
   minCharacters?: number;
   debounceTimeout?: number;
   onInputChange?: (value: string, actionMeta: InputActionMeta) => void;
-  fetchOptions: (params: { search: string }) => Promise<ServerSelectOption[]>;
+  loadOptions: (params: { search: string }) => Promise<ServerSelectOption[]>;
 }
 
 const DropdownIndicator = (
@@ -171,6 +172,7 @@ export function ServerSelectField<T extends FieldValues>({
   name,
   form,
   label,
+  smallLabel,
   description,
   required = false,
   placeholder = 'Type to search...',
@@ -182,7 +184,7 @@ export function ServerSelectField<T extends FieldValues>({
   minCharacters = 3,
   debounceTimeout = 300,
   onInputChange,
-  fetchOptions,
+  loadOptions,
 }: ServerSelectFieldProps<T>) {
   const [items, setItems] = React.useState<ServerSelectOption[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -277,7 +279,7 @@ export function ServerSelectField<T extends FieldValues>({
 
       setLoading(true);
       try {
-        const result = await fetchOptions({ search });
+        const result = await loadOptions({ search });
         setItems(result);
       } catch (error) {
         console.error('Error fetching options:', error);
@@ -286,7 +288,7 @@ export function ServerSelectField<T extends FieldValues>({
         setLoading(false);
       }
     },
-    [fetchOptions, minCharacters]
+    [loadOptions, minCharacters]
   );
 
   const debouncedSearch = React.useMemo(
@@ -314,6 +316,11 @@ export function ServerSelectField<T extends FieldValues>({
             <FormLabel className='flex gap-1 items-center'>
               {label}
               {required && <span className='text-destructive'>*</span>}
+              {smallLabel && (
+                <span className='text-small text-muted-foreground leading-none'>
+                  {smallLabel}
+                </span>
+              )}
             </FormLabel>
           )}
           <FormControl>
