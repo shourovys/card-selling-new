@@ -5,14 +5,16 @@ import { ReactNode } from 'react';
 interface IProps {
   selected?: boolean;
   children: ReactNode;
+  className?: string;
 }
 
-function TableRow({ selected, children }: IProps) {
+function TableRow({ selected, children, className }: IProps) {
   return (
     <tr
       className={cn(
         'custom_transition bg-white group hover:bg-[#F9FAFB] group',
-        selected && 'bg-[#F9FAFB]'
+        selected && 'bg-[#F9FAFB]',
+        className
       )}
       style={{ height: TABLE_ROW_HEIGHT }}
     >

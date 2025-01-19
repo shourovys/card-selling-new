@@ -5,6 +5,7 @@ export type TIconButtonColor = 'primary' | 'red' | 'gray' | 'black';
 interface ITableHeadBase {
   id: string;
   label: string;
+  align?: 'left' | 'center' | 'right';
 }
 
 export interface ITableHeadWithFilter extends ITableHeadBase {

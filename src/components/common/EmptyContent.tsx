@@ -1,3 +1,4 @@
+import EmptyImage from '@/assets/images/empty-folder.png';
 interface IProps {
   title: string;
   description?: string;
@@ -10,7 +11,7 @@ export default function EmptyContent({ title, description, img }: IProps) {
         <img
           className='mx-auto w-40 h-full'
           alt='empty content'
-          src={img || '/assets/images/empty-folder.png'}
+          src={img || EmptyImage}
           width={200}
           height={200}
         />

@@ -1,12 +1,12 @@
 // OrderTableRow.tsx
-import Checkbox from '@/components/atomic/Checkbox';
 import TableData from '@/components/table/TableData';
 import TableDataAction from '@/components/table/TableDataAction';
 import TableRow from '@/components/table/TableRow';
+import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { IOrder } from '@/types/features/order';
-import Icon, { checkIcon, copyIcon, threeDotsIcon } from '@/utils/icons';
 import { format } from 'date-fns';
+import { CopyIcon, MoreHorizontalIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface IProps {
@@ -20,7 +20,7 @@ const OrderTableRow: React.FC<IProps> = ({
   selected,
   handleSelectRow,
 }) => {
-  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [, setCopiedField] = useState<string | null>(null);
 
   // Copy text to clipboard with feedback for the copied field
   const handleCopyToClipboard = (text: string, field: string) => {
@@ -70,8 +70,7 @@ const OrderTableRow: React.FC<IProps> = ({
       {/* Order ID with copy functionality */}
       <TableData>
         {row._id.$oid}
-        <Icon
-          icon={copiedField === 'id' ? checkIcon : copyIcon}
+        <CopyIcon
           className='text-primary text-base ml-1.5 cursor-pointer'
           onClick={() => handleCopyToClipboard(row._id.$oid, 'id')}
         />
@@ -85,8 +84,7 @@ const OrderTableRow: React.FC<IProps> = ({
         <p>{row.shipping.name}</p>
         <div className='flex gap-2 items-center'>
           <p className='text-[#E46A11]'>{row.shipping.phone}</p>
-          <Icon
-            icon={copiedField === 'phone' ? checkIcon : copyIcon}
+          <CopyIcon
             className='text-base cursor-pointer text-primary'
             onClick={() => handleCopyToClipboard(row.shipping.phone, 'phone')}
           />
@@ -144,7 +142,7 @@ const OrderTableRow: React.FC<IProps> = ({
       <TableData className='pr-3 md:pr-5'>
         <div className='flex justify-end'>
           <div className='flex justify-center items-center w-9 text-base rounded-full aspect-square bg-primaryLight text-primary'>
-            <Icon icon={threeDotsIcon} />
+            <MoreHorizontalIcon />
           </div>
         </div>
       </TableData>

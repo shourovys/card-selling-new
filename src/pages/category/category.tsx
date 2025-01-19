@@ -1,22 +1,24 @@
 import { fetcher, sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
 import { CategoryModal } from '@/components/modals/category-modal';
 import CategoryTableRow from '@/components/pages/category/CategoryTableRow';
 import Pagination from '@/components/table/pagination/Pagination';
+import Table from '@/components/table/Table';
 import TableEmptyRows from '@/components/table/TableEmptyRows';
 import TableHeader from '@/components/table/TableHeader';
 import TableNoData from '@/components/table/TableNoData';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { getMetaInfo } from '@/getMetaInfo';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
 import useTable, { emptyRows } from '@/hooks/useTable';
 import { CategoryResponse } from '@/lib/api/category';
 import { Category, CategoryFormValues } from '@/lib/validations/category';
+import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import {
@@ -26,7 +28,7 @@ import {
 } from '@/types/features/category';
 import { Plus } from 'lucide-react';
 import QueryString from 'qs';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -45,10 +47,11 @@ export default function CategoryManagement() {
 
   // Define table head columns
   const TABLE_HEAD: ITableHead[] = [
-    { id: 'name', label: 'Categories' },
-    { id: 'status', label: 'Status' },
-    { id: 'createdAt', label: 'Created At' },
-    { id: 'actions', label: 'Actions' },
+    { id: 'sno', label: 'S.NO', align: 'left' },
+    { id: 'name', label: 'CATEGORIES', align: 'left' },
+    { id: 'status', label: 'STATUS', align: 'left' },
+    { id: 'createdAt', label: 'CREATED AT', align: 'left' },
+    { id: 'actions', label: 'ACTIONS', align: 'right' },
   ];
 
   // Modal state
@@ -70,10 +73,6 @@ export default function CategoryManagement() {
 
   // Create query params for API
   const apiQueryParamsString: CategoryApiQueryParams = {
-    // offset: (page - 1) * rowsPerPage,
-    // limit: rowsPerPage,
-    // sort_by: orderBy,
-    // order,
     ...(filterState.search && { search: filterState.search }),
   };
 
@@ -88,11 +87,6 @@ export default function CategoryManagement() {
   );
 
   const categories = data?.data?.categories || [];
-
-  // Reset pagination when filter changes
-  useEffect(() => {
-    handleChangePage(1);
-  }, [filterState]);
 
   // Modal handlers
   const handleModalOpen = (
@@ -161,84 +155,71 @@ export default function CategoryManagement() {
 
   // Check if no data is found
   const isNotFound = !categories.length && !isLoading && !error;
-  console.log(
-    '🚀 ~ CategoryManagement ~ categories.length:',
-    categories.length
-  );
+
+  const breadcrumbItems = [
+    { label: 'Dashboard', href: routePaths.dashboard },
+    { label: 'Category' },
+  ];
 
   return (
-    <div className='container py-6'>
-      <Card>
-        <CardHeader className='flex flex-row justify-between items-center pb-4 space-y-0'>
-          <CardTitle>Category Management</CardTitle>
-          <Button onClick={() => handleModalOpen('add')} size='sm'>
-            <Plus className='mr-2 w-4 h-4' />
-            Add Category
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className='flex justify-between items-center py-4 space-x-4'>
-            <div className='flex-1 max-w-sm'>
-              <Input
-                placeholder='Search categories...'
-                value={filterState.search}
-                onChange={(e) =>
-                  handleFilterInputChange('search', e.target.value)
-                }
-                className='h-9'
-              />
-            </div>
+    <div className='min-h-screen bg-gray-50/50'>
+      <div className=''>
+        <Breadcrumbs items={breadcrumbItems} title='Category Management' />
+
+        <Card className='bg-white shadow-sm p-6'>
+          <div className='flex justify-between items-center mb-6'>
+            <Input
+              placeholder='Search categories...'
+              value={filterState.search}
+              onChange={(e) =>
+                handleFilterInputChange('search', e.target.value)
+              }
+              className='max-w-sm h-10 bg-gray-50'
+            />
+            <Button
+              onClick={() => handleModalOpen('add')}
+              size='sm'
+              className='bg-rose-500 hover:bg-rose-600 text-white h-10 px-4'
+            >
+              <Plus className='mr-2 w-4 h-4' />
+              Add Category
+            </Button>
           </div>
 
-          <div className='rounded-md border'>
-            <Table>
-              <TableHeader
-                order={order}
-                orderBy={orderBy}
-                numSelected={selected.length}
-                rowCount={categories.length || 0}
-                handleSort={handleSort}
-                headerData={TABLE_HEAD}
-              />
-              <TableBody>
-                {isLoading ? (
-                  <TableBodyLoading
-                    isLoading={isLoading}
-                    tableRowPerPage={rowsPerPage}
+          <Table>
+            <TableHeader
+              order={order}
+              orderBy={orderBy}
+              numSelected={selected.length}
+              rowCount={categories.length || 0}
+              handleSort={handleSort}
+              headerData={TABLE_HEAD}
+            />
+            <tbody>
+              {!isLoading &&
+                categories.map((category, index) => (
+                  <CategoryTableRow
+                    key={category.id}
+                    category={category}
+                    index={index}
+                    handleModalOpen={handleModalOpen}
+                    onDelete={onDelete}
                   />
-                ) : error ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className='h-24 text-center text-muted-foreground'
-                    >
-                      Error loading categories
-                    </TableCell>
-                  </TableRow>
-                ) : isNotFound ? (
-                  <TableNoData isNotFound={isNotFound} />
-                ) : (
-                  <>
-                    {categories.map((category) => (
-                      <CategoryTableRow
-                        key={category.id}
-                        category={category}
-                        handleModalOpen={handleModalOpen}
-                        onDelete={onDelete}
-                      />
-                    ))}
-                    <TableEmptyRows
-                      emptyRows={
-                        data
-                          ? emptyRows(page, rowsPerPage, categories.length)
-                          : 0
-                      }
-                    />
-                  </>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                ))}
+              <TableEmptyRows
+                emptyRows={
+                  data ? emptyRows(page, rowsPerPage, categories.length) : 0
+                }
+              />
+            </tbody>
+          </Table>
+
+          {/* Loading and No Data States */}
+          <TableNoData isNotFound={isNotFound} />
+          <TableBodyLoading
+            isLoading={isLoading}
+            tableRowPerPage={rowsPerPage}
+          />
 
           <Pagination
             totalRows={categories.length || 0}
@@ -247,8 +228,8 @@ export default function CategoryManagement() {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        </CardContent>
-      </Card>
+        </Card>
+      </div>
 
       <CategoryModal
         open={modalState.open}

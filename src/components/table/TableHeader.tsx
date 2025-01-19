@@ -24,14 +24,11 @@ const TableHeader: React.FC<IProps> = ({
   headerData,
 }) => {
   return (
-    <thead className='bg-[#F9FAFB] border-y border-primaryBorder'>
-      <tr className='text-left'>
+    <thead>
+      <tr className='border-b border-gray-200'>
         {/* Checkbox for selecting all rows */}
         {selectAllRow && (
-          <th
-            scope='col'
-            className='sticky left-0 w-1 pr-1.5 pl-3 md:pl-5 bg-[#F9FAFB]'
-          >
+          <th scope='col' className='sticky left-0 w-1 pr-1.5 pl-3 md:pl-5'>
             <Checkbox
               value='select-all-row'
               checked={rowCount !== 0 && rowCount === numSelected}
@@ -49,7 +46,12 @@ const TableHeader: React.FC<IProps> = ({
             key={item.id}
             scope='col'
             className={cn(
-              'px-1 py-3 text-bwTableHeaderBgText whitespace-nowrap font-medium text-xs text-[#05060F99] min-w-20 2xl:min-w-28',
+              'py-4 px-4 text-sm font-semibold text-gray-900 whitespace-nowrap',
+              {
+                'text-left': !item.align || item.align === 'left',
+                'text-center': item.align === 'center',
+                'text-right': item.align === 'right',
+              },
               item.filter ? 'cursor-pointer' : 'cursor-default'
             )}
             onClick={() => {
@@ -59,24 +61,34 @@ const TableHeader: React.FC<IProps> = ({
               }
             }}
           >
-            <span className='flex items-center'>
-              <span className='mt-0.5'>{item.label}</span>
+            <span
+              className={cn('flex items-center', {
+                'justify-start': !item.align || item.align === 'left',
+                'justify-center': item.align === 'center',
+                'justify-end': item.align === 'right',
+              })}
+            >
+              <span>{item.label}</span>
               {/* Sorting icons displayed conditionally based on sort order */}
               {item.filter && (
-                <>
+                <div className='flex flex-col ml-1'>
                   <ChevronUpIcon
                     className={cn(
-                      'w-2 ml-1',
-                      orderBy === item.id && order === 'asc' && 'text-primary'
+                      'w-3 h-3',
+                      orderBy === item.id && order === 'asc'
+                        ? 'text-primary'
+                        : 'text-gray-400'
                     )}
                   />
                   <ChevronDownIcon
                     className={cn(
-                      'w-2',
-                      orderBy === item.id && order === 'desc' && 'text-primary'
+                      'w-3 h-3 -mt-1',
+                      orderBy === item.id && order === 'desc'
+                        ? 'text-primary'
+                        : 'text-gray-400'
                     )}
                   />
-                </>
+                </div>
               )}
             </span>
           </th>

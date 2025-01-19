@@ -82,9 +82,35 @@ const selectStyles: StylesConfig<ServerSelectOption, false> = {
     backgroundColor: 'hsl(var(--background))',
     border: '1px solid hsl(var(--border))',
     boxShadow: 'var(--shadow)',
-    borderRadius: 'var(--radius)',
-    marginTop: '8px',
-    zIndex: 50,
+    zIndex: 9999,
+  }),
+  menuPortal: (base) => ({
+    ...base,
+    zIndex: 9999,
+  }),
+  menuList: (base) => ({
+    ...base,
+    maxHeight: '200px',
+    minHeight: 35,
+    overflowY: 'auto',
+    paddingTop: 0,
+    paddingBottom: 0,
+    scrollBehavior: 'auto',
+    '::-webkit-scrollbar': {
+      width: '8px',
+      height: '8px',
+    },
+    '::-webkit-scrollbar-track': {
+      background: 'hsl(var(--muted))',
+      borderRadius: '4px',
+    },
+    '::-webkit-scrollbar-thumb': {
+      background: 'hsl(var(--muted-foreground))',
+      borderRadius: '4px',
+    },
+    '::-webkit-scrollbar-thumb:hover': {
+      background: 'hsl(var(--foreground))',
+    },
   }),
   option: (base, state) => ({
     ...base,
@@ -160,6 +186,69 @@ export function ServerSelectField<T extends FieldValues>({
 }: ServerSelectFieldProps<T>) {
   const [items, setItems] = React.useState<ServerSelectOption[]>([]);
   const [loading, setLoading] = React.useState(false);
+  const [portalTarget, setPortalTarget] = React.useState<HTMLElement | null>(
+    null
+  );
+
+  React.useEffect(() => {
+    setPortalTarget(document.body);
+  }, []);
+
+  // Add wheel event handler for manual scrolling
+  React.useEffect(() => {
+    let isScrolling = false;
+    let animationFrameId: number;
+
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const handleWheel = (e: WheelEvent) => {
+      const menuList = document.querySelector('.select__menu-list');
+      if (!menuList || !(e.target as HTMLElement).closest('.select__menu-list'))
+        return;
+
+      e.preventDefault();
+      if (isScrolling) {
+        cancelAnimationFrame(animationFrameId);
+      }
+
+      const scrollSpeed = 0.8;
+      const duration = 300; // ms
+      const startTime = performance.now();
+      const startScroll = menuList.scrollTop;
+      const targetDelta = e.deltaY * scrollSpeed;
+      const targetScroll = Math.max(
+        0,
+        Math.min(
+          startScroll + targetDelta,
+          menuList.scrollHeight - menuList.clientHeight
+        )
+      );
+
+      const scroll = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeProgress = easeOutCubic(progress);
+
+        menuList.scrollTop =
+          startScroll + (targetScroll - startScroll) * easeProgress;
+
+        if (progress < 1) {
+          animationFrameId = requestAnimationFrame(scroll);
+          isScrolling = true;
+        } else {
+          isScrolling = false;
+        }
+      };
+
+      animationFrameId = requestAnimationFrame(scroll);
+    };
+
+    document.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      document.removeEventListener('wheel', handleWheel);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
 
   const handleNoOptionsMessage = React.useCallback(
     ({ inputValue }: { inputValue: string }): React.ReactNode => {
@@ -236,6 +325,10 @@ export function ServerSelectField<T extends FieldValues>({
               placeholder={placeholder}
               isClearable={isClearable}
               menuPlacement={menuPlacement}
+              menuPortalTarget={portalTarget}
+              menuPosition='fixed'
+              closeMenuOnScroll={false}
+              captureMenuScroll={false}
               noOptionsMessage={handleNoOptionsMessage}
               loadingMessage={handleLoadingMessage}
               value={field.value}
@@ -248,6 +341,13 @@ export function ServerSelectField<T extends FieldValues>({
               theme={customTheme}
               backspaceRemovesValue={true}
               blurInputOnSelect={true}
+              classNames={{
+                control: () => 'select__control',
+                menu: () => 'select__menu',
+                menuList: () => 'select__menu-list',
+                option: () => 'select__option',
+              }}
+              classNamePrefix='select'
             />
           </FormControl>
           {description && (

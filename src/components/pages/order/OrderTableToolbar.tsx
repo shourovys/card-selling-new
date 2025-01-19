@@ -2,7 +2,7 @@
 import useDebounce from '@/hooks/useDebounce';
 import { THandleFilterInputChange } from '@/types/components/common';
 import { IOrderFilter, IOrderResponse } from '@/types/features/order';
-import Icon, { searchIcon } from '@/utils/icons';
+import { SearchIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 interface IProps {
@@ -14,11 +14,8 @@ interface IProps {
 }
 
 const OrderTableToolbar: React.FC<IProps> = ({
-  data,
   filterState,
-  handleFilterStateReset,
   handleFilterInputChange,
-  setFilterState,
 }) => {
   // State for managing search input
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -45,8 +42,7 @@ const OrderTableToolbar: React.FC<IProps> = ({
       <div className='flex items-center gap-2 sm:gap-3 flex-1 md:max-w-96 w-full'>
         {/* Search input */}
         <div className='flex items-center border border-primaryBorder py-2 px-3 rounded-md flex-1 w-full xl:max-w-72 2xl:max-w-80'>
-          <Icon
-            icon={searchIcon}
+          <SearchIcon
             className='w-3.5 h-3.5 text-[#05060F99]'
             aria-hidden='true'
           />

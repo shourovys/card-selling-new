@@ -1,9 +1,8 @@
 import { cn } from '@/lib/utils';
-import { TButtonColor, TButtonSize } from './Button';
 
 interface IProps {
-  size?: TButtonSize;
-  color?: TButtonColor;
+  size?: 'sm' | 'default' | 'lg';
+  color?: 'primary';
 }
 
 function LoadingSvg({ size = 'default', color }: IProps) {

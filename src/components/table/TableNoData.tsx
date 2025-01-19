@@ -1,4 +1,4 @@
-import { TABLE_ROW_HEIGHT, TABLE_ROW_PER_PAGE } from '@/config/config';
+import { TABLE_ROW_HEIGHT } from '@/config/config';
 import EmptyContent from '../common/EmptyContent';
 
 interface IProps {
@@ -9,12 +9,15 @@ interface IProps {
 
 export default function TableNoData({
   isNotFound,
-  tableRowPerPage = TABLE_ROW_PER_PAGE,
+  // tableRowPerPage = TABLE_ROW_PER_PAGE,
   tableRowHeight = TABLE_ROW_HEIGHT,
 }: IProps) {
   if (isNotFound) {
     return (
-      <div className='flex' style={{ height: 5 * tableRowHeight }}>
+      <div
+        className='flex w-full min-w-max'
+        style={{ height: 5 * tableRowHeight }}
+      >
         <EmptyContent title='No Data Found!' />
       </div>
     );

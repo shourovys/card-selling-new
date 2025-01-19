@@ -1,8 +1,7 @@
-import { TButtonSize } from './Button';
 import LoadingSvg from './LoadingSvg';
 
 interface IProps {
-  size?: TButtonSize;
+  size?: 'sm' | 'default' | 'lg';
 }
 
 function LoadingTextWithSvg({ size }: IProps) {

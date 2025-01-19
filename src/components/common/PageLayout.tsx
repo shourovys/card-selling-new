@@ -1,5 +1,5 @@
 import React from 'react';
-import Breadcrumbs from './Breadcrumbs';
+// import Breadcrumbs from './Breadcrumbs';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -8,11 +8,11 @@ interface PageLayoutProps {
 
 const PageLayout: React.FC<PageLayoutProps> = ({
   children,
-  showBreadcrumbs = true,
+  // showBreadcrumbs = true,
 }) => {
   return (
     <div className='space-y-4'>
-      {showBreadcrumbs && <Breadcrumbs />}
+      {/* {showBreadcrumbs && <Breadcrumbs />} */}
       {children}
     </div>
   );
