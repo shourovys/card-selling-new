@@ -78,7 +78,7 @@ export function DatePickerField<T extends FieldValues>({
             <FormLabel className='flex gap-1 items-center'>
               {label}
               {smallLabel && (
-                <span className='text-small text-muted-foreground'>
+                <span className='text-small text-muted-foreground leading-none'>
                   {smallLabel}
                 </span>
               )}

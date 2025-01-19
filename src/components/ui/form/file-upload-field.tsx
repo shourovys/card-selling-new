@@ -56,7 +56,7 @@ export function FileUploadField<T extends FieldValues>({
   maxSize = 5, // in MB
   preview = true,
   disabled = false,
-  height = 170,
+  height = 146,
 }: FileUploadFieldProps<T>) {
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -104,12 +104,12 @@ export function FileUploadField<T extends FieldValues>({
       control={form.control}
       name={name}
       render={() => (
-        <FormItem className={className} style={{ height }}>
+        <FormItem className={className}>
           {label && (
             <FormLabel className='flex gap-1 items-center'>
               {label}
               {smallLabel && (
-                <span className='text-small text-muted-foreground'>
+                <span className='text-small text-muted-foreground leading-none'>
                   {smallLabel}
                 </span>
               )}
@@ -120,11 +120,12 @@ export function FileUploadField<T extends FieldValues>({
             <div
               className={cn(
                 'relative rounded-lg border border-dashed transition-colors min-h-max flex items-center justify-center',
+
                 isDragActive && 'border-primary bg-primary/5',
                 error && 'border-destructive',
                 disabled && 'opacity-50 cursor-not-allowed'
               )}
-              style={{ height: height - 24 }}
+              style={{ height: height }}
             >
               {preview && value ? (
                 <div className='flex justify-center items-center p-2'>
@@ -134,7 +135,7 @@ export function FileUploadField<T extends FieldValues>({
                         <div
                           className='flex justify-center items-center p-2'
                           style={{
-                            height: disabled ? height - 50 : height - 82,
+                            height: disabled ? height - 22 : height - 54,
                           }}
                         >
                           <img
@@ -145,12 +146,12 @@ export function FileUploadField<T extends FieldValues>({
                           />
                         </div>
                         {!disabled && (
-                          <div className='flex w-full border-t divide-x'>
+                          <div className='flex w-full border-t'>
                             <Button
                               type='button'
                               variant='ghost'
                               size='sm'
-                              className='flex-1 h-[32px] text-[10px] rounded-none border-r text-secondary hover:bg-secondary/20'
+                              className='flex-1 h-[32px] text-[10px] rounded-none border-r text-secondary hover:bg-secondary/20 border-r'
                               onClick={() => setPreviewOpen(true)}
                             >
                               PREVIEW
@@ -191,7 +192,7 @@ export function FileUploadField<T extends FieldValues>({
                 <div
                   {...getRootProps()}
                   className={cn(
-                    'flex justify-center items-center p-2 h-full min-h-max',
+                    'flex justify-center items-center p-2 w-full h-full min-h-max',
                     !disabled && 'cursor-pointer'
                   )}
                 >
@@ -244,8 +245,8 @@ export function FileUploadField<T extends FieldValues>({
 
           {/* Delete Dialog */}
           <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-            <DialogContent>
-              <DialogHeader>
+            <DialogContent className=''>
+              <DialogHeader className=''>
                 <DialogTitle>Delete File</DialogTitle>
               </DialogHeader>
               <p className='text-sm text-muted-foreground'>
