@@ -41,35 +41,29 @@ export default function AdditionalCategoryTableRow({
 }: AdditionalCategoryTableRowProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const { trigger: deleteCategory, isMutating: isDeleting } = useSWRMutation(
-    BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.DELETE(category.id),
-    sendDeleteRequest,
-    {
-      onSuccess: () => {
-        toast({
-          title: 'Success',
-          description: 'Additional category deleted successfully',
-        });
-        onDelete();
-      },
-    }
-  );
-
-  const handleDelete = async () => {
-    try {
-      await deleteCategory();
-      onDelete();
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setDeleteDialogOpen(false);
-    }
-  };
+  const { trigger: deleteAddtionalCategory, isMutating: isDeleting } =
+    useSWRMutation(
+      BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.DELETE(category.id),
+      sendDeleteRequest,
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Success',
+            description: 'Additional category deleted successfully',
+          });
+          onDelete();
+          setDeleteDialogOpen(false);
+        },
+        onError: (error) => {
+          console.error('Error deleting category:', error);
+          toast({
+            title: 'Error',
+            description: 'Something went wrong. Please try again.',
+            variant: 'destructive',
+          });
+        },
+      }
+    );
 
   return (
     <>
@@ -153,7 +147,7 @@ export default function AdditionalCategoryTableRow({
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
+              onClick={() => deleteAddtionalCategory()}
               disabled={isDeleting}
               className='bg-destructive hover:bg-destructive/90'
             >
