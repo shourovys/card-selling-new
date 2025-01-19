@@ -103,7 +103,7 @@ export default function AdditionalCategoryTableRow({
           {category.position}
         </TableData>
         <TableData>{category.createdBy}</TableData>
-        <TableData className='pr-4 text-right'>
+        <TableData className='pr-1 text-right'>
           <div className='flex gap-1 justify-end items-center'>
             <Button
               variant='ghost'
