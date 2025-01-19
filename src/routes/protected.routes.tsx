@@ -14,7 +14,7 @@ export const protectedRoutes: AppRoute[] = [
     auth: true,
     children: [
       {
-        path: '/',
+        path: '/dashboard',
         element: React.createElement(Dashboard),
         title: 'Dashboard',
         breadcrumb: 'Dashboard',

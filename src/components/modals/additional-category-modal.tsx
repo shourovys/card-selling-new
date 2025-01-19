@@ -83,7 +83,7 @@ export function AdditionalCategoryModal({
     view: 'View Additional Category',
   }[mode];
 
-  const form = useForm<IAdditionalCategoryFormValues>({
+  const form = useForm({
     resolver: zodResolver(additionalCategoryFormSchema),
     defaultValues: getInitialValues(mode, category),
   });
@@ -205,7 +205,7 @@ export function AdditionalCategoryModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className='max-w-[800px] p-0'>
-        <DialogHeader className='py-6 px-8 border-b'>
+        <DialogHeader className='px-8 py-6 border-b'>
           <DialogTitle className='text-lg font-medium'>
             {modalTitle}
           </DialogTitle>
@@ -214,10 +214,10 @@ export function AdditionalCategoryModal({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <div className='px-8 py-4 pb-8 max-h-[calc(100vh-200px)] overflow-y-auto'>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
                 {/* Left Column */}
                 <div className='space-y-6'>
-                  <InputField<IAdditionalCategoryFormValues>
+                  <InputField
                     name='name'
                     form={form}
                     label='Category Name'
@@ -225,7 +225,7 @@ export function AdditionalCategoryModal({
                     disabled={isViewMode}
                   />
 
-                  <InputField<IAdditionalCategoryFormValues>
+                  <InputField
                     name='description'
                     form={form}
                     label='Description'
@@ -234,16 +234,11 @@ export function AdditionalCategoryModal({
                     disabled={isViewMode}
                   />
 
-                  <ServerSelectField<IAdditionalCategoryFormValues>
+                  <ServerSelectField
                     name='position'
                     form={form}
                     label='Display Order'
                     smallLabel='(Select previous category)'
-                    // description={
-                    //   mode === 'edit'
-                    //     ? 'Leave empty to keep current position'
-                    //     : undefined
-                    // }
                     loadOptions={loadOptions}
                     disabled={isViewMode || isLoadingPreviousCategory}
                     minCharacters={3}
@@ -255,7 +250,7 @@ export function AdditionalCategoryModal({
 
                 {/* Right Column */}
                 <div className='space-y-6'>
-                  <FileUploadField<IAdditionalCategoryFormValues>
+                  <FileUploadField
                     name='icon'
                     form={form}
                     label='Icon'
@@ -268,7 +263,7 @@ export function AdditionalCategoryModal({
                     maxSize={1}
                   />
 
-                  <RadioGroupField<IAdditionalCategoryFormValues>
+                  <RadioGroupField
                     name='status'
                     form={form}
                     label='Status'
@@ -287,7 +282,7 @@ export function AdditionalCategoryModal({
 
                 {/* Categories Multi-Select */}
                 <div className='col-span-2'>
-                  <MultiSelectField<IAdditionalCategoryFormValues>
+                  <MultiSelectField
                     name='categoryIds'
                     form={form}
                     label='Select Categories'
@@ -302,7 +297,7 @@ export function AdditionalCategoryModal({
               </div>
             </div>
 
-            <DialogFooter className='py-6 px-8 border-t gap-2'>
+            <DialogFooter className='gap-2 px-8 py-6 border-t'>
               {isViewMode ? (
                 <Button
                   type='button'

@@ -175,7 +175,7 @@ export function TestForm() {
               name='serverSelect'
               form={form}
               label='Server Select Field'
-              fetchOptions={fetchServerOptions}
+              loadOptions={fetchServerOptions}
               required
               loadingMessage='Loading results...'
               noOptionsMessage='No options found'
