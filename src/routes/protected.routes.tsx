@@ -11,7 +11,7 @@ const Product = lazy(() => import('../pages/product/product'));
 const ProductBundle = lazy(
   () => import('../pages/product-bundle/product-bundle')
 );
-
+const Role = lazy(() => import('../pages/role/role'));
 export const protectedRoutes: AppRoute[] = [
   {
     element: React.createElement(DashboardLayout),
@@ -55,6 +55,14 @@ export const protectedRoutes: AppRoute[] = [
         title: 'Product Bundle',
         breadcrumb: 'Product Bundle',
         roles: ['System Admin', 'Distributor', 'Sub Distributor'],
+        auth: true,
+      },
+      {
+        path: '/role',
+        element: React.createElement(Role),
+        title: 'Role',
+        breadcrumb: 'Role',
+        roles: ['System Admin'],
         auth: true,
       },
     ],

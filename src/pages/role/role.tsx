@@ -2,8 +2,8 @@ import { sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
-import { CategoryModal } from '@/components/modals/category-modal';
-import CategoryTableRow from '@/components/pages/category/CategoryTableRow';
+import { RoleModal } from '@/components/modals/role-modal';
+import { RoleTableRow } from '@/components/pages/role/RoleTableRow';
 import Table from '@/components/table/Table';
 import TableHeader from '@/components/table/TableHeader';
 import TableNoData from '@/components/table/TableNoData';
@@ -13,46 +13,43 @@ import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
 import useTable from '@/hooks/useTable';
-import { Category } from '@/lib/validations/category';
+import { Role, RoleFormValues } from '@/lib/validations/role';
 import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import {
-  CategoryApiQueryParams,
-  CategoryFilter,
-  ICategoryPayload,
-  ICategoryResponse,
-} from '@/types/features/category';
+  IPermissionGroupResponse,
+  IPermissionResponse,
+  IRoleResponse,
+} from '@/types/features/role';
 import { Plus } from 'lucide-react';
 import QueryString from 'qs';
 import { useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-export default function CategoryManagement() {
+export default function RoleManagement() {
   // Table state management
   const { rowsPerPage, order, orderBy, selected, handleSort } = useTable({});
 
   // Define table head columns
   const TABLE_HEAD: ITableHead[] = [
     { id: 'sno', label: 'S.NO', align: 'left' },
-    { id: 'name', label: 'CATEGORIES', align: 'left' },
-    { id: 'status', label: 'STATUS', align: 'left' },
+    { id: 'roleName', label: 'ROLE NAME', align: 'left' },
+    { id: 'permissions', label: 'PERMISSIONS', align: 'left' },
     { id: 'createdAt', label: 'CREATED AT', align: 'left' },
     { id: 'actions', label: 'ACTIONS', align: 'right' },
   ];
 
   // Modal state
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [modalState, setModalState] = useState<{
     open: boolean;
     mode: 'add' | 'edit' | 'view';
   }>({ open: false, mode: 'add' });
 
   // Filter state management
-  const initialFilterState: CategoryFilter = {
+  const initialFilterState = {
     search: '',
   };
 
@@ -60,62 +57,88 @@ export default function CategoryManagement() {
     useFilter(initialFilterState);
 
   // Create query params for API
-  const apiQueryParamsString: CategoryApiQueryParams = {
+  const apiQueryParamsString = QueryString.stringify({
     ...(filterState.search && { search: filterState.search }),
-  };
+  });
 
-  // Fetch categories using SWR
-  const { data, error, mutate, isLoading } = useSWR<
-    IApiResponse<ICategoryResponse>
-  >(
-    BACKEND_ENDPOINTS.CATEGORY.LIST(QueryString.stringify(apiQueryParamsString))
+  // Fetch roles using SWR
+  const {
+    data: rolesData,
+    mutate: mutateRoles,
+    isLoading,
+  } = useSWR<IApiResponse<IRoleResponse>>(
+    BACKEND_ENDPOINTS.ROLE.LIST(apiQueryParamsString)
   );
 
-  const categories = data?.data?.categories || [];
+  const { data: permissionsData } = useSWR<IApiResponse<IPermissionResponse>>(
+    BACKEND_ENDPOINTS.ROLE.PERMISSIONS
+  );
+
+  const { data: permissionGroupsData } = useSWR<
+    IApiResponse<IPermissionGroupResponse>
+  >(BACKEND_ENDPOINTS.ROLE.PERMISSION_GROUPS);
+
+  const roles = rolesData?.data?.roles || [];
+  const permissions = permissionsData?.data?.permissions || [];
+  const permissionGroups = permissionGroupsData?.data?.permissionGroups || [];
 
   // Modal handlers
-  const handleModalOpen = (
-    mode: 'add' | 'edit' | 'view',
-    category?: Category
-  ) => {
-    setSelectedCategory(category || null);
+  const handleModalOpen = (mode: 'add' | 'edit' | 'view', role?: Role) => {
+    setSelectedRole(role || null);
     setModalState({ open: true, mode });
   };
 
   const handleModalClose = () => {
     setModalState({ open: false, mode: 'add' });
-    setSelectedCategory(null);
+    setSelectedRole(null);
   };
 
   const { trigger: createTrigger, isMutating: isCreating } = useSWRMutation(
-    BACKEND_ENDPOINTS.CATEGORY.CREATE,
+    BACKEND_ENDPOINTS.ROLE.CREATE,
     sendPostRequest
   );
 
   const { trigger: updateTrigger, isMutating: isUpdating } = useSWRMutation(
-    BACKEND_ENDPOINTS.CATEGORY.UPDATE(selectedCategory?.id || 0),
+    selectedRole ? BACKEND_ENDPOINTS.ROLE.UPDATE(selectedRole.id) : null,
     sendPutRequest
   );
 
   // API handlers
-  const handleSubmit = async (payload: ICategoryPayload) => {
+  const handleSubmit = async (formData: RoleFormValues) => {
     try {
-      if (modalState.mode === 'edit' && selectedCategory) {
+      const payload = {
+        metaInfo: {
+          deviceID: 'web',
+          deviceType: 'web',
+          deviceInfo: {
+            deviceID: 'web',
+            deviceType: 'web',
+            notificationToken: '',
+          },
+        },
+        attribute: {
+          roleName: formData.roleName,
+          permissions: formData.permissions,
+        },
+      };
+
+      if (modalState.mode === 'edit' && selectedRole) {
         await updateTrigger(payload);
         toast({
           title: 'Success',
-          description: 'Category updated successfully',
+          description: 'Role updated successfully',
         });
       } else {
         await createTrigger(payload);
         toast({
           title: 'Success',
-          description: 'Category created successfully',
+          description: 'Role created successfully',
         });
       }
-      mutate(); // Refresh the categories list
+      mutateRoles();
+      handleModalClose();
     } catch (error) {
-      console.error('Error submitting category:', error);
+      console.error('Error submitting role:', error);
       toast({
         title: 'Error',
         description: 'Something went wrong. Please try again.',
@@ -125,26 +148,26 @@ export default function CategoryManagement() {
   };
 
   const onDelete = () => {
-    mutate(); // Refresh the categories list
+    mutateRoles();
   };
 
   // Check if no data is found
-  const isNotFound = !categories.length && !isLoading && !error;
+  const isNotFound = !roles.length && !isLoading;
 
   const breadcrumbItems = [
     { label: 'Dashboard', href: routePaths.dashboard },
-    { label: 'Category' },
+    { label: 'Role' },
   ];
 
   return (
     <div className='min-h-screen bg-gray-50/50'>
-      <div className=''>
-        <Breadcrumbs items={breadcrumbItems} title='Category Management' />
+      <div>
+        <Breadcrumbs items={breadcrumbItems} title='Role Management' />
 
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>
             <Input
-              placeholder='Search categories...'
+              placeholder='Search roles...'
               value={filterState.search}
               onChange={(e) =>
                 handleFilterInputChange('search', e.target.value)
@@ -157,7 +180,7 @@ export default function CategoryManagement() {
               className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
             >
               <Plus className='mr-2 w-4 h-4' />
-              Add Category
+              Add Role
             </Button>
           </div>
 
@@ -166,26 +189,21 @@ export default function CategoryManagement() {
               order={order}
               orderBy={orderBy}
               numSelected={selected.length}
-              rowCount={categories.length || 0}
+              rowCount={roles.length || 0}
               handleSort={handleSort}
               headerData={TABLE_HEAD}
             />
             <tbody>
               {!isLoading &&
-                categories.map((category, index) => (
-                  <CategoryTableRow
-                    key={category.id}
-                    category={category}
+                roles.map((role: Role, index: number) => (
+                  <RoleTableRow
+                    key={role.id}
+                    role={role}
                     index={index}
                     handleModalOpen={handleModalOpen}
                     onDelete={onDelete}
                   />
                 ))}
-              {/* <TableEmptyRows
-                emptyRows={
-                  data ? emptyRows(page, rowsPerPage, categories.length) : 0
-                }
-              /> */}
             </tbody>
           </Table>
 
@@ -195,25 +213,27 @@ export default function CategoryManagement() {
             isLoading={isLoading}
             tableRowPerPage={rowsPerPage}
           />
-
-          {/* <Pagination
-            totalRows={categories.length || 0}
-            currentPage={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          /> */}
         </Card>
       </div>
 
-      <CategoryModal
+      <RoleModal
         open={modalState.open}
         onClose={handleModalClose}
         onSubmit={handleSubmit}
         mode={modalState.mode}
-        category={selectedCategory || undefined}
-        categories={categories || []}
+        role={
+          selectedRole
+            ? {
+                roleName: selectedRole.roleName,
+                permissions: selectedRole.permissions.map(
+                  (p) => p.permissionName
+                ),
+              }
+            : undefined
+        }
         isSubmitting={isCreating || isUpdating}
+        permissions={permissions}
+        permissionGroups={permissionGroups}
       />
     </div>
   );

@@ -16,6 +16,9 @@ export interface IMetaData {
 
 export interface IApiResponse<T> {
   data: T;
+  message: string;
+  status: number;
+  success: boolean;
 }
 
 export interface IFormSubmissionResponse {
@@ -23,18 +26,13 @@ export interface IFormSubmissionResponse {
 }
 
 export interface IRequestMetaInfo {
-  requestId: string;
-  source: string;
-  versionCode: string;
-  versionName: string;
-  networkType: string;
   deviceID: string;
-  deviceOSCode: number;
-  deviceOSName: string;
-  deviceName: string;
-  language: string;
-  latitude: number;
-  longitude: number;
+  deviceType: string;
+  deviceInfo: {
+    deviceID: string;
+    deviceType: string;
+    notificationToken: string;
+  };
 }
 
 export interface IApiRequestWithMetaData<T> {

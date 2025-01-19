@@ -57,6 +57,16 @@ const BACKEND_ENDPOINTS = {
   CURRENCY: {
     LIST: '/api/v1/private/all/currency',
   },
+
+  ROLE: {
+    LIST: (queryString: string) =>
+      `/api/v1/private/roles${queryString ? `?${queryString}` : ''}`,
+    CREATE: 'api/v1/private/roles',
+    UPDATE: (id: number) => `/api/v1/private/role?id=${id}`,
+    DELETE: (id: number) => `/api/v1/private/role?id=${id}`,
+    PERMISSIONS: '/api/v1/private/get-all-app-permissions',
+    PERMISSION_GROUPS: '/api/v1/private/get-all-app-groups',
+  },
 } as const;
 
 export default BACKEND_ENDPOINTS;
