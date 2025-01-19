@@ -152,8 +152,8 @@ export default function CategoryManagement() {
       <div className=''>
         <Breadcrumbs items={breadcrumbItems} title='Category Management' />
 
-        <Card className='bg-white shadow-sm p-6'>
-          <div className='flex justify-between items-center mb-6'>
+        <Card className='bg-white shadow-sm space-y-4 p-6'>
+          <div className='flex justify-between items-center pb-2'>
             <Input
               placeholder='Search categories...'
               value={filterState.search}

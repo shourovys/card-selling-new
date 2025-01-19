@@ -167,8 +167,8 @@ export default function AdditionalCategoryManagement() {
           title='Additional Category Management'
         />
 
-        <Card className='bg-white shadow-sm p-6'>
-          <div className='flex justify-between items-center mb-6'>
+        <Card className='p-6 space-y-4 bg-white shadow-sm'>
+          <div className='flex justify-between items-center pb-2'>
             <Input
               placeholder='Search categories...'
               value={filterState.search}
@@ -180,7 +180,7 @@ export default function AdditionalCategoryManagement() {
             <Button
               onClick={() => handleModalOpen('add')}
               size='sm'
-              className='bg-rose-500 hover:bg-rose-600 text-white h-10 px-4'
+              className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
             >
               <Plus className='mr-2 w-4 h-4' />
               Add Additional Category
