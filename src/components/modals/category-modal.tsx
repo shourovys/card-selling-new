@@ -122,10 +122,10 @@ export function CategoryModal({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <div className='px-8 py-6 max-h-[calc(100vh-200px)] overflow-y-auto'>
+            <div className='px-8 py-8 max-h-[calc(100vh-200px)] overflow-y-auto'>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                 {/* Left Column */}
-                <div className='space-y-4'>
+                <div className='space-y-6'>
                   <InputField
                     name='name'
                     form={form}
@@ -166,7 +166,7 @@ export function CategoryModal({
                 </div>
 
                 {/* Right Column */}
-                <div className='space-y-4'>
+                <div className='space-y-6'>
                   <FileUploadField
                     name='icon'
                     form={form}
@@ -176,8 +176,7 @@ export function CategoryModal({
                     preview
                     required={mode === 'add'}
                     disabled={isViewMode}
-                    className='h-[154px]'
-                    acceptedTypes={['JPG', 'PNG']}
+                    acceptedTypes={['image/jpeg', 'image/png']}
                     maxSize={1}
                   />
 

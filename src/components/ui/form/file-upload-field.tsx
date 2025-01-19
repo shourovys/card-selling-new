@@ -39,6 +39,7 @@ interface FileUploadFieldProps<T extends FieldValues>
   preview?: boolean;
   disabled?: boolean;
   height?: number;
+  maxHeight?: number;
 }
 
 export function FileUploadField<T extends FieldValues>({
@@ -55,7 +56,7 @@ export function FileUploadField<T extends FieldValues>({
   maxSize = 5, // in MB
   preview = true,
   disabled = false,
-  height = 154,
+  height = 170,
 }: FileUploadFieldProps<T>) {
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -103,7 +104,7 @@ export function FileUploadField<T extends FieldValues>({
       control={form.control}
       name={name}
       render={() => (
-        <FormItem className={className}>
+        <FormItem className={className} style={{ height }}>
           {label && (
             <FormLabel className='flex gap-1 items-center'>
               {label}
@@ -118,31 +119,35 @@ export function FileUploadField<T extends FieldValues>({
           <FormControl>
             <div
               className={cn(
-                'relative rounded-lg border-2 border-dashed transition-colors',
+                'relative rounded-lg border border-dashed transition-colors min-h-max flex items-center justify-center',
                 isDragActive && 'border-primary bg-primary/5',
                 error && 'border-destructive',
-                disabled && 'opacity-50 cursor-not-allowed',
-                !disabled && 'hover:border-primary/50 hover:bg-primary/5'
+                disabled && 'opacity-50 cursor-not-allowed'
               )}
+              style={{ height: height - 24 }}
             >
               {preview && value ? (
-                <div className='flex justify-center items-center p-4 h-full'>
-                  <div className='overflow-hidden rounded-md border bg-background'>
+                <div className='flex justify-center items-center p-2'>
+                  <div className='overflow-hidden rounded-md border bg-background w-fit mx-auto'>
                     {previewUrl ? (
                       <div className='flex flex-col'>
                         <div
                           className='flex justify-center items-center p-2'
-                          style={{ height: height - 50 }}
+                          style={{
+                            height: disabled ? height - 50 : height - 82,
+                          }}
                         >
                           <img
                             src={previewUrl}
                             alt='Preview'
-                            className='object-contain max-w-full max-h-full'
+                            className='max-w-full max-h-full object-contain'
+                            style={{ maxHeight: '100%' }}
                           />
                         </div>
                         {!disabled && (
                           <div className='flex w-full border-t divide-x'>
                             <Button
+                              type='button'
                               variant='ghost'
                               size='sm'
                               className='flex-1 h-[32px] text-[10px] rounded-none border-r text-secondary hover:bg-secondary/20'
@@ -151,6 +156,7 @@ export function FileUploadField<T extends FieldValues>({
                               PREVIEW
                             </Button>
                             <Button
+                              type='button'
                               variant='ghost'
                               size='sm'
                               className='flex-1 h-[32px] text-[10px] rounded-none text-destructive hover:bg-destructive/10 hover:text-destructive'
@@ -168,6 +174,7 @@ export function FileUploadField<T extends FieldValues>({
                         </div>
                         {!disabled && (
                           <Button
+                            type='button'
                             variant='ghost'
                             size='sm'
                             className='text-xs text-destructive hover:bg-destructive/10 hover:text-destructive'
@@ -183,7 +190,10 @@ export function FileUploadField<T extends FieldValues>({
               ) : (
                 <div
                   {...getRootProps()}
-                  className='flex justify-center items-center p-2 h-full'
+                  className={cn(
+                    'flex justify-center items-center p-2 h-full min-h-max',
+                    !disabled && 'cursor-pointer'
+                  )}
                 >
                   <input {...inputProps} accept={acceptedTypes.join(',')} />
                   <div className='flex flex-col gap-2 items-center text-center'>
@@ -213,6 +223,7 @@ export function FileUploadField<T extends FieldValues>({
             <DialogContent className='p-0 max-w-3xl'>
               <div className='relative'>
                 <Button
+                  type='button'
                   size='icon'
                   variant='destructive'
                   className='absolute top-2 right-2 z-10'
@@ -242,12 +253,17 @@ export function FileUploadField<T extends FieldValues>({
               </p>
               <DialogFooter className='gap-2 sm:gap-0'>
                 <Button
+                  type='button'
                   variant='outline'
                   onClick={() => setDeleteDialogOpen(false)}
                 >
                   Cancel
                 </Button>
-                <Button variant='destructive' onClick={handleDelete}>
+                <Button
+                  type='button'
+                  variant='destructive'
+                  onClick={handleDelete}
+                >
                   Delete
                 </Button>
               </DialogFooter>
