@@ -34,6 +34,15 @@ const BACKEND_ENDPOINTS = {
         `/api/v1/private/all/additionalCategories?position=${position}`,
     },
   },
+
+  // Products
+  PRODUCT: {
+    LIST: (queryString: string = '') =>
+      `/api/v1/private/all/products${queryString ? `?${queryString}` : ''}`,
+    CREATE: '/api/v1/private/save/product',
+    UPDATE: (id: number) => `/api/v1/private/update/product/${id}`,
+    DELETE: (id: number) => `/api/v1/private/delete/product/${id}`,
+  },
 } as const;
 
 export default BACKEND_ENDPOINTS;

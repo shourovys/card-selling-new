@@ -7,6 +7,7 @@ const Category = lazy(() => import('../pages/category/category'));
 const AdditionalCategory = lazy(
   () => import('../pages/category/additional-category')
 );
+const Product = lazy(() => import('../pages/product/product'));
 
 export const protectedRoutes: AppRoute[] = [
   {
@@ -34,6 +35,14 @@ export const protectedRoutes: AppRoute[] = [
         element: React.createElement(AdditionalCategory),
         title: 'Additional Category',
         breadcrumb: 'Additional Category',
+        roles: ['System Admin', 'Distributor', 'Sub Distributor'],
+        auth: true,
+      },
+      {
+        path: '/product',
+        element: React.createElement(Product),
+        title: 'Product',
+        breadcrumb: 'Product',
         roles: ['System Admin', 'Distributor', 'Sub Distributor'],
         auth: true,
       },
