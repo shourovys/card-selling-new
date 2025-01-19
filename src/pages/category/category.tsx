@@ -12,12 +12,11 @@ import TableNoData from '@/components/table/TableNoData';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { getMetaInfo } from '@/getMetaInfo';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
 import useTable, { emptyRows } from '@/hooks/useTable';
 import { CategoryResponse } from '@/lib/api/category';
-import { Category, CategoryFormValues } from '@/lib/validations/category';
+import { Category } from '@/lib/validations/category';
 import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
@@ -102,36 +101,26 @@ export default function CategoryManagement() {
     setSelectedCategory(null);
   };
 
-  const { trigger: createTrigger } = useSWRMutation(
+  const { trigger: createTrigger, isMutating: isCreating } = useSWRMutation(
     BACKEND_ENDPOINTS.CATEGORY.CREATE,
     sendPostRequest
   );
 
-  const { trigger: updateTrigger } = useSWRMutation(
+  const { trigger: updateTrigger, isMutating: isUpdating } = useSWRMutation(
     BACKEND_ENDPOINTS.CATEGORY.UPDATE(selectedCategory?.id || 0),
     sendPutRequest
   );
 
   // API handlers
-  const handleSubmit = async (values: CategoryFormValues) => {
+  const handleSubmit = async (payload: ICategoryPayload) => {
     try {
       if (modalState.mode === 'edit' && selectedCategory) {
-        await updateTrigger(values);
+        await updateTrigger(payload);
         toast({
           title: 'Success',
           description: 'Category updated successfully',
         });
       } else {
-        const payload: ICategoryPayload = {
-          metaInfo: getMetaInfo(),
-          attribute: {
-            name: values.name,
-            description: values.description,
-            status: values.status === 'active',
-            icon: values.icon,
-            position: values.position ? parseInt(values.position) + 1 : null,
-          },
-        };
         await createTrigger(payload);
         toast({
           title: 'Success',
@@ -238,6 +227,7 @@ export default function CategoryManagement() {
         mode={modalState.mode}
         category={selectedCategory || undefined}
         categories={categories || []}
+        isSubmitting={isCreating || isUpdating}
       />
     </div>
   );

@@ -11,11 +11,14 @@ import { FileUploadField } from '@/components/ui/form/file-upload-field';
 import { InputField } from '@/components/ui/form/input-field';
 import { RadioGroupField } from '@/components/ui/form/radio-group-field';
 import { SelectField } from '@/components/ui/form/select-field';
+import { getMetaInfo } from '@/getMetaInfo';
 import {
   Category,
   CategoryFormValues,
   categoryFormSchema,
 } from '@/lib/validations/category';
+import { ICategoryPayload } from '@/types/features/category';
+import fileToBase64 from '@/utils/fileToBase64';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -23,10 +26,11 @@ import { useForm } from 'react-hook-form';
 interface CategoryModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (values: CategoryFormValues) => Promise<void>;
+  onSubmit: (values: ICategoryPayload) => Promise<void>;
   mode: 'add' | 'edit' | 'view';
   category?: Category;
   categories?: Category[];
+  isSubmitting: boolean;
 }
 
 // Find the category that comes before the current one
@@ -76,6 +80,7 @@ export function CategoryModal({
   mode = 'add',
   category,
   categories = [],
+  isSubmitting,
 }: CategoryModalProps) {
   const isViewMode = mode === 'view';
   const modalTitle = {
@@ -100,7 +105,36 @@ export function CategoryModal({
     if (isViewMode) return;
 
     try {
-      await onSubmit(values);
+      const payload: ICategoryPayload = {
+        metaInfo: getMetaInfo(),
+        attribute: {
+          name: values.name,
+          description: values.description,
+          status: values.status === 'active',
+          position: null,
+          icon: null,
+        },
+      };
+
+      // Handle position based on display order selection
+      if (values.position) {
+        const selectedCategory = categories.find(
+          (cat) => cat.id === Number(values.position)
+        );
+        if (selectedCategory) {
+          payload.attribute.position = selectedCategory.position + 1;
+        }
+      } else if (mode === 'edit' && category) {
+        payload.attribute.position = category.position || null;
+      }
+
+      // Convert icon to base64 if it exists and is a File object
+      if (values.icon && values.icon.type?.startsWith('image/')) {
+        const iconBase64 = await fileToBase64(values.icon);
+        payload.attribute.icon = iconBase64;
+      }
+
+      await onSubmit(payload);
       onClose();
       form.reset();
     } catch (error) {
@@ -215,6 +249,7 @@ export function CategoryModal({
                     {mode === 'add' ? 'Clear' : 'Cancel'}
                   </Button>
                   <Button
+                    disabled={isSubmitting}
                     type='submit'
                     className='min-w-[120px] min-h-[36px] bg-primary hover:bg-primary/90'
                   >
