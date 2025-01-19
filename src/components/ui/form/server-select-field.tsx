@@ -1,5 +1,6 @@
 import {
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -63,20 +64,23 @@ const selectStyles: StylesConfig<ServerSelectOption, false> = {
   control: (base, state) => ({
     ...base,
     minHeight: '40px',
-    backgroundColor: state.isDisabled
-      ? 'hsl(var(--muted))'
-      : 'hsl(var(--background))',
-    border: state.isFocused
-      ? '1px solid hsl(var(--ring))'
-      : '1px solid hsl(var(--input-border))',
+    backgroundColor: 'hsl(var(--background))',
+    border: '1px solid hsl(var(--input-border))',
     borderRadius: 'var(--radius)',
-    boxShadow: state.isFocused ? '0 0 0 1px hsl(var(--ring))' : 'none',
+    boxShadow: 'none',
+    transition: 'all 150ms ease',
     '&:hover': {
-      borderColor: state.isFocused
-        ? 'hsl(var(--ring))'
-        : 'hsl(var(--input-border-hover))',
+      borderColor: 'hsl(var(--input-border-hover))',
     },
-    cursor: state.isDisabled ? 'not-allowed' : 'pointer',
+    '&:focus-within': {
+      outline: 'none',
+      boxShadow: '0 0 0 2px hsl(var(--ring))',
+    },
+    ...(state.isDisabled && {
+      opacity: 0.5,
+      cursor: 'not-allowed',
+      backgroundColor: 'hsl(var(--muted))',
+    }),
   }),
   menu: (base) => ({
     ...base,
@@ -97,6 +101,7 @@ const selectStyles: StylesConfig<ServerSelectOption, false> = {
     paddingTop: 0,
     paddingBottom: 0,
     scrollBehavior: 'auto',
+    pointerEvents: 'auto',
     '::-webkit-scrollbar': {
       width: '8px',
       height: '8px',
@@ -115,39 +120,76 @@ const selectStyles: StylesConfig<ServerSelectOption, false> = {
   }),
   option: (base, state) => ({
     ...base,
-    padding: '8px 16px',
+    padding: '8px 14px',
+    borderRadius: 'var(--radius)',
     backgroundColor: state.isSelected
-      ? 'hsl(var(--accent))'
+      ? 'hsl(var(--secondary))'
       : state.isFocused
       ? 'hsl(var(--accent))'
       : 'transparent',
     color: state.isSelected
-      ? 'hsl(var(--accent-foreground))'
+      ? 'hsl(var(--secondary-foreground))'
       : 'hsl(var(--foreground))',
-    cursor: 'pointer',
+    cursor: state.isDisabled ? 'default' : 'pointer',
+    fontSize: '14px',
+    fontWeight: state.isSelected ? '500' : '400',
+    opacity: state.isDisabled ? 0.5 : 1,
     '&:hover': {
+      backgroundColor: state.isSelected
+        ? 'hsl(var(--secondary))'
+        : 'hsl(var(--accent))',
+    },
+    '&:active': {
       backgroundColor: 'hsl(var(--accent))',
     },
+    userSelect: 'none',
   }),
   input: (base) => ({
     ...base,
     color: 'hsl(var(--foreground))',
+    fontSize: '14px',
+    margin: '0',
+    padding: '0',
   }),
   singleValue: (base) => ({
     ...base,
     color: 'hsl(var(--foreground))',
+    fontSize: '14px',
   }),
   placeholder: (base) => ({
     ...base,
     color: 'hsl(var(--muted-foreground))',
+    fontSize: '14px',
+  }),
+  valueContainer: (base) => ({
+    ...base,
+    padding: '2px 12px',
+  }),
+  indicatorsContainer: (base) => ({
+    ...base,
+    padding: '2px 8px',
+  }),
+  indicatorSeparator: () => ({
+    display: 'none',
+  }),
+  clearIndicator: (base) => ({
+    ...base,
+    padding: '4px',
+    color: 'hsl(var(--muted-foreground))',
+    cursor: 'pointer',
+    '&:hover': {
+      color: 'hsl(var(--foreground))',
+    },
   }),
   loadingMessage: (base) => ({
     ...base,
     color: 'hsl(var(--muted-foreground))',
+    fontSize: '14px',
   }),
   noOptionsMessage: (base) => ({
     ...base,
     color: 'hsl(var(--muted-foreground))',
+    fontSize: '14px',
   }),
 };
 
@@ -194,62 +236,6 @@ export function ServerSelectField<T extends FieldValues>({
 
   React.useEffect(() => {
     setPortalTarget(document.body);
-  }, []);
-
-  // Add wheel event handler for manual scrolling
-  React.useEffect(() => {
-    let isScrolling = false;
-    let animationFrameId: number;
-
-    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
-
-    const handleWheel = (e: WheelEvent) => {
-      const menuList = document.querySelector('.select__menu-list');
-      if (!menuList || !(e.target as HTMLElement).closest('.select__menu-list'))
-        return;
-
-      e.preventDefault();
-      if (isScrolling) {
-        cancelAnimationFrame(animationFrameId);
-      }
-
-      const scrollSpeed = 0.8;
-      const duration = 300; // ms
-      const startTime = performance.now();
-      const startScroll = menuList.scrollTop;
-      const targetDelta = e.deltaY * scrollSpeed;
-      const targetScroll = Math.max(
-        0,
-        Math.min(
-          startScroll + targetDelta,
-          menuList.scrollHeight - menuList.clientHeight
-        )
-      );
-
-      const scroll = (currentTime: number) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easeProgress = easeOutCubic(progress);
-
-        menuList.scrollTop =
-          startScroll + (targetScroll - startScroll) * easeProgress;
-
-        if (progress < 1) {
-          animationFrameId = requestAnimationFrame(scroll);
-          isScrolling = true;
-        } else {
-          isScrolling = false;
-        }
-      };
-
-      animationFrameId = requestAnimationFrame(scroll);
-    };
-
-    document.addEventListener('wheel', handleWheel, { passive: false });
-    return () => {
-      document.removeEventListener('wheel', handleWheel);
-      cancelAnimationFrame(animationFrameId);
-    };
   }, []);
 
   const handleNoOptionsMessage = React.useCallback(
@@ -315,12 +301,12 @@ export function ServerSelectField<T extends FieldValues>({
           {label && (
             <FormLabel className='flex gap-1 items-center'>
               {label}
-              {required && <span className='text-destructive'>*</span>}
               {smallLabel && (
-                <span className='text-small text-muted-foreground leading-none'>
+                <span className='leading-none text-small text-muted-foreground'>
                   {smallLabel}
                 </span>
               )}
+              {required && <span className='text-destructive'>*</span>}
             </FormLabel>
           )}
           <FormControl>
@@ -336,18 +322,15 @@ export function ServerSelectField<T extends FieldValues>({
               menuPosition='fixed'
               closeMenuOnScroll={false}
               captureMenuScroll={false}
+              blurInputOnSelect={true}
               noOptionsMessage={handleNoOptionsMessage}
               loadingMessage={handleLoadingMessage}
               value={field.value}
               onChange={(newValue) => field.onChange(newValue ?? null)}
               onInputChange={handleInputChange}
-              components={{
-                DropdownIndicator,
-              }}
+              components={{ DropdownIndicator }}
               styles={selectStyles}
               theme={customTheme}
-              backspaceRemovesValue={true}
-              blurInputOnSelect={true}
               classNames={{
                 control: () => 'select__control',
                 menu: () => 'select__menu',
@@ -355,11 +338,10 @@ export function ServerSelectField<T extends FieldValues>({
                 option: () => 'select__option',
               }}
               classNamePrefix='select'
+              aria-label={label}
             />
           </FormControl>
-          {description && (
-            <p className='text-sm text-muted-foreground'>{description}</p>
-          )}
+          {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
         </FormItem>
       )}
