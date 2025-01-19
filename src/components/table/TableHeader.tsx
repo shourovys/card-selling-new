@@ -46,7 +46,7 @@ const TableHeader: React.FC<IProps> = ({
             key={item.id}
             scope='col'
             className={cn(
-              'py-4 px-4 text-sm font-semibold text-gray-900 whitespace-nowrap',
+              'py-4 px-1 text-sm font-semibold text-gray-900 whitespace-nowrap',
               {
                 'text-left': !item.align || item.align === 'left',
                 'text-center': item.align === 'center',
