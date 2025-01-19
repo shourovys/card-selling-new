@@ -1,5 +1,7 @@
 import { sendDeleteRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
+import TableData from '@/components/table/TableData';
+import TableRow from '@/components/table/TableRow';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,8 +20,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 import { IAdditionalCategory } from '@/lib/validations/additional-category';
-import { Edit, Eye, MoreHorizontal, Trash } from 'lucide-react';
+import { Edit, Eye, MoreVertical, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
@@ -67,73 +70,76 @@ export default function AdditionalCategoryTableRow({
 
   return (
     <>
-      <tr className='hover:bg-muted/50'>
-        <td className='px-6 py-4 whitespace-nowrap text-sm'>{index + 1}</td>
-        <td className='px-6 py-4 whitespace-nowrap'>
-          <div className='flex items-center gap-4'>
-            <img
-              src={category.icon}
-              alt={category.name}
-              className='w-10 h-10 rounded border p-0.5 object-contain'
-            />
+      <TableRow className='border-b hover:bg-gray-50/50'>
+        <TableData className='pl-4 w-1/12 text-sm'>{index + 1}</TableData>
+        <TableData className='w-1/2'>
+          <div className='flex gap-4 items-center'>
+            <div className='flex-shrink-0'>
+              <img
+                src={category.icon}
+                alt={category.name}
+                className='object-contain p-1 w-10 h-10 bg-white rounded border'
+              />
+            </div>
             <div className='min-w-0'>
-              <p className='text-sm font-medium text-foreground truncate'>
-                {category.name.slice(0, 60)}
+              <p className='font-medium mb-0.5 truncate max-w-[400px]'>
+                {category.name}
               </p>
-              <p className='text-xs text-muted-foreground truncate max-w-[300px]'>
-                {category.description?.slice(0, 60)}
-              </p>
+              <p className='truncate max-w-[400px]'>{category.description}</p>
             </div>
           </div>
-        </td>
-        <td className='px-6 py-4 whitespace-nowrap'>
+        </TableData>
+        <TableData>
           <div
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              category.status
-                ? 'bg-success/10 text-success'
-                : 'bg-destructive/10 text-destructive'
-            }`}
+            className={cn(
+              'inline-flex items-center rounded-full px-3 py-1 font-semibold text-white w-[90px] justify-center',
+              category.status ? 'bg-success' : 'bg-destructive'
+            )}
           >
             {category.status ? 'Active' : 'Inactive'}
           </div>
-        </td>
-        <td className='px-6 py-4 whitespace-nowrap text-sm'>
+        </TableData>
+        <TableData className='w-[200px] text-center'>
           {category.position}
-        </td>
-        <td className='px-6 py-4 whitespace-nowrap text-sm'>
-          {category.createdBy}
-        </td>
-        <td className='px-6 py-4 whitespace-nowrap text-right'>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='icon' className='h-8 w-8 p-0'>
-                <MoreHorizontal className='h-4 w-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuItem
-                onClick={() => handleModalOpen('view', category)}
-              >
-                <Eye className='mr-2 h-4 w-4' />
-                View
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleModalOpen('edit', category)}
-              >
-                <Edit className='mr-2 h-4 w-4' />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setDeleteDialogOpen(true)}
-                className='text-destructive focus:text-destructive'
-              >
-                <Trash className='mr-2 h-4 w-4' />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </td>
-      </tr>
+        </TableData>
+        <TableData>{category.createdBy}</TableData>
+        <TableData className='pr-4 text-right'>
+          <div className='flex gap-1 justify-end items-center'>
+            <Button
+              variant='ghost'
+              size='icon'
+              className='w-8 h-8 hover:bg-gray-100'
+              onClick={() => handleModalOpen('edit', category)}
+            >
+              <Edit className='w-4 h-4 text-gray-500' />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='ghost' className='w-8 h-8 hover:bg-gray-100'>
+                  <span className='sr-only'>Open menu</span>
+                  <MoreVertical className='w-4 h-4 text-gray-500' />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end' className='w-[160px]'>
+                <DropdownMenuItem
+                  onClick={() => handleModalOpen('view', category)}
+                  className='text-sm'
+                >
+                  <Eye className='mr-2 w-4 h-4 text-primary' />
+                  View
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setDeleteDialogOpen(true)}
+                  className='text-sm text-destructive focus:text-destructive'
+                >
+                  <Trash2 className='mr-2 w-4 h-4' />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </TableData>
+      </TableRow>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

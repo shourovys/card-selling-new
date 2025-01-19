@@ -69,7 +69,7 @@ export default function Pagination({
   const to = Math.min(currentPage * rowsPerPage, totalRows);
 
   return (
-    <div className='flex justify-between items-center p-3 pb-1 mb-5 text-sm font-medium md:p-5 sm:px-6'>
+    <div className='flex justify-between items-center p-3 pb-1 text-sm font-medium md:p-5 sm:px-6'>
       {/* Mobile view controls */}
       <div className='flex flex-1 justify-between sm:hidden'>
         <PaginationPrevNextControls

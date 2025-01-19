@@ -2,14 +2,13 @@ import { ReactNode } from 'react';
 
 interface IProps {
   className?: string;
-  align?: 'center' | 'left' | 'right';
   children: ReactNode;
 }
 
-function TableData({ className, align = 'left', children }: IProps) {
+function TableData({ className, children }: IProps) {
   return (
     <td
-      className={`text-sm font-normal px-1 whitespace-nowrap text-[#667085] text-${align} ${className}`}
+      className={`font-normal px-1 whitespace-nowrap text-sm text-muted-foreground  ${className}`}
     >
       {children}
     </td>

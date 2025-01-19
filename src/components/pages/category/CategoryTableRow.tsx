@@ -58,8 +58,8 @@ export default function CategoryTableRow({
   return (
     <>
       <TableRow className='border-b hover:bg-gray-50/50'>
-        <TableData className='py-4 pl-6 w-1/12 text-sm'>{index + 1}</TableData>
-        <TableData className='py-4 w-1/2'>
+        <TableData className='pl-4 w-1/12'>{index + 1}</TableData>
+        <TableData className='w-1/2'>
           <div className='flex gap-4 items-center'>
             <div className='flex-shrink-0'>
               <img
@@ -69,16 +69,12 @@ export default function CategoryTableRow({
               />
             </div>
             <div className='min-w-0'>
-              <p className='font-medium text-sm mb-0.5 truncate'>
-                {category.name}
-              </p>
-              <p className='text-xs truncate text-muted-foreground'>
-                Category for {category.type}
-              </p>
+              <p className='font-medium mb-0.5 truncate'>{category.name}</p>
+              <p className='text-xs truncate'>Category for {category.type}</p>
             </div>
           </div>
         </TableData>
-        <TableData className='py-4'>
+        <TableData>
           <div
             className={cn(
               'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white w-[90px] justify-center',
@@ -88,10 +84,8 @@ export default function CategoryTableRow({
             {category.status ? 'Active' : 'Inactive'}
           </div>
         </TableData>
-        <TableData className='py-4 text-sm text-muted-foreground'>
-          {new Date(category.createdAt).toLocaleString()}
-        </TableData>
-        <TableData className='py-4 pr-6 text-right'>
+        <TableData>{new Date(category.createdAt).toLocaleString()}</TableData>
+        <TableData className='pr-4 text-right'>
           <div className='flex gap-1 justify-end items-center'>
             <Button
               variant='ghost'
