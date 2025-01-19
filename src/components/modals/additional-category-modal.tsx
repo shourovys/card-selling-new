@@ -1,3 +1,4 @@
+import { additionalCategoryApi } from '@/api/additional-category';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,7 +15,6 @@ import { MultiSelectField } from '@/components/ui/form/multi-select-field';
 import { RadioGroupField } from '@/components/ui/form/radio-group-field';
 import { ServerSelectField } from '@/components/ui/form/server-select-field';
 import { getMetaInfo } from '@/getMetaInfo';
-import { additionalCategoryApi } from '@/lib/api/additional-category';
 import {
   IAdditionalCategory,
   IAdditionalCategoryFormValues,

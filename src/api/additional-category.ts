@@ -1,20 +1,19 @@
 import api from '@/config/apiConfig';
 import { IApiResponse } from '@/types/common';
 import { IAdditionalCategoryResponse } from '@/types/features/additional-category';
+import BACKEND_ENDPOINTS from './urls';
 
 export const additionalCategoryApi = {
   getAll: async (queryString: string = '') => {
     const response = await api.get<IApiResponse<IAdditionalCategoryResponse>>(
-      `/api/v1/private/all/additionalCategories${
-        queryString ? `?${queryString}` : ''
-      }`
+      BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.LIST(queryString)
     );
     return response.data;
   },
 
   getByPosition: async (position: string) => {
     const response = await api.get<IApiResponse<IAdditionalCategoryResponse>>(
-      `/api/v1/private/all/additionalCategories?position=${position}`
+      BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.MAPPING.GET_BY_POSITION(position)
     );
     return response.data;
   },
@@ -28,7 +27,7 @@ export const additionalCategoryApi = {
     formData.append('categoryIds', categoryIds.join(','));
 
     const response = await api.post(
-      '/api/v1/private/save/additionalCategoryMapping',
+      BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.MAPPING.CREATE,
       formData
     );
     return response.data;
@@ -39,9 +38,10 @@ export const additionalCategoryApi = {
     categoryIds: number[]
   ) => {
     const response = await api.delete(
-      `/api/v1/private/delete/additionalCategoryMapping?additionalCategoryId=${additionalCategoryId}&categoryIds=${categoryIds.join(
-        ','
-      )}`
+      BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.MAPPING.DELETE(
+        additionalCategoryId,
+        categoryIds
+      )
     );
     return response.data;
   },
