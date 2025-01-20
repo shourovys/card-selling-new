@@ -32,6 +32,8 @@ const BACKEND_ENDPOINTS = {
         )}`,
       GET_BY_POSITION: (position: string) =>
         `/api/v1/private/all/additionalCategories?position=${position}`,
+      GET_BY_CATEGORY_ID: (categoryId: number) =>
+        `/api/v1/private/categoryMapping/${categoryId}`,
     },
   },
 

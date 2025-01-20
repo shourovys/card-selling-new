@@ -1,4 +1,3 @@
-import { productApi } from '@/api/product';
 import { productBundleApi } from '@/api/product-bundle';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
@@ -16,7 +15,6 @@ import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
 import useTable, { emptyRows } from '@/hooks/useTable';
-import { Product } from '@/lib/validations/product';
 import {
   IProductBundlePayload,
   IProductBundleResponse,
@@ -27,7 +25,7 @@ import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import { Plus } from 'lucide-react';
 import QueryString from 'qs';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 
 export default function ProductBundleManagement() {
@@ -64,12 +62,9 @@ export default function ProductBundleManagement() {
   }>({ open: false, mode: 'add' });
 
   // Filter state management
-  const initialFilterState = {
+  const { filterState, handleFilterInputChange } = useFilter({
     search: '',
-  };
-
-  const { filterState, handleFilterInputChange } =
-    useFilter(initialFilterState);
+  });
 
   // Create query params for API
   const apiQueryParamsString = QueryString.stringify({
@@ -78,91 +73,82 @@ export default function ProductBundleManagement() {
     size: rowsPerPage,
   });
 
-  // Fetch product bundles using SWR
+  // Fetch data using SWR
   const { data, error, mutate, isLoading } = useSWR<
     IApiResponse<IProductBundleResponse>
   >(BACKEND_ENDPOINTS.PRODUCT_BUNDLE.LIST(apiQueryParamsString));
 
-  // Fetch currencies for modal
-  const { data: currencyData } = useSWR<
-    IApiResponse<{
-      currencies: { id: number; name: string; exchangeRate: number }[];
-    }>
-  >(BACKEND_ENDPOINTS.CURRENCY.LIST);
-
   const productBundles = data?.data?.productBundlesData?.productBundles || [];
-  const currencies = currencyData?.data?.currencies || [];
 
   // Modal handlers
-  const handleModalOpen = (
-    mode: 'add' | 'edit' | 'view',
-    bundle?: ProductBundle
-  ) => {
-    setSelectedBundle(bundle || null);
-    setModalState({ open: true, mode });
-  };
+  const handleModalOpen = useCallback(
+    async (mode: 'add' | 'edit' | 'view', bundle?: ProductBundle) => {
+      setSelectedBundle(bundle || null);
+      setModalState({ open: true, mode });
+    },
+    []
+  );
 
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setModalState({ open: false, mode: 'add' });
     setSelectedBundle(null);
-  };
+  }, []);
 
-  // Load products for modal
-  const loadProducts = async ({ search }: { search: string }) => {
-    try {
-      const response = await productApi.list(
-        QueryString.stringify({ search, page: 0, size: 10 })
-      );
-      return (
-        response.data?.productsData?.products.map((product: Product) => ({
-          value: product.id.toString(),
-          label: product.name,
-        })) || []
-      );
-    } catch (error) {
-      console.error('Error loading products:', error);
-      return [];
-    }
-  };
-
-  // API handlers
-  const handleSubmit = async (payload: IProductBundlePayload) => {
-    try {
-      if (modalState.mode === 'edit' && selectedBundle) {
-        await productBundleApi.update(selectedBundle.id, payload);
+  // Submit handler
+  const handleSubmit = useCallback(
+    async (payload: IProductBundlePayload) => {
+      try {
+        if (modalState.mode === 'edit' && selectedBundle) {
+          await productBundleApi.update(selectedBundle.id, payload);
+          toast({
+            title: 'Success',
+            description: 'Product bundle updated successfully',
+          });
+        } else {
+          await productBundleApi.create(payload);
+          toast({
+            title: 'Success',
+            description: 'Product bundle created successfully',
+          });
+        }
+        mutate();
+        handleModalClose();
+      } catch (error) {
+        console.error('Error submitting product bundle:', error);
         toast({
-          title: 'Success',
-          description: 'Product bundle updated successfully',
-        });
-      } else {
-        await productBundleApi.create(payload);
-        toast({
-          title: 'Success',
-          description: 'Product bundle created successfully',
+          title: 'Error',
+          description: 'Failed to save product bundle. Please try again.',
+          variant: 'destructive',
         });
       }
-      mutate(); // Refresh the product bundles list
-    } catch (error) {
-      console.error('Error submitting product bundle:', error);
-      toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
-    }
-  };
+    },
+    [modalState.mode, selectedBundle, mutate, handleModalClose]
+  );
 
-  const onDelete = () => {
-    mutate(); // Refresh the product bundles list
-  };
+  // Delete handler
+  const handleDelete = useCallback(() => {
+    mutate();
+  }, [mutate]);
 
-  // Check if no data is found
   const isNotFound = !productBundles.length && !isLoading && !error;
 
   const breadcrumbItems = [
     { label: 'Dashboard', href: routePaths.dashboard },
     { label: 'Product Bundles' },
   ];
+
+  if (error) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='text-center'>
+          <h2 className='text-lg font-semibold text-gray-900'>
+            Error Loading Data
+          </h2>
+          <p className='mt-2 text-gray-600'>Please try refreshing the page.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen bg-gray-50/50'>
@@ -207,20 +193,17 @@ export default function ProductBundleManagement() {
                   <ProductBundleTableRow
                     key={bundle.id}
                     bundle={bundle}
-                    index={(page - 1) * 10 + index}
+                    index={(page - 1) * rowsPerPage + index + 1}
                     handleModalOpen={handleModalOpen}
-                    onDelete={onDelete}
+                    onDelete={handleDelete}
                   />
                 ))}
               <TableEmptyRows
-                emptyRows={
-                  data ? emptyRows(page, rowsPerPage, productBundles.length) : 0
-                }
+                emptyRows={emptyRows(page, rowsPerPage, productBundles.length)}
               />
             </tbody>
           </Table>
 
-          {/* Loading and No Data States */}
           <TableNoData isNotFound={isNotFound} />
           <TableBodyLoading
             isLoading={isLoading}
@@ -243,9 +226,6 @@ export default function ProductBundleManagement() {
         onSubmit={handleSubmit}
         mode={modalState.mode}
         bundle={selectedBundle || undefined}
-        loadProducts={loadProducts}
-        currencies={currencies}
-        additionalCategories={[]} // This will be populated when a product is selected
         isSubmitting={isLoading}
       />
     </div>

@@ -77,11 +77,11 @@ export default function ProductBundleTableRow({
               />
             </div>
             <div className='min-w-0'>
-              <p className='font-medium mb-0.5 truncate'>{bundle.name}</p>
+              <p className='font-medium mb-0.5 truncate max-w-[100px]'>
+                {bundle.name}
+              </p>
               {bundle.description && (
-                <p className='text-xs text-gray-500 truncate'>
-                  {bundle.description}
-                </p>
+                <p className='truncate max-w-[400px]'>{bundle.description}</p>
               )}
             </div>
           </div>
@@ -89,10 +89,13 @@ export default function ProductBundleTableRow({
         <TableData className='w-1/6'>
           <div className='space-y-1'>
             <p className='font-medium'>
-              {bundle.currency} {bundle.salePrice}
+              {/* {bundle.currency}  */}
+              {bundle.salePrice}
             </p>
-            <p className='text-xs text-gray-500'>
-              Face: {bundle.currency} {bundle.facePrice}
+            <p className=''>
+              Face:
+              {/* {bundle.currency}  */}
+              {bundle.facePrice}
             </p>
           </div>
         </TableData>
@@ -101,13 +104,13 @@ export default function ProductBundleTableRow({
             <p className='font-medium'>
               {bundle.gpAmount} ({bundle.gpType})
             </p>
-            <p className='text-xs text-gray-500'>Value: {bundle.gpValue}</p>
+            <p className=''>Value: {bundle.gpValue}</p>
           </div>
         </TableData>
         <TableData className='w-1/12'>
           <div
             className={cn(
-              'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white w-[90px] justify-center',
+              'inline-flex items-center rounded-full px-1 py-1 text-xs font-semibold text-white w-[90px] justify-center',
               bundle.status ? 'bg-success' : 'bg-destructive'
             )}
           >

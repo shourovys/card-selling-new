@@ -69,7 +69,7 @@ export function SelectField<T extends FieldValues>({
   required = false,
   options,
   disabled = false,
-  placeholder = 'Select an option',
+  placeholder = '',
   isClearable = false,
   isSearchable = true,
   menuPlacement = 'auto',
