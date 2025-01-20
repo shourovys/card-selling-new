@@ -1,3 +1,6 @@
+import { additionalCategoryApi } from '@/api/additional-category';
+import { productApi } from '@/api/product';
+import BACKEND_ENDPOINTS from '@/api/urls';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,6 +12,7 @@ import {
 import { Form } from '@/components/ui/form';
 import { FileUploadField } from '@/components/ui/form/file-upload-field';
 import { InputField } from '@/components/ui/form/input-field';
+import { InputLabel } from '@/components/ui/form/input-label';
 import { RadioGroupField } from '@/components/ui/form/radio-group-field';
 import { SelectField } from '@/components/ui/form/select-field';
 import {
@@ -16,16 +20,19 @@ import {
   ServerSelectOption,
 } from '@/components/ui/form/server-select-field';
 import { getMetaInfo } from '@/getMetaInfo';
+import { toast } from '@/hooks/use-toast';
 import {
   IProductBundlePayload,
   ProductBundle,
   ProductBundleFormValues,
   productBundleFormSchema,
 } from '@/lib/validations/product-bundle';
+import { IApiResponse } from '@/types/common';
 import fileToBase64 from '@/utils/fileToBase64';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import useSWR from 'swr';
 
 interface ProductBundleModalProps {
   open: boolean;
@@ -34,9 +41,11 @@ interface ProductBundleModalProps {
   mode: 'add' | 'edit' | 'view';
   bundle?: ProductBundle;
   isSubmitting: boolean;
-  loadProducts: (params: { search: string }) => Promise<ServerSelectOption[]>;
-  currencies: { id: number; name: string; exchangeRate: number }[];
-  additionalCategories: { id: number; name: string }[];
+}
+
+interface AdditionalCategory {
+  id: number;
+  name: string;
 }
 
 const getInitialValues = (
@@ -93,10 +102,22 @@ export function ProductBundleModal({
   mode = 'add',
   bundle,
   isSubmitting,
-  loadProducts,
-  currencies,
-  additionalCategories,
 }: ProductBundleModalProps) {
+  // State for managing additional data
+  const [additionalCategories, setAdditionalCategories] = useState<
+    AdditionalCategory[]
+  >([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+
+  // Fetch currencies using SWR
+  const { data: currencyData } = useSWR<
+    IApiResponse<{
+      currencies: { id: number; name: string; exchangeRate: number }[];
+    }>
+  >(BACKEND_ENDPOINTS.CURRENCY.LIST);
+
+  const currencies = currencyData?.data?.currencies || [];
+
   const isViewMode = mode === 'view';
   const modalTitle = {
     add: 'Add New Product Bundle',
@@ -109,60 +130,150 @@ export function ProductBundleModal({
     defaultValues: getInitialValues(mode, bundle),
   });
 
+  // Load products function
+  const loadProducts = useCallback(
+    async ({ search }: { search: string }): Promise<ServerSelectOption[]> => {
+      try {
+        const response = await productApi.getAll(
+          `${search ? `?search=${search}` : ''}`
+        );
+
+        return (
+          response.data?.productsData?.products.map((product) => ({
+            value: product.id.toString(),
+            label: product.name,
+            categoryId: product.category?.id,
+          })) || []
+        );
+      } catch (error) {
+        console.error('Error loading products:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load products. Please try again.',
+          variant: 'destructive',
+        });
+        return [];
+      }
+    },
+    []
+  );
+
+  // Function to fetch additional categories
+  const fetchAdditionalCategories = useCallback(async (categoryId: number) => {
+    setIsLoadingCategories(true);
+    try {
+      const data = await additionalCategoryApi.getByCategoryId(categoryId);
+      setAdditionalCategories(
+        data.data?.categoryMapping?.additionalCategories || []
+      );
+    } catch (error) {
+      console.error('Error fetching additional categories:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load additional categories',
+        variant: 'destructive',
+      });
+      setAdditionalCategories([]);
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  }, []);
+
+  // Handle product selection
+  const handleProductSelect = useCallback(
+    async (productId: string, categoryId?: number) => {
+      if (categoryId) {
+        await fetchAdditionalCategories(categoryId);
+      } else {
+        setAdditionalCategories([]);
+      }
+    },
+    [fetchAdditionalCategories]
+  );
+
+  // Calculate EQD price
+  const calculateEqdPrice = useCallback(
+    (facePrice: string, currencyId: string) => {
+      if (!facePrice || !currencyId) return '';
+
+      const price = parseFloat(facePrice);
+      if (isNaN(price)) return '';
+
+      const selectedCurrency = currencies.find(
+        (c) => c.id === Number(currencyId)
+      );
+      if (!selectedCurrency) return '';
+
+      if (selectedCurrency.name === 'EQD') {
+        return price.toFixed(2);
+      }
+
+      return (price * selectedCurrency.exchangeRate).toFixed(2);
+    },
+    [currencies]
+  );
+
   // Reset form when modal opens/closes or mode changes
   useEffect(() => {
     if (open) {
       form.reset(getInitialValues(mode, bundle));
+      setAdditionalCategories([]);
+
+      // If editing/viewing and bundle has a product with category, fetch additional categories
+      if (bundle?.products?.categoryId) {
+        fetchAdditionalCategories(bundle.products.categoryId);
+      }
     }
-  }, [open, mode, bundle, form]);
+  }, [open, mode, bundle, form, fetchAdditionalCategories]);
+
+  // Watch product selection for additional categories
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'product' && value.product) {
+        const product = value.product as { value: string; categoryId?: number };
+        handleProductSelect(product.value, product.categoryId);
+
+        // Reset additional category when product changes
+        if (form.getValues('additionalCategoryId')) {
+          form.setValue('additionalCategoryId', '');
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, handleProductSelect]);
 
   // Calculate GP Amount and Sale Price
-  const calculateGPAmount = (
-    purchasePrice: string,
-    gpType: string,
-    gpValue: string
-  ) => {
-    if (!purchasePrice || !gpType || !gpValue) return '';
+  const calculateGPAmount = useCallback(
+    (purchasePrice: string, gpType: string, gpValue: string) => {
+      if (!purchasePrice || !gpType || !gpValue) return '';
 
-    const price = parseFloat(purchasePrice);
-    const value = parseFloat(gpValue);
+      const price = parseFloat(purchasePrice);
+      const value = parseFloat(gpValue);
 
-    if (isNaN(price) || isNaN(value)) return '';
+      if (isNaN(price) || isNaN(value)) return '';
 
-    if (gpType === 'percentage') {
-      return ((price * value) / 100).toFixed(2);
-    }
-    return value.toFixed(2);
-  };
+      if (gpType === 'percentage') {
+        return ((price * value) / 100).toFixed(2);
+      }
+      return value.toFixed(2);
+    },
+    []
+  );
 
-  const calculateSalePrice = (purchasePrice: string, gpAmount: string) => {
-    if (!purchasePrice || !gpAmount) return '';
+  const calculateSalePrice = useCallback(
+    (purchasePrice: string, gpAmount: string) => {
+      if (!purchasePrice || !gpAmount) return '';
 
-    const price = parseFloat(purchasePrice);
-    const amount = parseFloat(gpAmount);
+      const price = parseFloat(purchasePrice);
+      const amount = parseFloat(gpAmount);
 
-    if (isNaN(price) || isNaN(amount)) return '';
+      if (isNaN(price) || isNaN(amount)) return '';
 
-    return (price + amount).toFixed(2);
-  };
-
-  const calculateEqdPrice = (facePrice: string, currencyId: string) => {
-    if (!facePrice || !currencyId) return '';
-
-    const price = parseFloat(facePrice);
-    if (isNaN(price)) return '';
-
-    const selectedCurrency = currencies.find(
-      (c) => c.id === Number(currencyId)
-    );
-    if (!selectedCurrency) return '';
-
-    if (selectedCurrency.name === 'EQD') {
-      return price.toFixed(2);
-    }
-
-    return (price * selectedCurrency.exchangeRate).toFixed(2);
-  };
+      return (price + amount).toFixed(2);
+    },
+    []
+  );
 
   // Watch form values for calculations
   const purchasePrice = form.watch('purchasePrice');
@@ -184,7 +295,7 @@ export function ProductBundleModal({
     if (salePrice) {
       form.setValue('salePrice', salePrice);
     }
-  }, [purchasePrice, gpType, gpValue, form]);
+  }, [purchasePrice, gpType, gpValue, form, gpAmount, salePrice]);
 
   const handleSubmit = async (values: ProductBundleFormValues) => {
     if (isViewMode) return;
@@ -219,8 +330,6 @@ export function ProductBundleModal({
       }
 
       await onSubmit(payload);
-      onClose();
-      form.reset();
     } catch (error) {
       console.error('Error submitting product bundle:', error);
     }
@@ -241,7 +350,7 @@ export function ProductBundleModal({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <div className='px-8 py-4 pb-8 max-h-[calc(100vh-200px)] overflow-y-auto'>
-              <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+              <div className='grid grid-cols-1 gap-10 md:grid-cols-2'>
                 {/* Left Column */}
                 <div className='space-y-6'>
                   <InputField
@@ -265,10 +374,7 @@ export function ProductBundleModal({
                     name='product'
                     form={form}
                     label='Product'
-                    loadOptions={async ({ search }) => {
-                      const options = await loadProducts({ search });
-                      return options;
-                    }}
+                    loadOptions={loadProducts}
                     required
                     disabled={isViewMode}
                   />
@@ -347,7 +453,19 @@ export function ProductBundleModal({
                       label: cat.name,
                       value: cat.id.toString(),
                     }))}
-                    disabled={isViewMode || !form.watch('product.value')}
+                    disabled={
+                      isViewMode ||
+                      !form.watch('product.value') ||
+                      isLoadingCategories
+                    }
+                    placeholder={
+                      isLoadingCategories
+                        ? 'Loading categories...'
+                        : form.watch('product.value') &&
+                          !additionalCategories.length
+                        ? 'No additional categories available'
+                        : 'Select additional category'
+                    }
                   />
 
                   <InputField
@@ -384,24 +502,24 @@ export function ProductBundleModal({
                   </div>
 
                   <div className='space-y-2'>
-                    <div className='text-sm font-medium'>Face Price (EQD)</div>
-                    <div className='text-lg'>{eqdPriceValue || '-'}</div>
-                    {currency &&
-                      currencies.find((c) => c.id === Number(currency)) && (
-                        <div className='text-sm text-gray-500'>
-                          1{' '}
-                          {
-                            currencies.find((c) => c.id === Number(currency))
-                              ?.name
-                          }{' '}
-                          ={' '}
-                          {
-                            currencies.find((c) => c.id === Number(currency))
-                              ?.exchangeRate
-                          }{' '}
-                          EQD
-                        </div>
-                      )}
+                    <InputLabel
+                      name='facePriceEQD'
+                      label='Face Price (EQD)'
+                      value={eqdPriceValue}
+                      type='number'
+                      disabled
+                      description={
+                        currency &&
+                        currencies.find((c) => c.id === Number(currency)) &&
+                        `1 ${
+                          currencies.find((c) => c.id === Number(currency))
+                            ?.name
+                        } = ${
+                          currencies.find((c) => c.id === Number(currency))
+                            ?.exchangeRate
+                        } EQD`
+                      }
+                    />
                   </div>
 
                   <RadioGroupField
@@ -424,28 +542,31 @@ export function ProductBundleModal({
             </div>
 
             <DialogFooter className='gap-2 px-8 py-6 border-t'>
-              {isViewMode ? (
+              <Button
+                type='button'
+                variant='outline'
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
+                {isViewMode ? 'Close' : mode === 'add' ? 'Cancel' : 'Cancel'}
+              </Button>
+              {!isViewMode && (
                 <Button
-                  type='button'
-                  variant='outline'
-                  onClick={onClose}
+                  disabled={isSubmitting}
+                  type='submit'
                   className='min-w-[120px] min-h-[36px]'
                 >
-                  Close
+                  {isSubmitting ? (
+                    <span className='flex items-center gap-2'>
+                      <span className='h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent' />
+                      {mode === 'add' ? 'Creating...' : 'Updating...'}
+                    </span>
+                  ) : mode === 'add' ? (
+                    'Create'
+                  ) : (
+                    'Update'
+                  )}
                 </Button>
-              ) : (
-                <>
-                  <Button type='button' variant='outline' onClick={onClose}>
-                    {mode === 'add' ? 'Clear' : 'Cancel'}
-                  </Button>
-                  <Button
-                    disabled={isSubmitting}
-                    type='submit'
-                    className='min-w-[120px] min-h-[36px] bg-primary hover:bg-primary/90'
-                  >
-                    {mode === 'add' ? 'Confirm' : 'Update'}
-                  </Button>
-                </>
               )}
             </DialogFooter>
           </form>

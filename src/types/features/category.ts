@@ -22,5 +22,6 @@ export interface ICategoryPayload {
   attribute: Omit<CategoryFormValues, 'status' | 'position'> & {
     position: number | null;
     status: boolean;
+    parentCategoryId: number | null;
   };
 }

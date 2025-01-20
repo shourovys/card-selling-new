@@ -77,9 +77,11 @@ export default function ProductTableRow({
               />
             </div>
             <div className='min-w-0'>
-              <p className='font-medium mb-0.5 truncate'>{product.name}</p>
+              <p className='font-medium mb-0.5 truncate max-w-[400px]'>
+                {product.name}
+              </p>
               {product.description && (
-                <p className='text-xs text-gray-500 truncate'>
+                <p className='text-xs truncate max-w-[400px]'>
                   {product.description}
                 </p>
               )}
@@ -89,7 +91,7 @@ export default function ProductTableRow({
         <TableData>
           <div
             className={cn(
-              'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white w-[90px] justify-center',
+              'inline-flex items-center rounded-full px-1 py-1 text-xs font-semibold text-white w-[90px] justify-center',
               product.status ? 'bg-success' : 'bg-destructive'
             )}
           >

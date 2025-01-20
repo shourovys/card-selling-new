@@ -7,7 +7,7 @@ export const productApi = {
   getAll: async (
     queryString?: string
   ): Promise<IApiResponse<IProductResponse>> => {
-    const response = await api.post(
+    const response = await api.get(
       BACKEND_ENDPOINTS.PRODUCT.LIST(queryString || '')
     );
     return response.data;

@@ -20,6 +20,12 @@ export interface IAdditionalCategoryResponse {
   };
 }
 
+export interface IAdditionalCategoryMappingResponse {
+  categoryMapping: {
+    additionalCategories: IAdditionalCategory[];
+  };
+}
+
 export interface AdditionalCategoryFilter {
   search: string;
 }

@@ -2,6 +2,14 @@ import React, { lazy } from 'react';
 import type { AppRoute } from './routes';
 
 const DashboardLayout = lazy(() => import('../layouts/DashboardLayout'));
+const Role = lazy(() => import('../pages/role/role'));
+const RequestVirtualMoney = lazy(
+  () => import('../pages/virtual-money/request')
+);
+const VirtualMoney = lazy(() => import('../pages/virtual-money'));
+const PendingVirtualMoney = lazy(
+  () => import('../pages/virtual-money/pending')
+);
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Category = lazy(() => import('../pages/category/category'));
 const AdditionalCategory = lazy(
@@ -11,7 +19,6 @@ const Product = lazy(() => import('../pages/product/product'));
 const ProductBundle = lazy(
   () => import('../pages/product-bundle/product-bundle')
 );
-const Role = lazy(() => import('../pages/role/role'));
 export const protectedRoutes: AppRoute[] = [
   {
     element: React.createElement(DashboardLayout),
@@ -25,6 +32,39 @@ export const protectedRoutes: AppRoute[] = [
         roles: ['System Admin', 'Distributor', 'Sub Distributor'],
         auth: true,
       },
+      {
+        path: '/virtual-money/request',
+        element: React.createElement(RequestVirtualMoney),
+        title: 'Request Virtual Money',
+        breadcrumb: 'Request Virtual Money',
+        roles: ['System Admin', 'Distributor', 'Sub Distributor'],
+        auth: true,
+      },
+      {
+        path: '/role',
+        element: React.createElement(Role),
+        title: 'Role',
+        breadcrumb: 'Role',
+        roles: ['System Admin'],
+        auth: true,
+      },
+      {
+        path: '/virtual-money',
+        element: React.createElement(VirtualMoney),
+        title: 'Virtual Money',
+        breadcrumb: 'Virtual Money',
+        roles: ['System Admin', 'Distributor', 'Sub Distributor'],
+        auth: true,
+      },
+      {
+        path: '/virtual-money/pending',
+        element: React.createElement(PendingVirtualMoney),
+        title: 'Pending Virtual Money',
+        breadcrumb: 'Pending Virtual Money',
+        roles: ['System Admin', 'Distributor', 'Sub Distributor'],
+        auth: true,
+      },
+
       {
         path: '/category',
         element: React.createElement(Category),
@@ -55,14 +95,6 @@ export const protectedRoutes: AppRoute[] = [
         title: 'Product Bundle',
         breadcrumb: 'Product Bundle',
         roles: ['System Admin', 'Distributor', 'Sub Distributor'],
-        auth: true,
-      },
-      {
-        path: '/role',
-        element: React.createElement(Role),
-        title: 'Role',
-        breadcrumb: 'Role',
-        roles: ['System Admin'],
         auth: true,
       },
     ],

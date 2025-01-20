@@ -10,13 +10,10 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import {
   Permission,
   PermissionGroup,
@@ -24,8 +21,9 @@ import {
   roleFormSchema,
 } from '@/lib/validations/role';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { InputField } from '../ui/form/input-field';
 
 interface RoleModalProps {
   open: boolean;
@@ -66,15 +64,19 @@ export const RoleModal = ({
     defaultValues: getInitialValues(role),
   });
 
+  // Reset form when modal opens/closes or mode changes
   useEffect(() => {
     if (open) {
       form.reset(getInitialValues(role));
     }
   }, [form, open, role]);
 
-  const handleSubmit = (data: RoleFormValues) => {
-    onSubmit(data);
-  };
+  const handleSubmit = useCallback(
+    (data: RoleFormValues) => {
+      onSubmit(data);
+    },
+    [onSubmit]
+  );
 
   const isViewMode = mode === 'view';
   const title = useMemo(() => {
@@ -92,131 +94,204 @@ export const RoleModal = ({
 
   // Group permissions by their group
   const groupedPermissions = useMemo(() => {
-    const groups = new Map<number, Permission[]>();
+    const permissionsByGroup = new Map<number, Permission[]>();
     permissions.forEach((permission) => {
-      const group = groups.get(permission.groupId) || [];
-      group.push(permission);
-      groups.set(permission.groupId, group);
+      if (permission.groupId) {
+        const group = permissionsByGroup.get(permission.groupId) || [];
+        group.push(permission);
+        permissionsByGroup.set(permission.groupId, group);
+      }
     });
-    return groups;
+    return permissionsByGroup;
   }, [permissions]);
+
+  // Handle select all permissions for a group
+  const handleSelectAllGroup = useCallback(
+    (groupId: number, checked: boolean) => {
+      const groupPermissions = groupedPermissions.get(groupId);
+      if (!groupPermissions) return;
+
+      const currentPermissions = new Set(form.getValues('permissions') || []);
+      const groupPermissionNames = groupPermissions.map(
+        (p) => p.permissionName
+      );
+
+      if (checked) {
+        // Add all permissions from the group
+        groupPermissionNames.forEach((p) => currentPermissions.add(p));
+      } else {
+        // Remove all permissions from the group
+        groupPermissionNames.forEach((p) => currentPermissions.delete(p));
+      }
+
+      form.setValue('permissions', Array.from(currentPermissions), {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    },
+    [form, groupedPermissions]
+  );
+
+  // Check if all permissions in a group are selected
+  const isGroupSelected = useCallback(
+    (groupId: number) => {
+      const groupPermissions = groupedPermissions.get(groupId);
+      if (!groupPermissions || groupPermissions.length === 0) return false;
+
+      const currentPermissions = new Set(form.getValues('permissions') || []);
+      return groupPermissions.every((p) =>
+        currentPermissions.has(p.permissionName)
+      );
+    },
+    [form, groupedPermissions]
+  );
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-[600px]'>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+      <DialogContent className='max-w-[1000px] p-0 gap-0'>
+        <DialogHeader className='px-8 py-6 border-b'>
+          <DialogTitle className='text-xl font-medium'>{title}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className='space-y-6'
-          >
-            <FormField
-              control={form.control}
-              name='roleName'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Enter role name'
-                      disabled={isViewMode}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form onSubmit={form.handleSubmit(handleSubmit)} className='contents'>
+            <div className='px-8 py-4 pb-8 max-h-[calc(100vh-200px)] overflow-y-auto'>
+              {/* <ScrollArea className='h-[calc(85vh-250px)] pr-4 -mr-4'> */}
+              <div className='space-y-6'>
+                <InputField
+                  name='roleName'
+                  form={form}
+                  label='Role Name'
+                  disabled={isViewMode}
+                />
 
-            <FormField
-              control={form.control}
-              name='permissions'
-              render={() => (
-                <FormItem>
-                  <div className='mb-4'>
-                    <FormLabel>Permissions</FormLabel>
-                    <FormDescription>
-                      Select the permissions for this role.
-                    </FormDescription>
-                  </div>
-                  {Array.from(groupedPermissions.entries()).map(
-                    ([groupId, groupPermissions]) => {
-                      const group = permissionGroups.find(
-                        (g) => g.id === groupId
-                      );
-                      return (
-                        <div key={groupId} className='mb-6'>
-                          <h4 className='text-sm font-medium mb-2'>
-                            {group?.groupName || 'Other'}
-                          </h4>
-                          <div className='grid grid-cols-2 gap-4'>
-                            {groupPermissions.map((permission) => (
-                              <FormField
-                                key={permission.permissionName}
-                                control={form.control}
-                                name='permissions'
-                                render={({ field }) => {
-                                  return (
-                                    <FormItem
-                                      key={permission.permissionName}
-                                      className='flex flex-row items-start space-x-3 space-y-0'
+                <div>
+                  <FormLabel className='text-sm font-medium'>
+                    Permissions
+                  </FormLabel>
+                  <div className='mt-3 space-y-4 grid grid-cols-2 gap-x-10 gap-y-6'>
+                    {Array.from(groupedPermissions.entries()).map(
+                      ([groupId, groupPermissions]) => {
+                        const group = permissionGroups.find(
+                          (g) => g.id === groupId
+                        );
+                        return (
+                          <div
+                            key={groupId}
+                            className='space-y-3 border-b pb-6'
+                          >
+                            <FormField
+                              control={form.control}
+                              name='permissions'
+                              render={() => (
+                                <FormItem className='space-y-3'>
+                                  <div className='flex items-center gap-2'>
+                                    <Checkbox
+                                      id={`group-${groupId}`}
+                                      checked={isGroupSelected(groupId)}
+                                      onCheckedChange={(checked) =>
+                                        handleSelectAllGroup(
+                                          groupId,
+                                          checked as boolean
+                                        )
+                                      }
+                                      disabled={isViewMode}
+                                      className='h-4 w-4 data-[state=checked]:bg-rose-500 data-[state=checked]:border-rose-500'
+                                    />
+                                    <label
+                                      htmlFor={`group-${groupId}`}
+                                      className='text-sm font-medium cursor-pointer'
                                     >
-                                      <FormControl>
-                                        <Checkbox
-                                          checked={field.value?.includes(
-                                            permission.permissionName
-                                          )}
-                                          onCheckedChange={(checked) => {
-                                            return checked
-                                              ? field.onChange([
-                                                  ...field.value,
-                                                  permission.permissionName,
-                                                ])
-                                              : field.onChange(
-                                                  field.value?.filter(
-                                                    (value) =>
-                                                      value !==
-                                                      permission.permissionName
-                                                  )
-                                                );
-                                          }}
-                                          disabled={isViewMode}
-                                        />
-                                      </FormControl>
-                                      <FormLabel className='font-normal'>
-                                        {permission.displayName}
-                                      </FormLabel>
-                                    </FormItem>
-                                  );
-                                }}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    }
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                                      {group?.groupName}
+                                    </label>
+                                  </div>
+                                  <div className='grid grid-cols-2 gap-x-6 gap-y-2 ml-6'>
+                                    {groupPermissions.map((permission) => (
+                                      <FormField
+                                        key={permission.permissionName}
+                                        control={form.control}
+                                        name='permissions'
+                                        render={({ field }) => (
+                                          <FormItem
+                                            key={permission.permissionName}
+                                            className='flex flex-row items-center space-x-2 space-y-0'
+                                          >
+                                            <FormControl>
+                                              <Checkbox
+                                                id={permission.permissionName}
+                                                checked={field.value?.includes(
+                                                  permission.permissionName
+                                                )}
+                                                onCheckedChange={(checked) => {
+                                                  const newPermissions = checked
+                                                    ? [
+                                                        ...(field.value || []),
+                                                        permission.permissionName,
+                                                      ]
+                                                    : field.value?.filter(
+                                                        (value) =>
+                                                          value !==
+                                                          permission.permissionName
+                                                      ) || [];
 
-            <DialogFooter>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={onClose}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              {!isViewMode && (
-                <Button type='submit' disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : 'Save'}
+                                                  field.onChange(
+                                                    newPermissions
+                                                  );
+                                                }}
+                                                disabled={isViewMode}
+                                                className='h-4 w-4 data-[state=checked]:bg-rose-500 data-[state=checked]:border-rose-500'
+                                              />
+                                            </FormControl>
+                                            <label
+                                              htmlFor={
+                                                permission.permissionName
+                                              }
+                                              className='text-sm font-normal cursor-pointer'
+                                            >
+                                              {permission.displayName}
+                                            </label>
+                                          </FormItem>
+                                        )}
+                                      />
+                                    ))}
+                                  </div>
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
+              </div>
+              {/* </ScrollArea> */}
+            </div>
+
+            <DialogFooter className='gap-2 px-8 py-6 border-t'>
+              {isViewMode ? (
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={onClose}
+                  className='min-w-[120px] min-h-[36px]'
+                >
+                  Close
                 </Button>
+              ) : (
+                <>
+                  <Button type='button' variant='outline' onClick={onClose}>
+                    {mode === 'add' ? 'Clear' : 'Cancel'}
+                  </Button>
+                  <Button
+                    disabled={isSubmitting}
+                    type='submit'
+                    className='min-w-[120px] min-h-[36px] bg-primary hover:bg-primary/90'
+                  >
+                    {mode === 'add' ? 'Confirm' : 'Update'}
+                  </Button>
+                </>
               )}
             </DialogFooter>
           </form>

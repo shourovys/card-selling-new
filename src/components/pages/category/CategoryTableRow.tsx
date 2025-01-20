@@ -77,7 +77,7 @@ export default function CategoryTableRow({
         <TableData>
           <div
             className={cn(
-              'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white w-[90px] justify-center',
+              'inline-flex items-center rounded-full px-1 py-1 text-xs font-semibold text-white w-[90px] justify-center',
               category.status ? 'bg-success' : 'bg-destructive'
             )}
           >

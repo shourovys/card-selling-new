@@ -3,8 +3,29 @@ const BACKEND_ENDPOINTS = {
   LOGIN: '/api/v1/public/auth/signin',
   REFRESH_TOKEN: '/api/v1/public/auth/refresh-token',
 
-  // Categories
+  // Role
+  ROLE: {
+    LIST: (queryString: string) =>
+      `/api/v1/private/roles${queryString ? `?${queryString}` : ''}`,
+    CREATE: 'api/v1/private/roles',
+    UPDATE: (id: number) => `/api/v1/private/role?id=${id}`,
+    DELETE: (id: number) => `/api/v1/private/role?id=${id}`,
+    PERMISSIONS: '/api/v1/private/get-all-app-permissions',
+    PERMISSION_GROUPS: '/api/v1/private/get-all-app-groups',
+  },
 
+  // Virtual Money
+  VIRTUAL_MONEY: {
+    GENERATE: '/api/v1/private/generate-virtual-money',
+    LIST: (queryString: string = '') =>
+      `/api/v1/private/all-virtual-money-requests${
+        queryString ? `?${queryString}` : ''
+      }`,
+    APPROVE: '/api/v1/private/approve-virtual-money-request',
+    APPROVER_LIST: '/api/v1/private/approver-list',
+  },
+
+  // Categories
   CATEGORY: {
     LIST: (queryString: string) =>
       `/api/v1/private/all/categories?${queryString}`,
@@ -32,6 +53,8 @@ const BACKEND_ENDPOINTS = {
         )}`,
       GET_BY_POSITION: (position: string) =>
         `/api/v1/private/all/additionalCategories?position=${position}`,
+      GET_BY_CATEGORY_ID: (categoryId: number) =>
+        `/api/v1/private/categoryMapping/${categoryId}`,
     },
   },
 
@@ -56,16 +79,6 @@ const BACKEND_ENDPOINTS = {
 
   CURRENCY: {
     LIST: '/api/v1/private/all/currency',
-  },
-
-  ROLE: {
-    LIST: (queryString: string) =>
-      `/api/v1/private/roles${queryString ? `?${queryString}` : ''}`,
-    CREATE: 'api/v1/private/roles',
-    UPDATE: (id: number) => `/api/v1/private/role?id=${id}`,
-    DELETE: (id: number) => `/api/v1/private/role?id=${id}`,
-    PERMISSIONS: '/api/v1/private/get-all-app-permissions',
-    PERMISSION_GROUPS: '/api/v1/private/get-all-app-groups',
   },
 } as const;
 

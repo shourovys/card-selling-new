@@ -1,6 +1,7 @@
 import { ChevronRight, User } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Card } from '../ui/card';
 
 interface BreadcrumbsProps {
   items: {
@@ -12,7 +13,7 @@ interface BreadcrumbsProps {
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, title }) => {
   return (
-    <div className='bg-white rounded-md p-6 mb-6'>
+    <Card className='p-6 mb-6'>
       <div className='flex items-center gap-4 mb-2'>
         <div className='w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0'>
           <User className='w-6 h-6 text-gray-500' />
@@ -50,7 +51,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, title }) => {
           </nav>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
