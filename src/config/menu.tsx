@@ -6,6 +6,7 @@ import {
   Tag,
   Tags,
   User,
+  Wallet,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -29,6 +30,31 @@ export const menuItems: MenuItem[] = [
     label: 'Role',
     icon: User,
     roles: ['System Admin'],
+  },
+  {
+    label: 'Virtual Money',
+    icon: Wallet,
+    roles: ['System Admin', 'Distributor', 'Sub Distributor'],
+    subMenu: [
+      {
+        path: routePaths.requestVirtualMoney,
+        label: 'Request Virtual Money',
+        icon: Wallet,
+        roles: ['System Admin', 'Distributor', 'Sub Distributor'],
+      },
+      {
+        path: routePaths.pendingVirtualMoney,
+        label: 'Pending Virtual Money',
+        icon: Wallet,
+        roles: ['System Admin', 'Distributor', 'Sub Distributor'],
+      },
+      {
+        path: routePaths.virtualMoney,
+        label: 'Virtual Money History',
+        icon: Wallet,
+        roles: ['System Admin', 'Distributor', 'Sub Distributor'],
+      },
+    ],
   },
   {
     label: 'Category',

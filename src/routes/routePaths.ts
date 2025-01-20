@@ -14,6 +14,11 @@ export const routePaths = {
   product: '/product',
   productBundle: '/product-bundle',
 
+  // Virtual Money
+  requestVirtualMoney: '/virtual-money/request',
+  virtualMoney: '/virtual-money',
+  pendingVirtualMoney: '/virtual-money/pending',
+
   // Catch-all
   notFound: '*',
 } as const;
