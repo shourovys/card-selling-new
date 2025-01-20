@@ -112,6 +112,7 @@ export function CategoryModal({
           description: values.description,
           status: values.status === 'active',
           position: null,
+          parentCategoryId: null,
           icon: null,
         },
       };
@@ -157,7 +158,7 @@ export function CategoryModal({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <div className='px-8 py-4 pb-8 max-h-[calc(100vh-200px)] overflow-y-auto'>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-10'>
                 {/* Left Column */}
                 <div className='space-y-6'>
                   <InputField

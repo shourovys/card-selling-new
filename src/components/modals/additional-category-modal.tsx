@@ -214,7 +214,7 @@ export function AdditionalCategoryModal({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <div className='px-8 py-4 pb-8 max-h-[calc(100vh-200px)] overflow-y-auto'>
-              <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+              <div className='grid grid-cols-1 gap-10 md:grid-cols-2'>
                 {/* Left Column */}
                 <div className='space-y-6'>
                   <InputField
