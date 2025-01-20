@@ -4,7 +4,7 @@ export const routePaths = {
   login: '/',
 
   // Role
-  role: 'role',
+  role: '/role',
 
   // Protected routes
   dashboard: '/dashboard',

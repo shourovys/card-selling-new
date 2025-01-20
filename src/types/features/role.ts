@@ -8,11 +8,11 @@ export interface IRoleResponse {
 }
 
 export interface IPermissionResponse {
-  permissions: Permission[];
+  data: Permission[];
 }
 
 export interface IPermissionGroupResponse {
-  permissionGroups: PermissionGroup[];
+  data: PermissionGroup[];
 }
 
 export interface IRoleFilter {

@@ -4,6 +4,7 @@ import Breadcrumbs from '@/components/common/Breadcrumbs';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
 import { RoleModal } from '@/components/modals/role-modal';
 import { RoleTableRow } from '@/components/pages/role/RoleTableRow';
+import Pagination from '@/components/table/pagination/Pagination';
 import Table from '@/components/table/Table';
 import TableHeader from '@/components/table/TableHeader';
 import TableNoData from '@/components/table/TableNoData';
@@ -22,15 +23,25 @@ import {
   IPermissionResponse,
   IRoleResponse,
 } from '@/types/features/role';
+import { getMetaInfo } from '@/utils/getMetaInfo';
 import { Plus } from 'lucide-react';
 import QueryString from 'qs';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 export default function RoleManagement() {
   // Table state management
-  const { rowsPerPage, order, orderBy, selected, handleSort } = useTable({});
+  const {
+    page,
+    rowsPerPage,
+    order,
+    orderBy,
+    selected,
+    handleChangePage,
+    handleSort,
+    handleChangeRowsPerPage,
+  } = useTable({});
 
   // Define table head columns
   const TABLE_HEAD: ITableHead[] = [
@@ -49,19 +60,18 @@ export default function RoleManagement() {
   }>({ open: false, mode: 'add' });
 
   // Filter state management
-  const initialFilterState = {
+  const { filterState, handleFilterInputChange } = useFilter({
     search: '',
-  };
-
-  const { filterState, handleFilterInputChange } =
-    useFilter(initialFilterState);
+  });
 
   // Create query params for API
   const apiQueryParamsString = QueryString.stringify({
     ...(filterState.search && { search: filterState.search }),
+    page: page - 1,
+    size: rowsPerPage,
   });
 
-  // Fetch roles using SWR
+  // Fetch data using SWR
   const {
     data: rolesData,
     mutate: mutateRoles,
@@ -79,20 +89,24 @@ export default function RoleManagement() {
   >(BACKEND_ENDPOINTS.ROLE.PERMISSION_GROUPS);
 
   const roles = rolesData?.data?.roles || [];
-  const permissions = permissionsData?.data?.permissions || [];
-  const permissionGroups = permissionGroupsData?.data?.permissionGroups || [];
+  const permissions = permissionsData?.data?.data || [];
+  const permissionGroups = permissionGroupsData?.data?.data || [];
 
   // Modal handlers
-  const handleModalOpen = (mode: 'add' | 'edit' | 'view', role?: Role) => {
-    setSelectedRole(role || null);
-    setModalState({ open: true, mode });
-  };
+  const handleModalOpen = useCallback(
+    (mode: 'add' | 'edit' | 'view', role?: Role) => {
+      setSelectedRole(role || null);
+      setModalState({ open: true, mode });
+    },
+    []
+  );
 
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setModalState({ open: false, mode: 'add' });
     setSelectedRole(null);
-  };
+  }, []);
 
+  // API mutations
   const { trigger: createTrigger, isMutating: isCreating } = useSWRMutation(
     BACKEND_ENDPOINTS.ROLE.CREATE,
     sendPostRequest
@@ -103,56 +117,58 @@ export default function RoleManagement() {
     sendPutRequest
   );
 
-  // API handlers
-  const handleSubmit = async (formData: RoleFormValues) => {
-    try {
-      const payload = {
-        metaInfo: {
-          deviceID: 'web',
-          deviceType: 'web',
-          deviceInfo: {
-            deviceID: 'web',
-            deviceType: 'web',
-            notificationToken: '',
+  // Submit handler
+  const handleSubmit = useCallback(
+    async (formData: RoleFormValues) => {
+      try {
+        const payload = {
+          metaInfo: getMetaInfo(),
+          attribute: {
+            roleName: formData.roleName.trim(),
+            permissions: formData.permissions,
           },
-        },
-        attribute: {
-          roleName: formData.roleName,
-          permissions: formData.permissions,
-        },
-      };
+        };
 
-      if (modalState.mode === 'edit' && selectedRole) {
-        await updateTrigger(payload);
+        if (modalState.mode === 'edit' && selectedRole) {
+          await updateTrigger(payload);
+          toast({
+            title: 'Success',
+            description: 'Role updated successfully',
+          });
+        } else {
+          await createTrigger(payload);
+          toast({
+            title: 'Success',
+            description: 'Role created successfully',
+          });
+        }
+        mutateRoles();
+        handleModalClose();
+      } catch (error) {
+        console.error('Error submitting role:', error);
         toast({
-          title: 'Success',
-          description: 'Role updated successfully',
-        });
-      } else {
-        await createTrigger(payload);
-        toast({
-          title: 'Success',
-          description: 'Role created successfully',
+          title: 'Error',
+          description: 'Failed to save role. Please try again.',
+          variant: 'destructive',
         });
       }
-      mutateRoles();
-      handleModalClose();
-    } catch (error) {
-      console.error('Error submitting role:', error);
-      toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
-    }
-  };
+    },
+    [
+      modalState.mode,
+      selectedRole,
+      createTrigger,
+      updateTrigger,
+      mutateRoles,
+      handleModalClose,
+    ]
+  );
 
-  const onDelete = () => {
+  // Delete handler
+  const handleDelete = useCallback(() => {
     mutateRoles();
-  };
+  }, [mutateRoles]);
 
-  // Check if no data is found
-  const isNotFound = !roles.length && !isLoading;
+  const isNotFound = !roles?.length && !isLoading;
 
   const breadcrumbItems = [
     { label: 'Dashboard', href: routePaths.dashboard },
@@ -189,21 +205,24 @@ export default function RoleManagement() {
               order={order}
               orderBy={orderBy}
               numSelected={selected.length}
-              rowCount={roles.length || 0}
+              rowCount={roles?.length || 0}
               handleSort={handleSort}
               headerData={TABLE_HEAD}
             />
             <tbody>
               {!isLoading &&
-                roles.map((role: Role, index: number) => (
+                roles.map((role, index) => (
                   <RoleTableRow
                     key={role.id}
                     role={role}
-                    index={index}
+                    index={(page - 1) * rowsPerPage + index + 1}
                     handleModalOpen={handleModalOpen}
-                    onDelete={onDelete}
+                    onDelete={handleDelete}
                   />
                 ))}
+              {/* <TableEmptyRows
+                emptyRows={emptyRows(page, rowsPerPage, roles?.length)}
+              /> */}
             </tbody>
           </Table>
 
@@ -212,6 +231,14 @@ export default function RoleManagement() {
           <TableBodyLoading
             isLoading={isLoading}
             tableRowPerPage={rowsPerPage}
+          />
+
+          <Pagination
+            totalRows={rolesData?.data?.roles?.length || 0}
+            currentPage={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
       </div>
