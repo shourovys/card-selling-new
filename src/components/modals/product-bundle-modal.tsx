@@ -191,7 +191,7 @@ export function ProductBundleModal({
     [fetchAdditionalCategories]
   );
 
-  // Calculate EQD price
+  // Calculate IQD price
   const calculateEqdPrice = useCallback(
     (facePrice: string, currencyId: string) => {
       if (!facePrice || !currencyId) return '';
@@ -204,7 +204,7 @@ export function ProductBundleModal({
       );
       if (!selectedCurrency) return '';
 
-      if (selectedCurrency.name === 'EQD') {
+      if (selectedCurrency.name === 'IQD') {
         return price.toFixed(2);
       }
 
@@ -285,7 +285,7 @@ export function ProductBundleModal({
   // Calculate derived values
   const gpAmount = calculateGPAmount(purchasePrice, gpType, gpValue);
   const salePrice = calculateSalePrice(purchasePrice, gpAmount);
-  const eqdPriceValue = calculateEqdPrice(facePrice, currency);
+  const iqdPriceValue = calculateEqdPrice(facePrice, currency);
 
   // Update gpAmount and salePrice when dependencies change
   useEffect(() => {
@@ -503,9 +503,9 @@ export function ProductBundleModal({
 
                   <div className='space-y-2'>
                     <InputLabel
-                      name='facePriceEQD'
-                      label='Face Price (EQD)'
-                      value={eqdPriceValue}
+                      name='facePriceIQD'
+                      label='Face Price (IQD)'
+                      value={iqdPriceValue}
                       type='number'
                       disabled
                       description={
@@ -517,7 +517,7 @@ export function ProductBundleModal({
                         } = ${
                           currencies.find((c) => c.id === Number(currency))
                             ?.exchangeRate
-                        } EQD`
+                        } IQD`
                       }
                     />
                   </div>
