@@ -22,7 +22,7 @@ import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import QueryString from 'qs';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -59,19 +59,26 @@ export default function PendingVirtualMoneyList() {
     search: '',
   };
 
-  const { filterState, handleFilterInputChange } =
-    useFilter(initialFilterState);
+  const { filterState, debouncedFilterState, handleFilterInputChange } =
+    useFilter(initialFilterState, undefined, 300);
 
-  const apiQueryParamsString = QueryString.stringify({
-    ...(filterState.search && { search: filterState.search }),
-    page: page - 1,
-    size: rowsPerPage,
-    status: 'PENDING',
-  });
+  const createQueryParams = useCallback(
+    (filters: { search: string }) => ({
+      ...(filters.search && { search: filters.search }),
+      page: page - 1,
+      size: rowsPerPage,
+      status: 'PENDING',
+    }),
+    [page, rowsPerPage]
+  );
 
   const { data, error, mutate, isLoading } = useSWR<
     IApiResponse<IVirtualMoneyResponse>
-  >(BACKEND_ENDPOINTS.VIRTUAL_MONEY.LIST(apiQueryParamsString));
+  >(
+    BACKEND_ENDPOINTS.VIRTUAL_MONEY.LIST(
+      QueryString.stringify(createQueryParams(debouncedFilterState))
+    )
+  );
 
   const virtualMoneyList = data?.data?.content || [];
 

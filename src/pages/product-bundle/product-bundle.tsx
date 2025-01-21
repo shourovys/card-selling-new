@@ -62,21 +62,33 @@ export default function ProductBundleManagement() {
   }>({ open: false, mode: 'add' });
 
   // Filter state management
-  const { filterState, handleFilterInputChange } = useFilter({
-    search: '',
-  });
+  const { filterState, debouncedFilterState, handleFilterInputChange } =
+    useFilter(
+      {
+        search: '',
+      },
+      undefined,
+      300
+    );
 
   // Create query params for API
-  const apiQueryParamsString = QueryString.stringify({
-    ...(filterState.search && { search: filterState.search }),
-    page: page - 1,
-    size: rowsPerPage,
-  });
+  const createQueryParams = useCallback(
+    (filters: { search: string }) => ({
+      ...(filters.search && { search: filters.search }),
+      page: page - 1,
+      size: rowsPerPage,
+    }),
+    [page, rowsPerPage]
+  );
 
   // Fetch data using SWR
   const { data, error, mutate, isLoading } = useSWR<
     IApiResponse<IProductBundleResponse>
-  >(BACKEND_ENDPOINTS.PRODUCT_BUNDLE.LIST(apiQueryParamsString));
+  >(
+    BACKEND_ENDPOINTS.PRODUCT_BUNDLE.LIST(
+      QueryString.stringify(createQueryParams(debouncedFilterState))
+    )
+  );
 
   const productBundles = data?.data?.productBundlesData?.productBundles || [];
 

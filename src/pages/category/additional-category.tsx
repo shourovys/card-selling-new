@@ -28,7 +28,7 @@ import {
 import { ICategoryResponse } from '@/types/features/category';
 import { Plus } from 'lucide-react';
 import QueryString from 'qs';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -68,15 +68,18 @@ export default function AdditionalCategoryManagement() {
     search: '',
   };
 
-  const { filterState, handleFilterInputChange } =
-    useFilter(initialFilterState);
-
   // Create query params for API
-  const apiQueryParamsString: AdditionalCategoryApiQueryParams = {
-    page: page - 1,
-    size: rowsPerPage,
-    ...(filterState.search && { search: filterState.search }),
-  };
+  const createQueryParams = useCallback(
+    (filters: AdditionalCategoryFilter): AdditionalCategoryApiQueryParams => ({
+      page: page - 1,
+      size: rowsPerPage,
+      ...(filters.search && { name: filters.search }),
+    }),
+    [page, rowsPerPage]
+  );
+
+  const { filterState, debouncedFilterState, handleFilterInputChange } =
+    useFilter<AdditionalCategoryFilter>(initialFilterState);
 
   // Fetch categories using SWR
   const { data: categoriesData } = useSWR<IApiResponse<ICategoryResponse>>(
@@ -87,7 +90,7 @@ export default function AdditionalCategoryManagement() {
     IApiResponse<IAdditionalCategoryResponse>
   >(
     BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.LIST(
-      QueryString.stringify(apiQueryParamsString)
+      QueryString.stringify(createQueryParams(debouncedFilterState))
     )
   );
 

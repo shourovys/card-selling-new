@@ -26,7 +26,7 @@ import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import { Plus } from 'lucide-react';
 import QueryString from 'qs';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 
 export default function ProductManagement() {
@@ -64,20 +64,27 @@ export default function ProductManagement() {
     search: '',
   };
 
-  const { filterState, handleFilterInputChange } =
-    useFilter(initialFilterState);
+  const { filterState, debouncedFilterState, handleFilterInputChange } =
+    useFilter(initialFilterState, undefined, 300);
 
   // Create query params for API
-  const apiQueryParamsString = QueryString.stringify({
-    ...(filterState.search && { search: filterState.search }),
-    page: page - 1,
-    size: rowsPerPage,
-  });
+  const createQueryParams = useCallback(
+    (filters: { search: string }) => ({
+      ...(filters.search && { search: filters.search }),
+      page: page - 1,
+      size: rowsPerPage,
+    }),
+    [page, rowsPerPage]
+  );
 
   // Fetch products using SWR
   const { data, error, mutate, isLoading } = useSWR<
     IApiResponse<IProductResponse>
-  >(BACKEND_ENDPOINTS.PRODUCT.LIST(apiQueryParamsString));
+  >(
+    BACKEND_ENDPOINTS.PRODUCT.LIST(
+      QueryString.stringify(createQueryParams(debouncedFilterState))
+    )
+  );
 
   // Fetch categories for modal
   const { data: categoriesData } = useSWR<

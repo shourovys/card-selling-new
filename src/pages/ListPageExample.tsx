@@ -18,7 +18,7 @@ import {
   IOrderResponse,
 } from '@/types/features/order';
 import QueryString from 'qs';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 
 export default function Home() {
@@ -57,24 +57,29 @@ export default function Home() {
   // State and handlers for managing filters using a custom hook
   const {
     filterState,
-    setFilterState,
+    debouncedFilterState,
     handleFilterInputChange,
     handleFilterStateReset,
-  } = useFilter(initialFilterState);
+  } = useFilter(initialFilterState, undefined, 300);
 
   // Create query params for the API using a custom hook
-  const apiQueryParamsString: IOrderApiQueryParams = {
-    offset: (page - 1) * rowsPerPage,
-    limit: rowsPerPage,
-    sort_by: orderBy,
-    order,
-    ...(filterState.id && { id: filterState.id }),
-    ...(filterState.search && { search: filterState.search }),
-  };
+  const createQueryParams = useCallback(
+    (filters: IOrderFilter): IOrderApiQueryParams => ({
+      offset: (page - 1) * rowsPerPage,
+      limit: rowsPerPage,
+      sort_by: orderBy,
+      order,
+      ...(filters.id && { id: filters.id }),
+      ...(filters.search && { search: filters.search }),
+    }),
+    [page, rowsPerPage, orderBy, order]
+  );
 
   // Fetch data using SWR with the generated query string
   const { isLoading, data, error } = useSWR<IOrderResponse>(
-    BACKEND_ENDPOINTS.ORDER(QueryString.stringify(apiQueryParamsString)),
+    BACKEND_ENDPOINTS.ORDER(
+      QueryString.stringify(createQueryParams(debouncedFilterState))
+    ),
     fetcher
   );
 
@@ -96,7 +101,7 @@ export default function Home() {
           filterState={filterState}
           handleFilterStateReset={handleFilterStateReset}
           handleFilterInputChange={handleFilterInputChange}
-          setFilterState={setFilterState}
+          setFilterState={handleFilterStateReset}
         />
 
         {/* Table and Table Headers */}
