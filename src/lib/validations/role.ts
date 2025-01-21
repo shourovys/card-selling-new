@@ -49,12 +49,10 @@ export type PermissionGroup = z.infer<typeof permissionGroupSchema>;
 export type Permission = z.infer<typeof permissionSchema>;
 
 export interface IRoleResponse {
-  data: {
-    roles: Role[];
-    total: number;
-    totalPages: number;
-    currentPage: number;
-  };
+  roles: Role[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
 }
 
 export interface IPermissionResponse {

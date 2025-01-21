@@ -1,4 +1,4 @@
-import { getMetaInfo } from '@/getMetaInfo';
+import { getMetaInfo } from '@/utils/getMetaInfo';
 import axios from 'axios';
 
 export const axiosInstance = axios.create({

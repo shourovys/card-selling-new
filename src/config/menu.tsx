@@ -56,6 +56,38 @@ export const menuItems: MenuItem[] = [
       },
     ],
   },
+
+  {
+    label: 'User',
+    icon: User,
+    roles: ['System Admin'],
+    subMenu: [
+      {
+        path: routePaths.systemUser,
+        label: 'System Users',
+        icon: User,
+        roles: ['System Admin'],
+      },
+      {
+        path: routePaths.distributor,
+        label: 'Distributors',
+        icon: User,
+        roles: ['System Admin'],
+      },
+      {
+        path: routePaths.subDistributor,
+        label: 'Sub Distributors',
+        icon: User,
+        roles: ['System Admin'],
+      },
+      {
+        path: routePaths.sr,
+        label: 'SR',
+        icon: User,
+        roles: ['System Admin'],
+      },
+    ],
+  },
   {
     label: 'Category',
     icon: Tags,

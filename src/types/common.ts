@@ -26,17 +26,22 @@ export interface IFormSubmissionResponse {
 }
 
 export interface IRequestMetaInfo {
+  requestId: string;
+  source: string;
+  versionCode: string;
+  versionName: string;
+  networkType: string;
   deviceID: string;
-  deviceType: string;
-  deviceInfo: {
-    deviceID: string;
-    deviceType: string;
-    notificationToken: string;
-  };
+  deviceOSCode: number;
+  deviceOSName: string;
+  deviceName: string;
+  language: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface IApiRequestWithMetaData<T> {
-  attributes: T;
+  attribute: T;
   metaInfo: IRequestMetaInfo;
 }
 

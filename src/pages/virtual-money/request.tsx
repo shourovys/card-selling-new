@@ -5,13 +5,13 @@ import { Card } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
 import { InputField } from '@/components/ui/form/input-field';
 import { SelectField } from '@/components/ui/form/select-field';
-import { getMetaInfo } from '@/getMetaInfo';
 import { toast } from '@/hooks/use-toast';
 import {
   VirtualMoneyFormValues,
   virtualMoneyFormSchema,
 } from '@/lib/validations/virtual-money';
 import { IApiResponse } from '@/types/common';
+import { getMetaInfo } from '@/utils/getMetaInfo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import useSWR from 'swr';

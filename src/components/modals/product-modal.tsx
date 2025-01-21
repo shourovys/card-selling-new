@@ -11,7 +11,6 @@ import { FileUploadField } from '@/components/ui/form/file-upload-field';
 import { InputField } from '@/components/ui/form/input-field';
 import { RadioGroupField } from '@/components/ui/form/radio-group-field';
 import { SelectField } from '@/components/ui/form/select-field';
-import { getMetaInfo } from '@/getMetaInfo';
 import { Category } from '@/lib/validations/category';
 import {
   IProductPayload,
@@ -20,6 +19,7 @@ import {
   productFormSchema,
 } from '@/lib/validations/product';
 import fileToBase64 from '@/utils/fileToBase64';
+import { getMetaInfo } from '@/utils/getMetaInfo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';

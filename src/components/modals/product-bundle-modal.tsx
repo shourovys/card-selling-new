@@ -19,7 +19,6 @@ import {
   ServerSelectField,
   ServerSelectOption,
 } from '@/components/ui/form/server-select-field';
-import { getMetaInfo } from '@/getMetaInfo';
 import { toast } from '@/hooks/use-toast';
 import {
   IProductBundlePayload,
@@ -29,6 +28,7 @@ import {
 } from '@/lib/validations/product-bundle';
 import { IApiResponse } from '@/types/common';
 import fileToBase64 from '@/utils/fileToBase64';
+import { getMetaInfo } from '@/utils/getMetaInfo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';

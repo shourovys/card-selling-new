@@ -14,7 +14,6 @@ import { InputField } from '@/components/ui/form/input-field';
 import { MultiSelectField } from '@/components/ui/form/multi-select-field';
 import { RadioGroupField } from '@/components/ui/form/radio-group-field';
 import { ServerSelectField } from '@/components/ui/form/server-select-field';
-import { getMetaInfo } from '@/getMetaInfo';
 import {
   IAdditionalCategory,
   IAdditionalCategoryFormValues,
@@ -27,6 +26,7 @@ import {
   IAdditionalCategoryResponse,
 } from '@/types/features/additional-category';
 import fileToBase64 from '@/utils/fileToBase64';
+import { getMetaInfo } from '@/utils/getMetaInfo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';

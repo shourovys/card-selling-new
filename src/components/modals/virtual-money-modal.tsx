@@ -10,13 +10,13 @@ import {
 import { Form } from '@/components/ui/form';
 import { InputField } from '@/components/ui/form/input-field';
 import { ServerSelectField } from '@/components/ui/form/server-select-field';
-import { getMetaInfo } from '@/getMetaInfo';
 import {
   IVirtualMoneyPayload,
   Transaction,
   VirtualMoneyFormValues,
   virtualMoneyFormSchema,
 } from '@/lib/validations/virtual-money';
+import { getMetaInfo } from '@/utils/getMetaInfo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';

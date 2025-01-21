@@ -1,7 +1,6 @@
 import BACKEND_ENDPOINTS from '@/api/urls';
 import api from '@/config/apiConfig';
 import { CLIENT_ID, CLIENT_SECRET, LOCAL_STORAGE_KEYS } from '@/config/config';
-import { getMetaInfo } from '@/getMetaInfo';
 import {
   ILoginCredentials,
   ILoginResponse,
@@ -12,6 +11,7 @@ import {
 import { IApiResponse } from '@/types/common';
 import { localStorageUtil } from '@/utils/localStorageUtil';
 import axios from 'axios';
+import { getMetaInfo } from './getMetaInfo';
 
 class AuthService {
   private static instance: AuthService;
