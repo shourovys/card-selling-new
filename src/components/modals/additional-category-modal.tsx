@@ -255,7 +255,10 @@ export function AdditionalCategoryModal({
                     form={form}
                     label='Icon'
                     value={form.watch('icon')}
-                    onChange={(file) => form.setValue('icon', file)}
+                    onChange={(file) => {
+                      form.setValue('icon', file);
+                      form.trigger('icon');
+                    }}
                     preview
                     required={mode === 'add'}
                     disabled={isViewMode}

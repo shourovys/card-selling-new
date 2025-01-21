@@ -18,7 +18,6 @@ import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import {
-  CategoryApiQueryParams,
   CategoryFilter,
   ICategoryPayload,
   ICategoryResponse,
@@ -59,19 +58,21 @@ export default function CategoryManagement() {
   const { filterState, handleFilterInputChange } =
     useFilter(initialFilterState);
 
-  // Create query params for API
-  const apiQueryParamsString: CategoryApiQueryParams = {
-    ...(filterState.search && { search: filterState.search }),
-  };
-
   // Fetch categories using SWR
   const { data, error, mutate, isLoading } = useSWR<
     IApiResponse<ICategoryResponse>
-  >(
-    BACKEND_ENDPOINTS.CATEGORY.LIST(QueryString.stringify(apiQueryParamsString))
-  );
+  >(BACKEND_ENDPOINTS.CATEGORY.LIST(QueryString.stringify('')));
 
   const categories = data?.data?.categories || [];
+
+  // Filter sub distributors based on search term
+  const filteredCategories = categories.filter((category: Category) => {
+    if (!filterState.search) return true;
+
+    const searchTerm = filterState.search.toLowerCase();
+
+    return category.name.includes(searchTerm);
+  });
 
   // Modal handlers
   const handleModalOpen = (
@@ -129,7 +130,7 @@ export default function CategoryManagement() {
   };
 
   // Check if no data is found
-  const isNotFound = !categories.length && !isLoading && !error;
+  const isNotFound = !filteredCategories.length && !isLoading && !error;
 
   const breadcrumbItems = [
     { label: 'Dashboard', href: routePaths.dashboard },
@@ -166,13 +167,13 @@ export default function CategoryManagement() {
               order={order}
               orderBy={orderBy}
               numSelected={selected.length}
-              rowCount={categories.length || 0}
+              rowCount={filteredCategories.length || 0}
               handleSort={handleSort}
               headerData={TABLE_HEAD}
             />
             <tbody>
               {!isLoading &&
-                categories.map((category, index) => (
+                filteredCategories.map((category, index) => (
                   <CategoryTableRow
                     key={category.id}
                     category={category}

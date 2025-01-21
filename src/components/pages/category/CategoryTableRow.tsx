@@ -42,13 +42,13 @@ export default function CategoryTableRow({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { trigger: deleteCategory, isMutating: isDeleting } = useSWRMutation(
-    BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.DELETE(category.id),
+    BACKEND_ENDPOINTS.CATEGORY.DELETE(category.id),
     sendDeleteRequest,
     {
       onSuccess: () => {
         toast({
           title: 'Success',
-          description: 'Additional category deleted successfully',
+          description: 'Category deleted successfully',
         });
         onDelete();
       },
