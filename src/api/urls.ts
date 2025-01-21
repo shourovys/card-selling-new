@@ -5,31 +5,33 @@ const BACKEND_ENDPOINTS = {
 
   // Role
   ROLE: {
-    LIST: (queryString?: string) =>
+    LIST: (queryString: string) =>
       `/api/v1/private/roles${queryString ? `?${queryString}` : ''}`,
     CREATE: 'api/v1/private/roles',
-    UPDATE: (id: number) => `/api/v1/private/roles/${id}`,
-    DELETE: (id: number) => `/api/v1/private/roles/${id}`,
-    PERMISSIONS: '/api/v1/private/roles/permissions',
-    PERMISSION_GROUPS: '/api/v1/private/roles/permission-groups',
+    UPDATE: (id: number) => `/api/v1/private/role?id=${id}`,
+    DELETE: (id: number) => `/api/v1/private/role?id=${id}`,
+    PERMISSIONS: '/api/v1/private/get-all-app-permissions',
+    PERMISSION_GROUPS: '/api/v1/private/get-all-app-groups',
   },
 
   // Virtual Money
   VIRTUAL_MONEY: {
-    LIST: (queryString: string) =>
-      `/api/v1/private/virtual-money${queryString}`,
-    GENERATE: '/api/v1/private/virtual-money/generate',
-    APPROVE: '/api/v1/private/virtual-money/approve',
-    APPROVER_LIST: '/api/v1/private/virtual-money/approver-list',
+    GENERATE: '/api/v1/private/generate-virtual-money',
+    LIST: (queryString: string = '') =>
+      `/api/v1/private/all-virtual-money-requests${
+        queryString ? `?${queryString}` : ''
+      }`,
+    APPROVE: '/api/v1/private/approve-virtual-money-request',
+    APPROVER_LIST: '/api/v1/private/approver-list',
   },
 
   // Categories
   CATEGORY: {
     LIST: (queryString: string) =>
-      `/api/v1/private/all/categories${queryString}`,
-    CREATE: '/api/v1/private/categories',
-    UPDATE: (id: number) => `/api/v1/private/categories/${id}`,
-    DELETE: (id: number) => `/api/v1/private/categories/${id}`,
+      `/api/v1/private/all/categories?${queryString}`,
+    CREATE: '/api/v1/private/save/category',
+    UPDATE: (id: number) => `/api/v1/private/update/category/${id}`,
+    DELETE: (id: number) => `/api/v1/private/delete/category/${id}`,
   },
 
   // Orders
@@ -58,10 +60,11 @@ const BACKEND_ENDPOINTS = {
 
   // Products
   PRODUCT: {
-    LIST: (queryString: string) => `/api/v1/private/products${queryString}`,
-    CREATE: '/api/v1/private/products',
-    UPDATE: (id: number) => `/api/v1/private/products/${id}`,
-    DELETE: (id: number) => `/api/v1/private/products/${id}`,
+    LIST: (queryString: string = '') =>
+      `/api/v1/private/all/products${queryString ? `?${queryString}` : ''}`,
+    CREATE: '/api/v1/private/save/product',
+    UPDATE: (id: number) => `/api/v1/private/update/product/${id}`,
+    DELETE: (id: number) => `/api/v1/private/delete/product/${id}`,
   },
 
   PRODUCT_BUNDLE: {

@@ -91,7 +91,7 @@ export function SystemUserModal({
 
   // Fetch roles and checkers
   const { data: rolesData } = useSWR<IApiResponse<IRoleResponse>>(
-    open ? BACKEND_ENDPOINTS.ROLE.LIST() : null
+    open ? BACKEND_ENDPOINTS.ROLE.LIST('') : null
   );
   const { data: checkersData } = useSWR<IApiResponse<ICheckerResponse>>(
     open && form.watch('status') === 'inactive'
