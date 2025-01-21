@@ -114,39 +114,38 @@ export default function AdditionalCategoryManagement() {
 
   const { trigger: createTrigger, isMutating: isCreating } = useSWRMutation(
     BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.CREATE,
-    sendPostRequest
-  );
-
-  const { trigger: updateTrigger, isMutating: isUpdating } = useSWRMutation(
-    BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.UPDATE(selectedCategory?.id || 0),
-    sendPutRequest
-  );
-
-  // API handlers
-  const handleSubmit = async (payload: IAdditionalCategoryPayload) => {
-    try {
-      if (modalState.mode === 'edit' && selectedCategory) {
-        await updateTrigger(payload);
-        toast({
-          title: 'Success',
-          description: 'Additional category updated successfully',
-        });
-      } else {
-        await createTrigger(payload);
+    sendPostRequest,
+    {
+      onSuccess: () => {
         toast({
           title: 'Success',
           description: 'Additional category created successfully',
         });
-      }
-      mutate(); // Refresh the categories list
-    } catch (error) {
-      console.error('Error submitting category:', error);
-      toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
+      },
     }
+  );
+
+  const { trigger: updateTrigger, isMutating: isUpdating } = useSWRMutation(
+    BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.UPDATE(selectedCategory?.id || 0),
+    sendPutRequest,
+    {
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: 'Additional category updated successfully',
+        });
+      },
+    }
+  );
+
+  // API handlers
+  const handleSubmit = async (payload: IAdditionalCategoryPayload) => {
+    if (modalState.mode === 'edit' && selectedCategory) {
+      await updateTrigger(payload);
+    } else {
+      await createTrigger(payload);
+    }
+    mutate();
   };
 
   const onDelete = () => {
