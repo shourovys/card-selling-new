@@ -63,7 +63,7 @@ const getInitialValues = (
     position: null,
     status: category?.status ? 'active' : 'inactive',
     icon: category?.icon || null,
-    categoryIds: category?.categoryIds || [],
+    categoryIds: category?.categoryIds.map((id) => id.toString()) || [],
   };
 };
 
