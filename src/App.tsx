@@ -1,3 +1,4 @@
+import 'react-loading-skeleton/dist/skeleton.css';
 import { SWRConfig } from 'swr';
 import { swrConfig } from './api/swrConfig';
 import { Toaster } from './components/ui/toaster';

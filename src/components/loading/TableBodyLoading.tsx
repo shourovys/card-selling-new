@@ -1,6 +1,7 @@
 import { TABLE_ROW_HEIGHT, TABLE_ROW_PER_PAGE } from '@/config/config';
 import { cn } from '@/lib/utils';
 import createArray from '@/utils/createArray';
+import Skeleton from 'react-loading-skeleton';
 
 interface IProps {
   isLoading: boolean;
@@ -20,7 +21,7 @@ function TableBodyLoading({
   return (
     <div className='overflow-hidden divide-y divide-white'>
       {createArray(tableRowPerPage).map((item) => (
-        <div
+        <Skeleton
           className={cn('w-full animate-pulse bg-primaryBorder')}
           style={{ height: tableRowHeight }}
           key={item}
