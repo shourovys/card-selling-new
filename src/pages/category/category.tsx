@@ -52,7 +52,7 @@ export default function CategoryManagement() {
 
   // Filter state management
   const initialFilterState: CategoryFilter = {
-    search: '',
+    name: '',
   };
 
   const { filterState, handleFilterInputChange } =
@@ -65,13 +65,13 @@ export default function CategoryManagement() {
 
   const categories = data?.data?.categories || [];
 
-  // Filter sub distributors based on search term
+  // Filter sub distributors based on name term
   const filteredCategories = categories.filter((category: Category) => {
-    if (!filterState.search) return true;
+    if (!filterState.name) return true;
 
-    const searchTerm = filterState.search.toLowerCase();
+    const nameTerm = filterState.name.toLowerCase();
 
-    return category.name.includes(searchTerm);
+    return category.name.includes(nameTerm);
   });
 
   // Modal handlers
@@ -145,11 +145,9 @@ export default function CategoryManagement() {
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>
             <Input
-              placeholder='Search categories...'
-              value={filterState.search}
-              onChange={(e) =>
-                handleFilterInputChange('search', e.target.value)
-              }
+              placeholder='Search by name...'
+              value={filterState.name}
+              onChange={(e) => handleFilterInputChange('name', e.target.value)}
               className='max-w-sm h-10 bg-gray-50'
             />
             <Button

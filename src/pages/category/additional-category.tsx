@@ -65,7 +65,7 @@ export default function AdditionalCategoryManagement() {
 
   // Filter state management
   const initialFilterState: AdditionalCategoryFilter = {
-    search: '',
+    name: '',
   };
 
   // Create query params for API
@@ -73,7 +73,7 @@ export default function AdditionalCategoryManagement() {
     (filters: AdditionalCategoryFilter): AdditionalCategoryApiQueryParams => ({
       page: page - 1,
       size: rowsPerPage,
-      ...(filters.search && { name: filters.search }),
+      ...(filters.name && { name: filters.name }),
     }),
     [page, rowsPerPage]
   );
@@ -172,11 +172,9 @@ export default function AdditionalCategoryManagement() {
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>
             <Input
-              placeholder='Search categories...'
-              value={filterState.search}
-              onChange={(e) =>
-                handleFilterInputChange('search', e.target.value)
-              }
+              placeholder='Search by name...'
+              value={filterState.name}
+              onChange={(e) => handleFilterInputChange('name', e.target.value)}
               className='max-w-sm h-10 bg-gray-50'
             />
             <Button

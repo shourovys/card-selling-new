@@ -63,12 +63,12 @@ export default function ProductBundleManagement() {
 
   // Filter state management
   const { filterState, debouncedFilterState, handleFilterInputChange } =
-    useFilter({ search: '' });
+    useFilter({ name: '' });
 
   // Create query params for API
   const createQueryParams = useCallback(
-    (filters: { search: string }) => ({
-      ...(filters.search && { search: filters.search }),
+    (filters: { name: string }) => ({
+      ...(filters.name && { name: filters.name }),
       page: page - 1,
       size: rowsPerPage,
     }),
@@ -167,11 +167,9 @@ export default function ProductBundleManagement() {
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>
             <Input
-              placeholder='Search product bundles...'
-              value={filterState.search}
-              onChange={(e) =>
-                handleFilterInputChange('search', e.target.value)
-              }
+              placeholder='Search by name...'
+              value={filterState.name}
+              onChange={(e) => handleFilterInputChange('name', e.target.value)}
               className='max-w-sm h-10 bg-gray-50'
             />
             <Button

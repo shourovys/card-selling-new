@@ -5,7 +5,6 @@ import {
 import { IRequestMetaInfo } from '../common';
 
 export interface AdditionalCategoryApiQueryParams {
-  search?: string;
   page?: number;
   size?: number;
   name?: string;
@@ -27,7 +26,7 @@ export interface IAdditionalCategoryMappingResponse {
 }
 
 export interface AdditionalCategoryFilter {
-  search: string;
+  name: string;
 }
 
 export interface IAdditionalCategoryPayload {

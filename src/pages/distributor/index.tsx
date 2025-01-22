@@ -49,7 +49,7 @@ export default function DistributorManagement() {
   }>({ open: false, mode: 'add' });
 
   const initialFilterState = {
-    search: '',
+    name: '',
   };
 
   const { filterState, handleFilterInputChange } =
@@ -61,16 +61,16 @@ export default function DistributorManagement() {
 
   const distributors = data?.data?.distributors || [];
 
-  // Filter distributors based on search term
+  // Filter distributors based on name term
   const filteredDistributors = distributors.filter(
     (distributor: Distributor) => {
-      if (!filterState.search) return true;
+      if (!filterState.name) return true;
 
-      const searchTerm = filterState.search.toLowerCase();
+      const nameTerm = filterState.name.toLowerCase();
       const fullName =
         `${distributor.firstName} ${distributor.lastName}`.toLowerCase();
 
-      return fullName.includes(searchTerm);
+      return fullName.includes(nameTerm);
     }
   );
 
@@ -143,11 +143,9 @@ export default function DistributorManagement() {
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>
             <Input
-              placeholder='Search distributors...'
-              value={filterState.search}
-              onChange={(e) =>
-                handleFilterInputChange('search', e.target.value)
-              }
+              placeholder='Search by name...'
+              value={filterState.name}
+              onChange={(e) => handleFilterInputChange('name', e.target.value)}
               className='max-w-sm h-10 bg-gray-50'
             />
             <Button

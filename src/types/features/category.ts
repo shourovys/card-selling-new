@@ -6,7 +6,7 @@ export interface CategoryApiQueryParams {
   // limit: number;
   // sort_by: string;
   // order: 'asc' | 'desc';
-  search?: string;
+  name?: string;
 }
 
 export interface ICategoryResponse {
@@ -14,7 +14,7 @@ export interface ICategoryResponse {
 }
 
 export interface CategoryFilter {
-  search: string;
+  name: string;
 }
 
 export interface ICategoryPayload {
