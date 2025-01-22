@@ -50,7 +50,7 @@ export default function AdditionalCategoryManagement() {
     { id: 'sno', label: 'S.NO', align: 'left' },
     { id: 'name', label: 'CATEGORIES', align: 'left' },
     { id: 'status', label: 'STATUS', align: 'left' },
-    { id: 'position', label: 'POSITION', align: 'left' },
+    { id: 'position', label: 'POSITION', align: 'center' },
     { id: 'createdBy', label: 'CREATED BY', align: 'left' },
     { id: 'actions', label: 'ACTIONS', align: 'right' },
   ];

@@ -108,7 +108,7 @@ export function AdditionalCategoryModal({
         const previousCategory =
           data.data.additionalCategoriesData.additionalCategories[0];
         form.setValue('position', {
-          value: previousCategory.id.toString(),
+          value: previousCategory.position.toString(),
           label: previousCategory.name,
         });
       },
@@ -133,16 +133,7 @@ export function AdditionalCategoryModal({
 
       // Handle position based on display order selection
       if (values.position) {
-        const response = await additionalCategoryApi.getByPosition(
-          values.position.value
-        );
-        const selectedCategory =
-          response.data.additionalCategoriesData.additionalCategories[0];
-        if (selectedCategory) {
-          payload.attribute.position = selectedCategory.position + 1;
-        }
-      } else if (mode === 'edit' && category) {
-        payload.attribute.position = category.position || null;
+        payload.attribute.position = Number(values.position.value) + 1;
       }
 
       // Convert icon to base64 if it exists and is a File object
@@ -196,7 +187,7 @@ export function AdditionalCategoryModal({
     const response = await additionalCategoryApi.getAll(`name=${search}`);
     return response.data.additionalCategoriesData.additionalCategories.map(
       (item) => ({
-        value: item.id.toString(),
+        value: item.position.toString(),
         label: item.name,
       })
     );
