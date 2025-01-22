@@ -233,7 +233,6 @@ export function AdditionalCategoryModal({
                     loadOptions={loadOptions}
                     disabled={isViewMode || isLoadingPreviousCategory}
                     minCharacters={3}
-                    debounceTimeout={300}
                     isClearable
                     placeholder='Select previous category'
                   />

@@ -224,7 +224,7 @@ export function ServerSelectField<T extends FieldValues>({
   isClearable = false,
   menuPlacement = 'auto',
   minCharacters = 3,
-  debounceTimeout = 300,
+  debounceTimeout = 800,
   onInputChange,
   loadOptions,
 }: ServerSelectFieldProps<T>) {
