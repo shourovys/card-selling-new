@@ -212,7 +212,7 @@ export function CategoryModal({
                       form.trigger('icon');
                     }}
                     preview
-                    required={mode === 'add'}
+                    required
                     disabled={isViewMode}
                     acceptedTypes={['image/jpeg', 'image/png']}
                     maxSize={1}

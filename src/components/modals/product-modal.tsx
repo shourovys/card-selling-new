@@ -171,7 +171,7 @@ export function ProductModal({
                     value={form.watch('image')}
                     onChange={(file) => form.setValue('image', file)}
                     preview
-                    required={mode === 'add'}
+                    required
                     disabled={isViewMode}
                     acceptedTypes={['image/jpeg', 'image/png']}
                     maxSize={1}

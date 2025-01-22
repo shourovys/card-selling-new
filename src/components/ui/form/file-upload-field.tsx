@@ -56,7 +56,7 @@ export function FileUploadField<T extends FieldValues>({
   maxSize = 5, // in MB
   preview = true,
   disabled = false,
-  height = 146,
+  height = 167,
 }: FileUploadFieldProps<T>) {
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
