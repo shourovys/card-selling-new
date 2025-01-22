@@ -150,30 +150,40 @@ export function SelectField<T extends FieldValues>({
         border: hasError
           ? '1px solid hsl(var(--destructive))'
           : '1px solid hsl(var(--input-border))',
-        borderRadius: 'var(--radius)',
+        borderRadius: '6px',
         boxShadow: 'none',
         transition: 'all 150ms ease',
-        '&:hover': {
-          borderColor: hasError
-            ? 'hsl(var(--destructive))'
-            : 'hsl(var(--input-border-hover))',
-        },
+        '&:hover': state.isDisabled
+          ? {}
+          : {
+              borderColor: hasError
+                ? 'hsl(var(--destructive))'
+                : 'hsl(var(--input-border-hover))',
+            },
         '&:focus-within': {
           outline: 'none',
+          borderColor: hasError
+            ? 'hsl(var(--destructive))'
+            : 'hsl(var(--input-border-focus))',
           boxShadow: hasError
-            ? '0 0 0 2px hsl(var(--destructive))'
-            : '0 0 0 2px hsl(var(--ring))',
+            ? '0 0 0 1px hsl(var(--destructive))'
+            : '0 0 0 1px hsl(var(--ring))',
         },
         ...(state.isDisabled && {
-          opacity: 0.5,
           cursor: 'not-allowed',
-          backgroundColor: 'hsl(var(--muted))',
+          backgroundColor: 'hsl(var(--input-disabled-background))',
+          borderColor: 'hsl(var(--input-border))',
+          color: 'hsl(var(--input-disabled-text))',
+          '& *': {
+            color: 'hsl(var(--input-disabled-text)) !important',
+          },
         }),
       }),
       menu: (base) => ({
         ...base,
         backgroundColor: 'hsl(var(--background))',
         border: '1px solid hsl(var(--border))',
+        borderRadius: '6px',
         boxShadow: 'var(--shadow)',
         zIndex: 9999,
       }),
@@ -183,6 +193,7 @@ export function SelectField<T extends FieldValues>({
       }),
       menuList: (base) => ({
         ...base,
+        padding: '4px',
         maxHeight: maxMenuHeight,
         minHeight: 35,
         overflowY: 'auto',
@@ -208,8 +219,9 @@ export function SelectField<T extends FieldValues>({
       }),
       option: (base, state) => ({
         ...base,
-        padding: '8px 14px',
-        borderRadius: 'var(--radius)',
+        padding: '6px 12px',
+        borderRadius: '6px',
+        marginBottom: '4px',
         backgroundColor: state.isSelected
           ? 'hsl(var(--secondary))'
           : state.isFocused
@@ -231,26 +243,34 @@ export function SelectField<T extends FieldValues>({
           backgroundColor: 'hsl(var(--accent))',
         },
       }),
-      singleValue: (base) => ({
+      singleValue: (base, state) => ({
         ...base,
-        color: 'hsl(var(--foreground))',
+        color: state.isDisabled
+          ? 'hsl(var(--input-disabled-text))'
+          : 'hsl(var(--foreground))',
         fontSize: '14px',
       }),
-      input: (base) => ({
+      input: (base, state) => ({
         ...base,
-        color: 'hsl(var(--foreground))',
+        color: state.isDisabled
+          ? 'hsl(var(--input-disabled-text))'
+          : 'hsl(var(--foreground))',
         fontSize: '14px',
         margin: '0',
         padding: '0',
       }),
-      placeholder: (base) => ({
+      placeholder: (base, state) => ({
         ...base,
-        color: 'hsl(var(--muted-foreground))',
+        color: state.isDisabled
+          ? 'hsl(var(--input-disabled-text))'
+          : 'hsl(var(--muted-foreground))',
         fontSize: '14px',
       }),
       valueContainer: (base) => ({
         ...base,
-        padding: '2px 12px',
+        padding: '0px 12px',
+        paddingTop: '0px',
+        paddingBottom: '4px',
       }),
       indicatorsContainer: (base) => ({
         ...base,

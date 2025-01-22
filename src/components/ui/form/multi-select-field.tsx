@@ -1,3 +1,4 @@
+import EmptyContent from '@/components/common/EmptyContent';
 import { Button } from '@/components/ui/button';
 import {
   FormDescription,
@@ -12,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, ArrowRight, Search } from 'lucide-react';
 import * as React from 'react';
 import { FieldValues, Path, PathValue, UseFormReturn } from 'react-hook-form';
+import { Separator } from '../separator';
 
 export interface MultiSelectOption {
   label: string;
@@ -23,7 +25,9 @@ type BaseFieldProps<T extends FieldValues> = {
   name: Path<T>;
   form: UseFormReturn<T>;
   label?: string;
+  smallLabel?: string;
   description?: string;
+  className?: string;
   required?: boolean;
 };
 
@@ -31,18 +35,18 @@ interface MultiSelectFieldProps<T extends FieldValues>
   extends BaseFieldProps<T> {
   options: MultiSelectOption[];
   disabled?: boolean;
-  error?: string;
 }
 
 export function MultiSelectField<T extends FieldValues>({
   name,
   form,
   label,
+  smallLabel,
   description,
+  className,
   required = false,
   options,
   disabled = false,
-  error: customError,
 }: MultiSelectFieldProps<T>) {
   const [availableSearch, setAvailableSearch] = React.useState('');
   const [selectedSearch, setSelectedSearch] = React.useState('');
@@ -51,8 +55,7 @@ export function MultiSelectField<T extends FieldValues>({
   );
   const [selectedChosen, setSelectedChosen] = React.useState<string[]>([]);
 
-  const formError = form.formState.errors[name];
-  const error = customError || (formError?.message as string);
+  const error = form.formState.errors[name];
   const selectedValues = (form.watch(name) || []) as string[];
 
   const selectedItems = React.useMemo(() => {
@@ -80,6 +83,7 @@ export function MultiSelectField<T extends FieldValues>({
     selectedList: string[],
     setSelectedList: React.Dispatch<React.SetStateAction<string[]>>
   ) => {
+    if (disabled) return;
     const isSelected = selectedList.includes(item.value);
     setSelectedList(
       isSelected
@@ -89,6 +93,7 @@ export function MultiSelectField<T extends FieldValues>({
   };
 
   const handleTransfer = (direction: 'right' | 'left') => {
+    if (disabled) return;
     if (direction === 'right') {
       const itemsToTransfer = availableItems.filter((item) =>
         selectedAvailable.includes(item.value)
@@ -120,28 +125,30 @@ export function MultiSelectField<T extends FieldValues>({
     onSelect: (item: MultiSelectOption) => void
   ) => (
     <ScrollArea className='h-[200px] px-4 w-full rounded-md'>
-      <div className='space-y-[1px]'>
+      <div className=''>
         {items.map((item) => (
-          <div
-            key={item.value.toString()}
-            onClick={() => !disabled && !item.disabled && onSelect(item)}
-            className={cn(
-              'px-4 py-3 text-sm transition-colors border-b border-border',
-              selectedIds.includes(item.value)
-                ? 'bg-secondary/20 font-medium'
-                : 'hover:bg-muted/50',
-              disabled || item.disabled
-                ? 'cursor-not-allowed opacity-50'
-                : 'cursor-pointer'
-            )}
-          >
-            {item.label}
+          <div key={item.value.toString()}>
+            <div
+              onClick={() => !item.disabled && onSelect(item)}
+              className={cn(
+                'px-3 py-3 text-sm transition-colors rounded-md',
+                selectedIds.includes(item.value)
+                  ? !disabled && 'bg-secondary/20 font-medium'
+                  : !disabled && 'hover:bg-accent',
+                item.disabled
+                  ? 'cursor-not-allowed opacity-50'
+                  : disabled
+                  ? 'cursor-default text-input-disabled-text'
+                  : 'cursor-pointer'
+              )}
+            >
+              {item.label}
+            </div>
+            <Separator className='h-[0.5px]' />
           </div>
         ))}
         {items.length === 0 && (
-          <div className='px-4 py-6 text-sm text-center text-muted-foreground'>
-            No items found
-          </div>
+          <EmptyContent title='No items found' imageClassName='w-32' />
         )}
       </div>
     </ScrollArea>
@@ -152,71 +159,118 @@ export function MultiSelectField<T extends FieldValues>({
       control={form.control}
       name={name}
       render={() => (
-        <FormItem>
+        <FormItem className={className}>
           {label && (
             <FormLabel className='flex gap-1 items-center'>
               {label}
+              {smallLabel && (
+                <span className='text-small text-muted-foreground leading-none'>
+                  {smallLabel}
+                </span>
+              )}
               {required && <span className='text-destructive'>*</span>}
             </FormLabel>
           )}
           <div className='space-y-4'>
-            <div className='flex gap-4 rounded-lg'>
+            <div className='flex gap-4'>
               {/* Available Items */}
-              <div className='flex-1 space-y-3 rounded-lg border border-input'>
-                <div className='px-4 py-3 text-sm font-medium border-b border-input text-muted-foreground'>
-                  Available
+              {!disabled && (
+                <div
+                  className={cn(
+                    'flex-1 space-y-3 rounded-md border transition-colors',
+                    error
+                      ? 'border-destructive focus-within:ring-destructive'
+                      : 'border-input focus-within:ring-ring ',
+                    disabled
+                      ? 'bg-input-disabled-background '
+                      : 'hover:border-input-borderHover'
+                  )}
+                >
+                  <div className='px-4 py-3 text-sm font-medium border-b border-input text-muted-foreground'>
+                    Available
+                  </div>
+                  <div className='relative px-4'>
+                    <Search
+                      className={cn(
+                        'absolute left-7 top-2.5 h-4 w-4',
+                        disabled
+                          ? 'text-input-disabled-text'
+                          : 'text-muted-foreground'
+                      )}
+                    />
+                    <Input
+                      placeholder='Search...'
+                      value={availableSearch}
+                      onChange={(e) => setAvailableSearch(e.target.value)}
+                      className={cn(
+                        'pl-9 h-9 rounded-full'
+                        // error && 'border-destructive',
+                        // disabled &&
+                        //   'bg-transparent border-transparent focus-visible:ring-0'
+                      )}
+                    />
+                  </div>
+                  {renderList(filteredAvailable, selectedAvailable, (item) =>
+                    handleItemClick(
+                      item,
+                      selectedAvailable,
+                      setSelectedAvailable
+                    )
+                  )}
                 </div>
-                <div className='relative px-4'>
-                  <Search className='absolute left-7 top-2.5 h-4 w-4 text-muted-foreground' />
-                  <Input
-                    placeholder='Search...'
-                    value={availableSearch}
-                    onChange={(e) => setAvailableSearch(e.target.value)}
-                    disabled={disabled}
-                    className={cn(
-                      'pl-9 h-9 rounded-full',
-                      error && 'border-destructive'
-                    )}
-                  />
-                </div>
-                {renderList(filteredAvailable, selectedAvailable, (item) =>
-                  handleItemClick(item, selectedAvailable, setSelectedAvailable)
-                )}
-              </div>
+              )}
 
               {/* Transfer Buttons */}
-              <div className='flex flex-col gap-2 justify-center'>
-                <Button
-                  size='icon'
-                  onClick={() => handleTransfer('right')}
-                  disabled={disabled || selectedAvailable.length === 0}
-                  className='w-9 h-9 rounded-lg shrink-0'
-                >
-                  <ArrowRight className='w-4 h-4' />
-                </Button>
-                <Button
-                  size='icon'
-                  variant='destructive'
-                  onClick={() => handleTransfer('left')}
-                  disabled={disabled || selectedChosen.length === 0}
-                  className='w-9 h-9 rounded-lg shrink-0'
-                >
-                  <ArrowLeft className='w-4 h-4' />
-                </Button>
-              </div>
+              {!disabled && (
+                <div className='flex flex-col gap-2 justify-center'>
+                  <Button
+                    size='icon'
+                    onClick={() => handleTransfer('right')}
+                    disabled={selectedAvailable.length === 0}
+                    className='w-9 h-9 rounded-md shrink-0'
+                  >
+                    <ArrowRight className='w-4 h-4' />
+                  </Button>
+                  <Button
+                    size='icon'
+                    variant='destructive'
+                    onClick={() => handleTransfer('left')}
+                    disabled={selectedChosen.length === 0}
+                    className='w-9 h-9 rounded-md shrink-0'
+                  >
+                    <ArrowLeft className='w-4 h-4' />
+                  </Button>
+                </div>
+              )}
 
               {/* Selected Items */}
-              <div className='flex-1 space-y-3 rounded-lg border border-input'>
+              <div
+                className={cn(
+                  'flex-1 space-y-3 rounded-md border transition-colors',
+                  error
+                    ? 'border-destructive focus-within:ring-destructive'
+                    : 'border-input focus-within:ring-ring',
+                  disabled
+                    ? 'bg-input-disabled-background'
+                    : 'hover:border-input-borderHover'
+                )}
+              >
                 <div className='px-4 py-3 text-sm font-medium border-b border-input text-muted-foreground'>
                   Selected
                 </div>
                 <div className='relative px-4'>
-                  <Search className='absolute left-7 top-2.5 h-4 w-4 text-muted-foreground' />
+                  <Search
+                    className={cn(
+                      'absolute left-7 top-2.5 h-4 w-4',
+                      disabled
+                        ? 'text-input-disabled-text'
+                        : 'text-muted-foreground'
+                    )}
+                  />
                   <Input
                     placeholder='Search...'
                     value={selectedSearch}
                     onChange={(e) => setSelectedSearch(e.target.value)}
-                    disabled={disabled}
                     className={cn(
                       'pl-9 h-9 rounded-full',
                       error && 'border-destructive'
@@ -230,7 +284,7 @@ export function MultiSelectField<T extends FieldValues>({
             </div>
           </div>
           {description && <FormDescription>{description}</FormDescription>}
-          {error && <FormMessage>{error}</FormMessage>}
+          {error && <FormMessage />}
         </FormItem>
       )}
     />

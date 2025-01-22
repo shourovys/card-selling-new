@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Manrope', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -61,6 +61,8 @@ h1 {
     --input-border: 0 0% 88%;
     --input-border-hover: 0 0% 74%;
     --input-border-focus: 212 100% 40%;
+    --input-disabled-background: 0 0% 96%;
+    --input-disabled-text: 0 0% 20%;
 
     --border: 0 0% 88%;
     --ring: 212 100% 40%;

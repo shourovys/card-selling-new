@@ -121,14 +121,16 @@ export function DatePickerField<T extends FieldValues>({
               containerClassName
             )}
             inputClassName={cn(
-              'flex h-10 w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50',
+              'flex h-10 w-full rounded-md border bg-background px-3.5 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-offset-0',
+              'disabled:cursor-default disabled:bg-input-disabled-background disabled:text-input-disabled-text disabled:border-input-border',
               error
                 ? 'border-destructive focus-visible:ring-destructive'
-                : 'border-input focus-visible:ring-ring',
+                : 'border-input focus-visible:ring-ring enabled:hover:border-input-borderHover focus-visible:border-ring enabled:focus-visible:hover:border-ring',
               inputClassName
             )}
             toggleClassName={cn(
-              'absolute right-0 h-full px-3 text-gray-400 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed',
+              'absolute right-0 top-0 h-full px-3 flex items-center justify-center text-gray-400 focus:outline-none',
+              'disabled:opacity-50 disabled:cursor-default',
               toggleClassName
             )}
             popoverDirection={popoverDirection}

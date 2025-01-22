@@ -119,17 +119,28 @@ export function FileUploadField<T extends FieldValues>({
           <FormControl>
             <div
               className={cn(
-                'relative rounded-lg border border-dashed transition-colors min-h-max flex items-center justify-center',
+                'relative rounded-md border transition-colors',
+                'focus-within:outline-none focus-within:ring-1 focus-within:ring-offset-0',
+                error
+                  ? 'border-destructive focus-within:ring-destructive'
+                  : 'border-input focus-within:ring-ring focus-within:border-ring',
 
-                isDragActive && 'border-primary bg-primary/5',
-                error && 'border-destructive',
-                disabled && 'opacity-50 cursor-not-allowed'
+                isDragActive && !disabled && 'border-primary bg-primary/5',
+                disabled
+                  ? 'cursor-default bg-input-disabled-background border-input-border'
+                  : 'hover:border-input-borderHover'
+                // !value && 'border-dashed'
               )}
-              style={{ height: height }}
+              style={{ height }}
             >
               {preview && value ? (
                 <div className='flex justify-center items-center p-2'>
-                  <div className='overflow-hidden rounded-md border bg-background w-fit mx-auto'>
+                  <div
+                    className={cn(
+                      'overflow-hidden rounded-md border bg-background w-fit mx-auto',
+                      disabled && 'opacity-50'
+                    )}
+                  >
                     {previewUrl ? (
                       <div className='flex flex-col'>
                         <div
@@ -151,7 +162,7 @@ export function FileUploadField<T extends FieldValues>({
                               type='button'
                               variant='ghost'
                               size='sm'
-                              className='flex-1 h-[32px] text-[10px] rounded-none border-r text-secondary hover:bg-secondary/20 border-r'
+                              className='flex-1 h-[32px] text-[10px] rounded-none border-r text-secondary hover:bg-secondary/20'
                               onClick={() => setPreviewOpen(true)}
                             >
                               PREVIEW
@@ -193,14 +204,29 @@ export function FileUploadField<T extends FieldValues>({
                   {...getRootProps()}
                   className={cn(
                     'flex justify-center items-center p-2 w-full h-full min-h-max',
-                    !disabled && 'cursor-pointer'
+                    !disabled && 'cursor-pointer',
+                    disabled && 'cursor-not-allowed'
                   )}
                 >
                   <input {...inputProps} accept={acceptedTypes.join(',')} />
                   <div className='flex flex-col gap-2 items-center text-center'>
-                    <UploadCloud className='size-10 text-muted-foreground' />
+                    <UploadCloud
+                      className={cn(
+                        'size-10',
+                        disabled
+                          ? 'text-input-disabled-text'
+                          : 'text-muted-foreground'
+                      )}
+                    />
                     <div className='space-y-1'>
-                      <p className='text-base font-medium text-muted-foreground'>
+                      <p
+                        className={cn(
+                          'text-base font-medium',
+                          disabled
+                            ? 'text-input-disabled-text'
+                            : 'text-muted-foreground'
+                        )}
+                      >
                         {disabled
                           ? 'No file uploaded'
                           : 'Upload your files here'}

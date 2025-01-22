@@ -7,7 +7,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
 import * as React from 'react';
 import { FieldValues, Path, UseFormReturn } from 'react-hook-form';
 import { Textarea } from '../textarea';
@@ -77,10 +76,7 @@ export function InputField<T extends FieldValues>({
           <FormControl>
             {multiline ? (
               <Textarea
-                className={cn(
-                  'flex px-3.5 py-2 w-full text-sm rounded-md border min-h-[60px] border-input bg-input-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
-                  className
-                )}
+                className={className}
                 rows={rows}
                 maxLength={maxLength}
                 placeholder={placeholder}
@@ -94,6 +90,7 @@ export function InputField<T extends FieldValues>({
               />
             ) : (
               <Input
+                className={className}
                 type={type}
                 maxLength={maxLength}
                 placeholder={placeholder}

@@ -91,11 +91,28 @@ export function RadioGroupField<T extends FieldValues>({
                 onClick={() => field.onChange(option.value)}
                 disabled={disabled || option.disabled}
                 className={cn(
-                  'h-10 px-4',
+                  'h-10 px-4 transition-colors',
                   fullWidth && 'flex-1',
-                  error && 'border-destructive',
-                  option.disabled && 'opacity-50'
+                  error && 'border-destructive focus-visible:ring-destructive',
+                  option.disabled && 'opacity-50',
+                  !disabled &&
+                    !option.disabled &&
+                    field.value !== option.value &&
+                    'hover:border-input-borderHover',
+                  disabled && 'cursor-not-allowed',
+                  field.value === option.value &&
+                    !disabled &&
+                    'hover:bg-secondary/90',
+                  'focus-visible:ring-1 focus-visible:ring-offset-0',
+                  disabled &&
+                    field.value === option.value &&
+                    'disabled:opacity-60',
+                  disabled &&
+                    field.value !== option.value &&
+                    'bg-input-disabled-background disabled:opacity-100 disabled:text-input-disabled-text'
                 )}
+                aria-checked={field.value === option.value}
+                role='radio'
               >
                 {option.label}
               </Button>
