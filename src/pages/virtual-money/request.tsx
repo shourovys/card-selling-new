@@ -60,7 +60,7 @@ export default function RequestVirtualMoney() {
       attribute: {
         amount: parseFloat(values.amount),
         approverUserCode: values.approverUserCode,
-        remarks: values.remarks.trim(),
+        remarks: values.remarks?.trim() || '',
       },
     });
   };
@@ -105,7 +105,6 @@ export default function RequestVirtualMoney() {
                 label='Remarks'
                 multiline
                 rows={4}
-                required
               />
 
               <div className='flex justify-end border-t border-gray-200 pt-6'>

@@ -3,9 +3,7 @@ import { z } from 'zod';
 
 export const virtualMoneyFormSchema = z.object({
   amount: z.string().min(1, { message: 'Amount is required' }),
-  remarks: z
-    .string()
-    .min(2, { message: 'Remarks must be at least 2 characters' }),
+  remarks: z.string().optional(),
   approverUserCode: z.string().min(1, { message: 'Approver is required' }),
 });
 

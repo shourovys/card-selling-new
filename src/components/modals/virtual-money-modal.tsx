@@ -101,7 +101,7 @@ export function VirtualMoneyModal({
         attribute: {
           amount: parseFloat(values.amount),
           approverUserCode: values.approverUserCode,
-          remarks: values.remarks.trim(),
+          remarks: values.remarks?.trim() || '',
         },
       };
 
@@ -143,7 +143,6 @@ export function VirtualMoneyModal({
                 label='Remarks'
                 multiline
                 rows={3}
-                required
                 disabled={isViewMode}
               />
 
