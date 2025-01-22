@@ -42,7 +42,7 @@ export default function SystemUserTableRow({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { trigger, isMutating: isDeleting } = useSWRMutation(
-    BACKEND_ENDPOINTS.SYSTEM_USER.DELETE(user.id),
+    BACKEND_ENDPOINTS.SYSTEM_USER.DELETE(user.userId),
     sendDeleteRequest,
     {
       onSuccess: () => {

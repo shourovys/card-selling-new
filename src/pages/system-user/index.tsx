@@ -1,4 +1,4 @@
-import { systemUserApi } from '@/api/system-user';
+import { sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
@@ -24,6 +24,7 @@ import { ITableHead } from '@/types/components/table';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 export default function SystemUserManagement() {
   const { page, rowsPerPage, order, orderBy, selected, handleSort } = useTable(
@@ -83,30 +84,39 @@ export default function SystemUserManagement() {
     setSelectedUser(null);
   };
 
-  const handleSubmit = async (payload: ISystemUserPayload) => {
-    try {
-      if (modalState.mode === 'edit' && selectedUser) {
-        await systemUserApi.update(selectedUser.id, payload);
-        toast({
-          title: 'Success',
-          description: 'System user updated successfully',
-        });
-      } else {
-        await systemUserApi.create(payload);
+  const { trigger: createSystemUser, isMutating: isCreatingSystemUser } =
+    useSWRMutation(BACKEND_ENDPOINTS.SYSTEM_USER.CREATE, sendPostRequest, {
+      onSuccess: () => {
         toast({
           title: 'Success',
           description: 'System user created successfully',
         });
+      },
+    });
+
+  const { trigger: updateSystemUser, isMutating: isUpdatingSystemUser } =
+    useSWRMutation(
+      selectedUser?.userId
+        ? BACKEND_ENDPOINTS.SYSTEM_USER.UPDATE(selectedUser.userId)
+        : null,
+      sendPutRequest,
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Success',
+            description: 'System user updated successfully',
+          });
+        },
       }
-      mutate();
-    } catch (error) {
-      console.error('Error submitting system user:', error);
-      toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
+    );
+
+  const handleSubmit = async (payload: ISystemUserPayload) => {
+    if (modalState.mode === 'edit' && selectedUser) {
+      await updateSystemUser(payload);
+    } else {
+      await createSystemUser(payload);
     }
+    mutate();
   };
 
   const handleDelete = () => {
@@ -158,7 +168,7 @@ export default function SystemUserManagement() {
               {!isLoading &&
                 filteredUsers.map((user, index) => (
                   <SystemUserTableRow
-                    key={user.id}
+                    key={user.userId}
                     user={user}
                     index={(page - 1) * rowsPerPage + index + 1}
                     handleModalOpen={handleModalOpen}
@@ -195,7 +205,7 @@ export default function SystemUserManagement() {
         onSubmit={handleSubmit}
         mode={modalState.mode}
         user={selectedUser || undefined}
-        isSubmitting={isLoading}
+        isSubmitting={isCreatingSystemUser || isUpdatingSystemUser}
       />
     </div>
   );

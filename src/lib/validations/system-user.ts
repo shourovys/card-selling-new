@@ -26,7 +26,7 @@ export const systemUserFormSchema = z.object({
 });
 
 export const systemUserSchema = z.object({
-  id: z.number(),
+  // id: z.number(),
   userId: z.string(),
   firstName: z.string(),
   lastName: z.string(),

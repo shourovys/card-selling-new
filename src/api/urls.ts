@@ -85,8 +85,8 @@ const BACKEND_ENDPOINTS = {
     LIST: (queryString: string) =>
       `/api/v1/private/get-all-system-users${queryString}`,
     CREATE: '/api/v1/private/create-system-user',
-    UPDATE: (id: number) => `/api/v1/private/update-system-user/${id}`,
-    DELETE: (id: number) => `/api/v1/private/delete-system-user/${id}`,
+    UPDATE: (userId: string) => `/api/v1/private/update-system-user/${userId}`,
+    DELETE: (userId: string) => `/api/v1/private/delete-system-user/${userId}`,
     CHECKERS:
       '/api/v1/private/users/get-all-checker-by-user-type?userTypeString=System Admin',
   },
