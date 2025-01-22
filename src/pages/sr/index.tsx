@@ -58,12 +58,7 @@ export default function SRManagement() {
     return srs.filter((sr) => {
       const fullName = `${sr.firstName} ${sr.lastName}`.toLowerCase();
       const searchTerm = filterState.search.toLowerCase();
-      return (
-        fullName.includes(searchTerm) ||
-        sr.emailAddress.toLowerCase().includes(searchTerm) ||
-        sr.mobileNumber.toLowerCase().includes(searchTerm) ||
-        sr.subDistributorName.toLowerCase().includes(searchTerm)
-      );
+      return fullName.includes(searchTerm);
     });
   }, [srs, filterState.search]);
 
