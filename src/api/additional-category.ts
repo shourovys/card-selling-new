@@ -42,7 +42,12 @@ export const additionalCategoryApi = {
 
     const response = await api.post(
       BACKEND_ENDPOINTS.ADDITIONAL_CATEGORY.MAPPING.CREATE,
-      formData
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
     );
     return response.data;
   },
