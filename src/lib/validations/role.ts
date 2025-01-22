@@ -71,7 +71,9 @@ export interface IRolePayload {
   metaInfo: IRequestMetaInfo;
   attribute: {
     roleName: string;
-    permissions: string[];
+    permissions: {
+      name: string;
+    }[];
   };
 }
 

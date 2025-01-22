@@ -129,7 +129,9 @@ export default function RoleManagement() {
           metaInfo: getMetaInfo(),
           attribute: {
             roleName: formData.roleName.trim(),
-            permissions: formData.permissions,
+            permissions: formData.permissions.map((permission) => ({
+              name: permission,
+            })),
           },
         };
 
