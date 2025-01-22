@@ -90,7 +90,7 @@ export function SubDistributorModal({
   }, [open, mode, subDistributor, form]);
 
   // Fetch distributors and checkers
-  const { data: distributorsData } = useSWR<IDistributorResponse>(
+  const { data: distributorsData } = useSWR<IApiResponse<IDistributorResponse>>(
     open ? BACKEND_ENDPOINTS.DISTRIBUTOR.LIST('') : null
   );
 
@@ -100,7 +100,7 @@ export function SubDistributorModal({
       : null
   );
 
-  const distributors = distributorsData?.distributors || [];
+  const distributors = distributorsData?.data?.distributors || [];
   const checkers = checkersData?.data?.checkerList || [];
 
   const handleSubmit = async (values: SubDistributorFormValues) => {
@@ -186,7 +186,7 @@ export function SubDistributorModal({
                   form={form}
                   label='Distributor'
                   options={distributors.map((distributor) => ({
-                    label: distributor.name,
+                    label: `${distributor.firstName} ${distributor.lastName}`,
                     value: distributor.userId,
                   }))}
                   required

@@ -31,7 +31,9 @@ export interface Transaction {
   approverUserCode: string;
   amount: number;
   transactionId: string;
-  status: string;
+  status: {
+    name: string;
+  };
   remarks: string;
   createdAt: string;
   approvedAt: string | null;

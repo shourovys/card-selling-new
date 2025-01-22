@@ -1,4 +1,3 @@
-import { sendPostRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
@@ -11,7 +10,6 @@ import TableHeader from '@/components/table/TableHeader';
 import TableNoData from '@/components/table/TableNoData';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
 import useTable, { emptyRows } from '@/hooks/useTable';
 import {
@@ -24,7 +22,6 @@ import { ITableHead } from '@/types/components/table';
 import QueryString from 'qs';
 import { useCallback, useState } from 'react';
 import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
 
 export default function VirtualMoneyHistoryList() {
   const {
@@ -91,19 +88,9 @@ export default function VirtualMoneyHistoryList() {
     setSelectedVirtualMoney(null);
   };
 
-  const { trigger } = useSWRMutation(
-    BACKEND_ENDPOINTS.VIRTUAL_MONEY.APPROVE,
-    sendPostRequest,
-    {
-      onSuccess: () => {
-        toast({
-          title: 'Success',
-          description: 'Virtual money approved successfully',
-        });
-        mutate();
-      },
-    }
-  );
+  const onApprove = () => {
+    mutate();
+  };
 
   const isNotFound = !virtualMoneyList.length && !isLoading && !error;
 
@@ -146,7 +133,7 @@ export default function VirtualMoneyHistoryList() {
                     virtualMoney={virtualMoney}
                     index={(page - 1) * rowsPerPage + index + 1}
                     handleModalOpen={handleModalOpen}
-                    onApprove={trigger}
+                    onApprove={onApprove}
                   />
                 ))}
               <TableEmptyRows

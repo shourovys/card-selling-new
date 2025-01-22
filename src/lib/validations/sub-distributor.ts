@@ -72,7 +72,8 @@ export interface ICheckerResponse {
 
 export interface IDistributor {
   userId: string;
-  name: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface IDistributorResponse {
