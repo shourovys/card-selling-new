@@ -1,11 +1,16 @@
 import { routePaths } from '@/routes/routePaths';
 import {
+  Boxes,
+  Building2,
+  CircleDollarSign,
   LayoutDashboard,
   Package,
-  PackageSearch,
+  ShoppingBag,
+  Store,
   Tag,
   Tags,
-  User,
+  UserCog,
+  Users,
   Wallet,
   type LucideIcon,
 } from 'lucide-react';
@@ -28,12 +33,12 @@ export const menuItems: MenuItem[] = [
   {
     path: routePaths.role,
     label: 'Role',
-    icon: User,
+    icon: UserCog,
     roles: ['System Admin'],
   },
   {
     label: 'Virtual Money',
-    icon: Wallet,
+    icon: CircleDollarSign,
     roles: ['System Admin', 'Distributor', 'Sub Distributor'],
     subMenu: [
       {
@@ -45,7 +50,7 @@ export const menuItems: MenuItem[] = [
       {
         path: routePaths.pendingVirtualMoney,
         label: 'Pending Virtual Money',
-        icon: Wallet,
+        icon: CircleDollarSign,
         roles: ['System Admin', 'Distributor', 'Sub Distributor'],
       },
       {
@@ -59,31 +64,31 @@ export const menuItems: MenuItem[] = [
 
   {
     label: 'User',
-    icon: User,
+    icon: Users,
     roles: ['System Admin'],
     subMenu: [
       {
         path: routePaths.systemUser,
         label: 'System Users',
-        icon: User,
+        icon: UserCog,
         roles: ['System Admin'],
       },
       {
         path: routePaths.distributor,
         label: 'Distributors',
-        icon: User,
+        icon: Building2,
         roles: ['System Admin'],
       },
       {
         path: routePaths.subDistributor,
         label: 'Sub Distributors',
-        icon: User,
+        icon: Store,
         roles: ['System Admin'],
       },
       {
         path: routePaths.sr,
         label: 'SR',
-        icon: User,
+        icon: Users,
         roles: ['System Admin'],
       },
     ],
@@ -109,7 +114,7 @@ export const menuItems: MenuItem[] = [
   },
   {
     label: 'Product',
-    icon: Package,
+    icon: ShoppingBag,
     roles: ['System Admin', 'Distributor', 'Sub Distributor'],
     subMenu: [
       {
@@ -121,7 +126,7 @@ export const menuItems: MenuItem[] = [
       {
         path: routePaths.productBundle,
         label: 'Product Bundles',
-        icon: PackageSearch,
+        icon: Boxes,
         roles: ['System Admin', 'Distributor', 'Sub Distributor'],
       },
     ],
