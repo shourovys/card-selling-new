@@ -11,8 +11,10 @@ export const productFormSchema = z.object({
     .max(500, { message: 'Description must be less than 500 characters' })
     .optional(),
   status: z.enum(['active', 'inactive']).default('active'),
-  image: z.any().nullable(),
-  categoryId: z.string({ required_error: 'Category is required' }),
+  image: z.any().refine((file) => file !== null, {
+    message: 'Icon is required',
+  }),
+  categoryId: z.string().min(1, { message: 'Category is required' }),
 });
 
 export const productSchema = z.object({

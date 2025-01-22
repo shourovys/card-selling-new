@@ -11,7 +11,9 @@ export const productBundleFormSchema = z.object({
     .max(500, { message: 'Description must be less than 500 characters' })
     .optional(),
   status: z.enum(['active', 'inactive']).default('active'),
-  image: z.any().nullable(),
+  image: z.any().refine((file) => file !== null, {
+    message: 'Icon is required',
+  }),
   facePrice: z.string().min(1, { message: 'Face price is required' }),
   purchasePrice: z.string().min(1, { message: 'Purchase price is required' }),
   salePrice: z.string().min(1, { message: 'Sale price is required' }),

@@ -60,7 +60,7 @@ export default function PendingVirtualMoneyList() {
   };
 
   const { filterState, debouncedFilterState, handleFilterInputChange } =
-    useFilter(initialFilterState, undefined, 300);
+    useFilter(initialFilterState);
 
   const createQueryParams = useCallback(
     (filters: { search: string }) => ({

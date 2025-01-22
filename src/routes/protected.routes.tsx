@@ -26,9 +26,7 @@ const AdditionalCategory = lazy(
   () => import('../pages/category/additional-category')
 );
 const Product = lazy(() => import('../pages/product/product'));
-const ProductBundle = lazy(
-  () => import('../pages/product-bundle/product-bundle')
-);
+const ProductBundle = lazy(() => import('../pages/product/product-bundle'));
 export const protectedRoutes: AppRoute[] = [
   {
     element: React.createElement(DashboardLayout),

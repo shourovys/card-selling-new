@@ -77,7 +77,6 @@ export function ProductModal({
     resolver: zodResolver(productFormSchema),
     defaultValues: getInitialValues(mode, product),
   });
-  console.log('🚀 ~ form:', form.watch(), product);
 
   // Reset form when modal opens/closes or mode changes
   useEffect(() => {

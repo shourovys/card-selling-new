@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 export const useFilter = <T>(
   initialFilterState: T,
   onFilterChange?: (filters: T) => void,
-  debounceTime: number = 1000
+  debounceTime: number = 800
 ) => {
   // State to store the filter values
   const [filterState, setFilterState] = useState<T>(initialFilterState);

@@ -60,7 +60,7 @@ export default function Home() {
     debouncedFilterState,
     handleFilterInputChange,
     handleFilterStateReset,
-  } = useFilter(initialFilterState, undefined, 300);
+  } = useFilter(initialFilterState);
 
   // Create query params for the API using a custom hook
   const createQueryParams = useCallback(

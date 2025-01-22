@@ -63,13 +63,7 @@ export default function ProductBundleManagement() {
 
   // Filter state management
   const { filterState, debouncedFilterState, handleFilterInputChange } =
-    useFilter(
-      {
-        search: '',
-      },
-      undefined,
-      300
-    );
+    useFilter({ search: '' });
 
   // Create query params for API
   const createQueryParams = useCallback(

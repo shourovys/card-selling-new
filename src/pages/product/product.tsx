@@ -65,7 +65,7 @@ export default function ProductManagement() {
   };
 
   const { filterState, debouncedFilterState, handleFilterInputChange } =
-    useFilter(initialFilterState, undefined, 300);
+    useFilter(initialFilterState);
 
   // Create query params for API
   const createQueryParams = useCallback(
