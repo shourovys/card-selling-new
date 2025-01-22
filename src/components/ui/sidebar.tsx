@@ -1,4 +1,3 @@
-import Logo from '@/assets/images/logo.png';
 import { Button } from '@/components/ui/button';
 import {
   Collapsible,
@@ -173,7 +172,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         )}
       >
         <div className='flex items-center justify-center rounded-lg bg-background'>
-          <img src={Logo} alt='Logo' className='h-8 w-full' />
+          <img src='/logo/full_logo.svg' alt='Logo' className='h-8 w-full' />
         </div>
       </div>
     );
