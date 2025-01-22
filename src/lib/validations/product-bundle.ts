@@ -1,35 +1,45 @@
 import { IRequestMetaInfo } from '@/types/common';
 import { z } from 'zod';
 
-export const productBundleFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: 'Bundle name must be at least 2 characters' })
-    .max(100, { message: 'Bundle name must be less than 100 characters' }),
-  description: z
-    .string()
-    .max(500, { message: 'Description must be less than 500 characters' })
-    .optional(),
-  status: z.enum(['active', 'inactive']).default('active'),
-  image: z.any().refine((file) => file !== null, {
-    message: 'Icon is required',
-  }),
-  facePrice: z.string().min(1, { message: 'Face price is required' }),
-  purchasePrice: z.string().min(1, { message: 'Purchase price is required' }),
-  salePrice: z.string().min(1, { message: 'Sale price is required' }),
-  currency: z.string().min(1, { message: 'Currency is required' }),
-  gpType: z.enum(['percentage', 'fixed']).default('percentage'),
-  gpValue: z.string().min(1, { message: 'GP value is required' }),
-  gpAmount: z.string().optional(),
-  product: z.object({
-    value: z.string().min(1, { message: 'Product is required' }),
-    label: z.string(),
-  }),
-  additionalCategoryId: z.string().optional(),
-  inventoryProductId: z
-    .string()
-    .min(1, { message: 'Inventory Product ID is required' }),
-});
+export const productBundleFormSchema = z
+  .object({
+    name: z
+      .string()
+      .min(2, { message: 'Bundle name must be at least 2 characters' })
+      .max(100, { message: 'Bundle name must be less than 100 characters' }),
+    description: z
+      .string()
+      .max(500, { message: 'Description must be less than 500 characters' })
+      .optional(),
+    status: z.enum(['active', 'inactive']).default('active'),
+    image: z.any().refine((file) => file !== null, {
+      message: 'Bundle Image is required',
+    }),
+    facePrice: z.string().min(1, { message: 'Face price is required' }),
+    purchasePrice: z.string().min(1, { message: 'Purchase price is required' }),
+    salePrice: z.string(),
+    currency: z.string().min(1, { message: 'Currency is required' }),
+    gpType: z.enum(['percentage', 'fixed']).default('percentage'),
+    gpValue: z.string().min(1, { message: 'GP value is required' }),
+    gpAmount: z.string().optional(),
+    product: z.object({
+      value: z.string().min(1, { message: 'Product is required' }),
+      label: z.string(),
+    }),
+    additionalCategoryId: z.string().optional(),
+    inventoryProductId: z
+      .string()
+      .min(1, { message: 'Inventory Product ID is required' }),
+  })
+  .superRefine((data, ctx) => {
+    if (Number(data.facePrice) < Number(data.salePrice)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Face price must be greater than sale price',
+        path: ['facePrice'],
+      });
+    }
+  });
 
 export const productBundleSchema = z.object({
   id: z.number(),

@@ -464,7 +464,7 @@ export function ProductBundleModal({
                         : form.watch('product.value') &&
                           !additionalCategories.length
                         ? 'No additional categories available'
-                        : 'Select additional category'
+                        : ''
                     }
                   />
 

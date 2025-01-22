@@ -1,4 +1,4 @@
-import { productBundleApi } from '@/api/product-bundle';
+import { sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
@@ -27,6 +27,7 @@ import { Plus } from 'lucide-react';
 import QueryString from 'qs';
 import { useCallback, useState } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 export default function ProductBundleManagement() {
   // Table state management
@@ -100,22 +101,40 @@ export default function ProductBundleManagement() {
     setSelectedBundle(null);
   }, []);
 
+  const { trigger: createProductBundle, isMutating: isCreating } =
+    useSWRMutation(BACKEND_ENDPOINTS.PRODUCT_BUNDLE.CREATE, sendPostRequest, {
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: 'Product bundle created successfully',
+        });
+      },
+    });
+
+  const { trigger: updateProductBundle, isMutating: isUpdating } =
+    useSWRMutation(
+      selectedBundle?.id
+        ? BACKEND_ENDPOINTS.PRODUCT_BUNDLE.UPDATE(selectedBundle?.id)
+        : null,
+      sendPutRequest,
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Success',
+            description: 'Product bundle updated successfully',
+          });
+        },
+      }
+    );
+
   // Submit handler
   const handleSubmit = useCallback(
     async (payload: IProductBundlePayload) => {
       try {
         if (modalState.mode === 'edit' && selectedBundle) {
-          await productBundleApi.update(selectedBundle.id, payload);
-          toast({
-            title: 'Success',
-            description: 'Product bundle updated successfully',
-          });
+          await updateProductBundle(payload);
         } else {
-          await productBundleApi.create(payload);
-          toast({
-            title: 'Success',
-            description: 'Product bundle created successfully',
-          });
+          await createProductBundle(payload);
         }
         mutate();
         handleModalClose();
@@ -230,7 +249,7 @@ export default function ProductBundleManagement() {
         onSubmit={handleSubmit}
         mode={modalState.mode}
         bundle={selectedBundle || undefined}
-        isSubmitting={isLoading}
+        isSubmitting={isCreating || isUpdating}
       />
     </div>
   );

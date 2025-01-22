@@ -1,4 +1,5 @@
-import { productBundleApi } from '@/api/product-bundle';
+import { sendDeleteRequest } from '@/api/swrConfig';
+import BACKEND_ENDPOINTS from '@/api/urls';
 import TableData from '@/components/table/TableData';
 import TableRow from '@/components/table/TableRow';
 import {
@@ -23,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { ProductBundle } from '@/lib/validations/product-bundle';
 import { Edit, Eye, MoreVertical, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import useSWRMutation from 'swr/mutation';
 
 interface ProductBundleTableRowProps {
   bundle: ProductBundle;
@@ -38,30 +40,22 @@ export default function ProductBundleTableRow({
   onDelete,
 }: ProductBundleTableRowProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
-    try {
-      setIsDeleting(true);
-      if (!bundle.id) return;
-      await productBundleApi.delete(bundle.id);
-      toast({
-        title: 'Success',
-        description: 'Product bundle deleted successfully',
-      });
-      onDelete();
-      setDeleteDialogOpen(false);
-    } catch (error) {
-      console.error('Error deleting product bundle:', error);
-      toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+  const { trigger: deleteProductBundle, isMutating: isDeleting } =
+    useSWRMutation(
+      BACKEND_ENDPOINTS.PRODUCT_BUNDLE.DELETE(bundle.id),
+      sendDeleteRequest,
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Success',
+            description: 'Product bundle deleted successfully',
+          });
+          onDelete();
+          setDeleteDialogOpen(false);
+        },
+      }
+    );
 
   return (
     <>
@@ -77,7 +71,7 @@ export default function ProductBundleTableRow({
               />
             </div>
             <div className='min-w-0'>
-              <p className='font-medium mb-0.5 truncate max-w-[100px]'>
+              <p className='font-medium mb-0.5 truncate max-w-[400px]'>
                 {bundle.name}
               </p>
               {bundle.description && (
@@ -170,7 +164,7 @@ export default function ProductBundleTableRow({
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
+              onClick={() => deleteProductBundle()}
               disabled={isDeleting}
               className='bg-destructive hover:bg-destructive/90'
             >
