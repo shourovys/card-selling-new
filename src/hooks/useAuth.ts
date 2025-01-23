@@ -1,5 +1,5 @@
-import AuthContext from '@/contexts/authContext';
-import { IAuthContextType } from '@/contexts/authContextProvider';
+import AuthContext from '@/contexts/auth/authContext';
+import { IAuthContextType } from '@/contexts/auth/authContextProvider';
 import { useContext } from 'react';
 
 const useAuth = (): IAuthContextType => {
