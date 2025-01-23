@@ -40,9 +40,9 @@ export const protectedRoutes: AppRoute[] = [
         auth: true,
       },
       {
-        routePath: routeConfig.requestVirtualMoney.routePath,
+        routePath: routeConfig.virtualMoneyRequest.routePath,
         element: React.createElement(RequestVirtualMoney),
-        roles: routeConfig.requestVirtualMoney.roles,
+        roles: routeConfig.virtualMoneyRequest.roles,
         auth: true,
       },
       {
@@ -58,9 +58,9 @@ export const protectedRoutes: AppRoute[] = [
         auth: true,
       },
       {
-        routePath: routeConfig.pendingVirtualMoney.routePath,
+        routePath: routeConfig.virtualMoneyPending.routePath,
         element: React.createElement(PendingVirtualMoney),
-        roles: routeConfig.pendingVirtualMoney.roles,
+        roles: routeConfig.virtualMoneyPending.roles,
         auth: true,
       },
       {

@@ -12,7 +12,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 }) => {
   return (
     <div className='space-y-4'>
-      {/* {showBreadcrumbs && <Breadcrumbs />} */}
+      {/* {showBreadcrumbs && <Breadcrumbs icon={routeConfig./>} */}
       {children}
     </div>
   );

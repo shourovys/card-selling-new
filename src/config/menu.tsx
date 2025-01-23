@@ -30,8 +30,8 @@ export const menuItems: MenuItem[] = [
     icon: CircleDollarSign,
     roles: ['System Admin', 'Distributor', 'Sub Distributor'],
     subMenu: [
-      routeConfig.requestVirtualMoney,
-      routeConfig.pendingVirtualMoney,
+      routeConfig.virtualMoneyRequest,
+      routeConfig.virtualMoneyPending,
       routeConfig.virtualMoneyHistory,
     ],
   },

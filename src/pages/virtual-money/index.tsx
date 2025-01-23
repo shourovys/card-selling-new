@@ -10,6 +10,7 @@ import TableHeader from '@/components/table/TableHeader';
 import TableNoData from '@/components/table/TableNoData';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { routeConfig } from '@/config/routeConfig';
 import { useFilter } from '@/hooks/useFilter';
 import useTable, { emptyRows } from '@/hooks/useTable';
 import {
@@ -96,7 +97,7 @@ export default function VirtualMoneyHistoryList() {
   return (
     <div className='min-h-screen bg-gray-50/50'>
       <div className=''>
-        <Breadcrumbs />
+        <Breadcrumbs icon={routeConfig.virtualMoneyHistory.icon} />
 
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>

@@ -51,14 +51,14 @@ export const routeConfig = {
   },
   // Virtual Money Section
 
-  requestVirtualMoney: {
+  virtualMoneyRequest: {
     routePath: '/virtual-money/request',
     path: () => '/virtual-money/request',
     title: 'Request Virtual Money',
     icon: Wallet,
     roles: [ROLES.SYSTEM_ADMIN, ROLES.DISTRIBUTOR, ROLES.SUB_DISTRIBUTOR],
   },
-  pendingVirtualMoney: {
+  virtualMoneyPending: {
     routePath: '/virtual-money/pending',
     path: () => '/virtual-money/pending',
     title: 'Pending Virtual Money',

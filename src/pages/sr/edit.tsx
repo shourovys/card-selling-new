@@ -226,7 +226,7 @@ export default function EditSR() {
 
   return (
     <div className='space-y-6'>
-      <Breadcrumbs />
+      <Breadcrumbs icon={routeConfig.sr.icon} />
 
       <Card>
         <CardContent className='p-10'>

@@ -1,17 +1,17 @@
 import generateBreadcrumbs, { IRouteMetadata } from '@/utils/routeMaker';
-import { ChevronRight, User } from 'lucide-react';
+import { ChevronRight, LucideIcon } from 'lucide-react';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Card } from '../ui/card';
 
 interface BreadcrumbsProps {
   routeMetadata?: IRouteMetadata;
-  icon?: React.ReactNode;
+  icon?: LucideIcon;
 }
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   routeMetadata,
-  icon = <User className='w-6 h-6 text-gray-500' />,
+  icon: Icon,
 }) => {
   const location = useLocation();
   const { title: pageTitle, pageRoutes } = generateBreadcrumbs(
@@ -22,9 +22,11 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   return (
     <Card className='p-6 mb-6'>
       <div className='flex items-center gap-4 mb-2'>
-        <div className='w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0'>
-          {icon}
-        </div>
+        {Icon && (
+          <div className='w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0'>
+            <Icon className='w-6 h-6 text-gray-500' />
+          </div>
+        )}
         <div>
           <h1 className='text-xl font-semibold mb-1'>{pageTitle}</h1>
           <nav aria-label='breadcrumb' className='text-sm'>

@@ -12,6 +12,7 @@ import TableNoData from '@/components/table/TableNoData';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
 import useTable, { emptyRows } from '@/hooks/useTable';
@@ -144,7 +145,7 @@ export default function ProductManagement() {
   return (
     <div className='min-h-screen bg-gray-50/50'>
       <div className=''>
-        <Breadcrumbs />
+        <Breadcrumbs icon={routeConfig.product.icon} />
 
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>

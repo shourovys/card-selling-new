@@ -71,7 +71,7 @@ export default function SRManagement() {
   return (
     <div className='min-h-screen bg-gray-50/50'>
       <div className=''>
-        <Breadcrumbs />
+        <Breadcrumbs icon={routeConfig.sr.icon} />
 
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>
