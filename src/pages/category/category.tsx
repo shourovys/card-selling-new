@@ -14,7 +14,6 @@ import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
 import useTable from '@/hooks/useTable';
 import { Category } from '@/lib/validations/category';
-import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import {
@@ -132,15 +131,10 @@ export default function CategoryManagement() {
   // Check if no data is found
   const isNotFound = !filteredCategories.length && !isLoading && !error;
 
-  const breadcrumbItems = [
-    { label: 'Dashboard', href: routePaths.dashboard },
-    { label: 'Category' },
-  ];
-
   return (
     <div className='min-h-screen bg-gray-50/50'>
       <div className=''>
-        <Breadcrumbs items={breadcrumbItems} title='Category Management' />
+        <Breadcrumbs />
 
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>

@@ -16,7 +16,6 @@ import {
   IVirtualMoneyResponse,
   Transaction,
 } from '@/lib/validations/virtual-money';
-import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import QueryString from 'qs';
@@ -94,15 +93,10 @@ export default function VirtualMoneyHistoryList() {
 
   const isNotFound = !virtualMoneyList.length && !isLoading && !error;
 
-  const breadcrumbItems = [
-    { label: 'Dashboard', href: routePaths.dashboard },
-    { label: 'Virtual Money' },
-  ];
-
   return (
     <div className='min-h-screen bg-gray-50/50'>
       <div className=''>
-        <Breadcrumbs items={breadcrumbItems} title='Virtual Money' />
+        <Breadcrumbs />
 
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>

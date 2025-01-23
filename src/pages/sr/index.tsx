@@ -68,18 +68,10 @@ export default function SRManagement() {
 
   const isNotFound = !filteredSRs.length && !isLoading && !error;
 
-  const breadcrumbItems = [
-    { label: 'Dashboard', href: routePaths.dashboard },
-    { label: 'Sales Representatives' },
-  ];
-
   return (
     <div className='min-h-screen bg-gray-50/50'>
       <div className=''>
-        <Breadcrumbs
-          items={breadcrumbItems}
-          title='Sales Representative Management'
-        />
+        <Breadcrumbs />
 
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>

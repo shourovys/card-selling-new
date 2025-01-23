@@ -17,10 +17,10 @@ export const routePaths = {
   systemUser: '/system-user',
   distributor: '/distributor',
   subDistributor: '/sub-distributor',
-  sr: '/sr',
-  srAdd: '/sr/add',
-  srView: (id: string) => `/sr/view/${id}`,
-  srEdit: (id: string) => `/sr/edit/${id}`,
+  sr: '/sales-representative',
+  srAdd: '/sales-representative/add',
+  srView: (id: string) => `/sales-representative/view/${id}`,
+  srEdit: (id: string) => `/sales-representative/edit/${id}`,
 
   // Protected routes
   category: '/category',

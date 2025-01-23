@@ -18,7 +18,6 @@ import {
   ISubDistributorResponse,
   SubDistributor,
 } from '@/lib/validations/sub-distributor';
-import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import { Plus } from 'lucide-react';
@@ -130,18 +129,10 @@ export default function SubDistributorManagement() {
 
   const isNotFound = !filteredSubDistributors.length && !isLoading && !error;
 
-  const breadcrumbItems = [
-    { label: 'Dashboard', href: routePaths.dashboard },
-    { label: 'Sub Distributors' },
-  ];
-
   return (
     <div className='min-h-screen bg-gray-50/50'>
       <div className=''>
-        <Breadcrumbs
-          items={breadcrumbItems}
-          title='Sub Distributor Management'
-        />
+        <Breadcrumbs />
 
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>

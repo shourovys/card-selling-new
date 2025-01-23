@@ -181,9 +181,9 @@ export function ProductBundleModal({
 
   // Handle product selection
   const handleProductSelect = useCallback(
-    async (productId: string, categoryId?: number) => {
-      if (categoryId) {
-        await fetchAdditionalCategories(categoryId);
+    async (productCategoryId?: number) => {
+      if (productCategoryId) {
+        await fetchAdditionalCategories(productCategoryId);
       } else {
         setAdditionalCategories([]);
       }
@@ -231,7 +231,7 @@ export function ProductBundleModal({
     const subscription = form.watch((value, { name }) => {
       if (name === 'product' && value.product) {
         const product = value.product as { value: string; categoryId?: number };
-        handleProductSelect(product.value, product.categoryId);
+        handleProductSelect(product.categoryId);
 
         // Reset additional category when product changes
         if (form.getValues('additionalCategoryId')) {

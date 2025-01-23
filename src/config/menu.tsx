@@ -87,7 +87,7 @@ export const menuItems: MenuItem[] = [
       },
       {
         path: routePaths.sr,
-        label: 'SR',
+        label: 'Sales Representatives (SR)',
         icon: Users,
         roles: ['System Admin'],
       },

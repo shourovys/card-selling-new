@@ -208,12 +208,6 @@ export default function EditSR() {
     }
   };
 
-  const breadcrumbItems = [
-    { label: 'Dashboard', href: routePaths.dashboard },
-    { label: 'Sales Representatives', href: routePaths.sr },
-    { label: 'Edit Sales Representative' },
-  ];
-
   if (srError) {
     return (
       <div className='flex items-center justify-center h-full'>
@@ -232,7 +226,7 @@ export default function EditSR() {
 
   return (
     <div className='space-y-6'>
-      <Breadcrumbs title='Edit Sales Representative' items={breadcrumbItems} />
+      <Breadcrumbs />
 
       <Card>
         <CardContent className='p-10'>

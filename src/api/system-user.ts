@@ -12,12 +12,12 @@ export const systemUserApi = {
       arg: payload,
     });
   },
-  update: async (id: number, payload: ISystemUserPayload) => {
+  update: async (id: string, payload: ISystemUserPayload) => {
     return sendPutRequest(BACKEND_ENDPOINTS.SYSTEM_USER.UPDATE(id), {
       arg: payload,
     });
   },
-  delete: async (id: number) => {
+  delete: async (id: string) => {
     return sendDeleteRequest(BACKEND_ENDPOINTS.SYSTEM_USER.DELETE(id));
   },
 };

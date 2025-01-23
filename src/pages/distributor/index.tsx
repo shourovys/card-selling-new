@@ -18,7 +18,6 @@ import {
   IDistributorPayload,
   IDistributorResponse,
 } from '@/lib/validations/distributor';
-import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import { Plus } from 'lucide-react';
@@ -130,15 +129,10 @@ export default function DistributorManagement() {
 
   const isNotFound = !filteredDistributors.length && !isLoading && !error;
 
-  const breadcrumbItems = [
-    { label: 'Dashboard', href: routePaths.dashboard },
-    { label: 'Distributors' },
-  ];
-
   return (
     <div className='min-h-screen bg-gray-50/50'>
       <div className=''>
-        <Breadcrumbs items={breadcrumbItems} title='Distributor Management' />
+        <Breadcrumbs />
 
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>

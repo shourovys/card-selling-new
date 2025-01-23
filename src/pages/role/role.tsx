@@ -15,7 +15,6 @@ import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
 import useTable from '@/hooks/useTable';
 import { Role, RoleFormValues } from '@/lib/validations/role';
-import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import {
@@ -176,15 +175,10 @@ export default function RoleManagement() {
 
   const isNotFound = !roles?.length && !isLoading;
 
-  const breadcrumbItems = [
-    { label: 'Dashboard', href: routePaths.dashboard },
-    { label: 'Role' },
-  ];
-
   return (
     <div className='min-h-screen bg-gray-50/50'>
       <div>
-        <Breadcrumbs items={breadcrumbItems} title='Role Management' />
+        <Breadcrumbs />
 
         <Card className='p-6 space-y-4 bg-white shadow-sm'>
           <div className='flex justify-between items-center pb-2'>

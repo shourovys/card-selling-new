@@ -171,15 +171,9 @@ export default function AddSR() {
     }
   };
 
-  const breadcrumbItems = [
-    { label: 'Dashboard', href: routePaths.dashboard },
-    { label: 'Sales Representatives', href: routePaths.sr },
-    { label: 'Add Sales Representative' },
-  ];
-
   return (
     <div className='space-y-6'>
-      <Breadcrumbs title='Add Sales Representative' items={breadcrumbItems} />
+      <Breadcrumbs />
 
       <Card>
         <CardContent className='p-10'>
