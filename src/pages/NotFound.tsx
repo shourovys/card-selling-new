@@ -1,11 +1,11 @@
+import Page from '@/components/HOC/page';
 import { routeConfig } from '@/config/routeConfig';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import PageLayout from '../components/common/PageLayout';
 
 const NotFound: React.FC = () => {
   return (
-    <PageLayout showBreadcrumbs={false}>
+    <Page title='404'>
       <div className='min-h-[80vh] flex items-center justify-center bg-white'>
         <div className='text-center'>
           <h1 className='text-6xl font-bold text-indigo-600'>404</h1>
@@ -25,7 +25,7 @@ const NotFound: React.FC = () => {
           </div>
         </div>
       </div>
-    </PageLayout>
+    </Page>
   );
 };
 

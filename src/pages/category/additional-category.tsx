@@ -1,6 +1,7 @@
 import { sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
+import Page from '@/components/HOC/page';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
 import { AdditionalCategoryModal } from '@/components/modals/additional-category-modal';
 import AdditionalCategoryTableRow from '@/components/pages/category/AdditionalCategoryTableRow';
@@ -157,88 +158,92 @@ export default function AdditionalCategoryManagement() {
     !data?.data?.additionalCategoriesData?.totalItems && !isLoading && !error;
 
   return (
-    <div className='min-h-screen bg-gray-50/50'>
-      <div className=''>
-        <Breadcrumbs icon={routeConfig.additionalCategory.icon} />
+    <Page>
+      <div className='min-h-screen bg-gray-50/50'>
+        <div className=''>
+          <Breadcrumbs icon={routeConfig.additionalCategory.icon} />
 
-        <Card className='p-6 space-y-4 bg-white shadow-sm'>
-          <div className='flex justify-between items-center pb-2'>
-            <Input
-              placeholder='Search by name...'
-              value={filterState.name}
-              onChange={(e) => handleFilterInputChange('name', e.target.value)}
-              className='max-w-sm h-10 bg-gray-50'
-            />
-            <Button
-              onClick={() => handleModalOpen('add')}
-              size='sm'
-              className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
-            >
-              <Plus className='mr-2 w-4 h-4' />
-              Add Additional Category
-            </Button>
-          </div>
-
-          <Table>
-            <TableHeader
-              order={order}
-              orderBy={orderBy}
-              numSelected={selected.length}
-              rowCount={additionalCategories.length || 0}
-              handleSort={handleSort}
-              headerData={TABLE_HEAD}
-            />
-            <tbody>
-              {!isLoading &&
-                additionalCategories.map((category, index) => (
-                  <AdditionalCategoryTableRow
-                    key={category.id}
-                    category={category}
-                    index={(page - 1) * 10 + index}
-                    handleModalOpen={handleModalOpen}
-                    onDelete={onDelete}
-                  />
-                ))}
-              <TableEmptyRows
-                emptyRows={
-                  data
-                    ? emptyRows(
-                        page,
-                        rowsPerPage,
-                        data?.data?.additionalCategoriesData?.totalItems
-                      )
-                    : 0
+          <Card className='p-6 space-y-4 bg-white shadow-sm'>
+            <div className='flex justify-between items-center pb-2'>
+              <Input
+                placeholder='Search by name...'
+                value={filterState.name}
+                onChange={(e) =>
+                  handleFilterInputChange('name', e.target.value)
                 }
+                className='max-w-sm h-10 bg-gray-50'
               />
-            </tbody>
-          </Table>
+              <Button
+                onClick={() => handleModalOpen('add')}
+                size='sm'
+                className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
+              >
+                <Plus className='mr-2 w-4 h-4' />
+                Add Additional Category
+              </Button>
+            </div>
 
-          {/* Loading and No Data States */}
-          <TableNoData isNotFound={isNotFound} />
-          <TableBodyLoading
-            isLoading={isLoading}
-            tableRowPerPage={rowsPerPage}
-          />
+            <Table>
+              <TableHeader
+                order={order}
+                orderBy={orderBy}
+                numSelected={selected.length}
+                rowCount={additionalCategories.length || 0}
+                handleSort={handleSort}
+                headerData={TABLE_HEAD}
+              />
+              <tbody>
+                {!isLoading &&
+                  additionalCategories.map((category, index) => (
+                    <AdditionalCategoryTableRow
+                      key={category.id}
+                      category={category}
+                      index={(page - 1) * 10 + index}
+                      handleModalOpen={handleModalOpen}
+                      onDelete={onDelete}
+                    />
+                  ))}
+                <TableEmptyRows
+                  emptyRows={
+                    data
+                      ? emptyRows(
+                          page,
+                          rowsPerPage,
+                          data?.data?.additionalCategoriesData?.totalItems
+                        )
+                      : 0
+                  }
+                />
+              </tbody>
+            </Table>
 
-          <Pagination
-            totalRows={data?.data?.additionalCategoriesData?.totalItems || 0}
-            currentPage={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Card>
+            {/* Loading and No Data States */}
+            <TableNoData isNotFound={isNotFound} />
+            <TableBodyLoading
+              isLoading={isLoading}
+              tableRowPerPage={rowsPerPage}
+            />
+
+            <Pagination
+              totalRows={data?.data?.additionalCategoriesData?.totalItems || 0}
+              currentPage={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Card>
+        </div>
+
+        <AdditionalCategoryModal
+          open={modalState.open}
+          onClose={handleModalClose}
+          onSubmit={handleSubmit}
+          mode={modalState.mode}
+          category={selectedCategory || undefined}
+          categories={categories}
+          isSubmitting={isCreating || isUpdating}
+        />
       </div>
-
-      <AdditionalCategoryModal
-        open={modalState.open}
-        onClose={handleModalClose}
-        onSubmit={handleSubmit}
-        mode={modalState.mode}
-        category={selectedCategory || undefined}
-        categories={categories}
-        isSubmitting={isCreating || isUpdating}
-      />
-    </div>
+    </Page>
   );
 }

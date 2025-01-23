@@ -1,3 +1,4 @@
+import { HelmetProvider } from 'react-helmet-async';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { SWRConfig } from 'swr';
 import { swrConfig } from './api/swrConfig';
@@ -10,10 +11,12 @@ function App() {
   useScrollToTop();
   return (
     <SWRConfig value={swrConfig}>
-      <AuthProvider>
-        <AppRoutes />
-        <Toaster />
-      </AuthProvider>
+      <HelmetProvider>
+        <AuthProvider>
+          <AppRoutes />
+          <Toaster />
+        </AuthProvider>
+      </HelmetProvider>
     </SWRConfig>
   );
 }

@@ -1,6 +1,7 @@
 import { sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
+import Page from '@/components/HOC/page';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
 import { CategoryModal } from '@/components/modals/category-modal';
 import CategoryTableRow from '@/components/pages/category/CategoryTableRow';
@@ -133,82 +134,86 @@ export default function CategoryManagement() {
   const isNotFound = !filteredCategories.length && !isLoading && !error;
 
   return (
-    <div className='min-h-screen bg-gray-50/50'>
-      <div className=''>
-        <Breadcrumbs icon={routeConfig.category.icon} />
+    <Page>
+      <div className='min-h-screen bg-gray-50/50'>
+        <div className=''>
+          <Breadcrumbs icon={routeConfig.category.icon} />
 
-        <Card className='p-6 space-y-4 bg-white shadow-sm'>
-          <div className='flex justify-between items-center pb-2'>
-            <Input
-              placeholder='Search by name...'
-              value={filterState.name}
-              onChange={(e) => handleFilterInputChange('name', e.target.value)}
-              className='max-w-sm h-10 bg-gray-50'
-            />
-            <Button
-              onClick={() => handleModalOpen('add')}
-              size='sm'
-              className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
-            >
-              <Plus className='mr-2 w-4 h-4' />
-              Add Category
-            </Button>
-          </div>
+          <Card className='p-6 space-y-4 bg-white shadow-sm'>
+            <div className='flex justify-between items-center pb-2'>
+              <Input
+                placeholder='Search by name...'
+                value={filterState.name}
+                onChange={(e) =>
+                  handleFilterInputChange('name', e.target.value)
+                }
+                className='max-w-sm h-10 bg-gray-50'
+              />
+              <Button
+                onClick={() => handleModalOpen('add')}
+                size='sm'
+                className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
+              >
+                <Plus className='mr-2 w-4 h-4' />
+                Add Category
+              </Button>
+            </div>
 
-          <Table>
-            <TableHeader
-              order={order}
-              orderBy={orderBy}
-              numSelected={selected.length}
-              rowCount={filteredCategories.length || 0}
-              handleSort={handleSort}
-              headerData={TABLE_HEAD}
-            />
-            <tbody>
-              {!isLoading &&
-                filteredCategories.map((category, index) => (
-                  <CategoryTableRow
-                    key={category.id}
-                    category={category}
-                    index={index}
-                    handleModalOpen={handleModalOpen}
-                    onDelete={onDelete}
-                  />
-                ))}
-              {/* <TableEmptyRows
+            <Table>
+              <TableHeader
+                order={order}
+                orderBy={orderBy}
+                numSelected={selected.length}
+                rowCount={filteredCategories.length || 0}
+                handleSort={handleSort}
+                headerData={TABLE_HEAD}
+              />
+              <tbody>
+                {!isLoading &&
+                  filteredCategories.map((category, index) => (
+                    <CategoryTableRow
+                      key={category.id}
+                      category={category}
+                      index={index}
+                      handleModalOpen={handleModalOpen}
+                      onDelete={onDelete}
+                    />
+                  ))}
+                {/* <TableEmptyRows
                 emptyRows={
                   data ? emptyRows(page, rowsPerPage, categories.length) : 0
                 }
               /> */}
-            </tbody>
-          </Table>
+              </tbody>
+            </Table>
 
-          {/* Loading and No Data States */}
-          <TableNoData isNotFound={isNotFound} />
-          <TableBodyLoading
-            isLoading={isLoading}
-            tableRowPerPage={rowsPerPage}
-          />
+            {/* Loading and No Data States */}
+            <TableNoData isNotFound={isNotFound} />
+            <TableBodyLoading
+              isLoading={isLoading}
+              tableRowPerPage={rowsPerPage}
+            />
 
-          {/* <Pagination
+            {/* <Pagination
             totalRows={categories.length || 0}
             currentPage={page}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           /> */}
-        </Card>
-      </div>
+          </Card>
+        </div>
 
-      <CategoryModal
-        open={modalState.open}
-        onClose={handleModalClose}
-        onSubmit={handleSubmit}
-        mode={modalState.mode}
-        category={selectedCategory || undefined}
-        categories={categories || []}
-        isSubmitting={isCreating || isUpdating}
-      />
-    </div>
+        <CategoryModal
+          open={modalState.open}
+          onClose={handleModalClose}
+          onSubmit={handleSubmit}
+          mode={modalState.mode}
+          category={selectedCategory || undefined}
+          categories={categories || []}
+          isSubmitting={isCreating || isUpdating}
+        />
+      </div>
+    </Page>
   );
 }

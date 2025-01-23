@@ -1,6 +1,7 @@
 import { sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
+import Page from '@/components/HOC/page';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
 import { ProductBundleModal } from '@/components/modals/product-bundle-modal';
 import ProductBundleTableRow from '@/components/pages/product-bundle/ProductBundleTableRow';
@@ -171,78 +172,86 @@ export default function ProductBundleManagement() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50/50'>
-      <div className=''>
-        <Breadcrumbs icon={routeConfig.productBundle.icon} />
+    <Page>
+      <div className='min-h-screen bg-gray-50/50'>
+        <div className=''>
+          <Breadcrumbs icon={routeConfig.productBundle.icon} />
 
-        <Card className='p-6 space-y-4 bg-white shadow-sm'>
-          <div className='flex justify-between items-center pb-2'>
-            <Input
-              placeholder='Search by name...'
-              value={filterState.name}
-              onChange={(e) => handleFilterInputChange('name', e.target.value)}
-              className='max-w-sm h-10 bg-gray-50'
-            />
-            <Button
-              onClick={() => handleModalOpen('add')}
-              size='sm'
-              className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
-            >
-              <Plus className='mr-2 w-4 h-4' />
-              Add Product Bundle
-            </Button>
-          </div>
-
-          <Table>
-            <TableHeader
-              order={order}
-              orderBy={orderBy}
-              numSelected={selected.length}
-              rowCount={productBundles.length || 0}
-              handleSort={handleSort}
-              headerData={TABLE_HEAD}
-            />
-            <tbody>
-              {!isLoading &&
-                productBundles.map((bundle, index) => (
-                  <ProductBundleTableRow
-                    key={bundle.id}
-                    bundle={bundle}
-                    index={(page - 1) * rowsPerPage + index + 1}
-                    handleModalOpen={handleModalOpen}
-                    onDelete={handleDelete}
-                  />
-                ))}
-              <TableEmptyRows
-                emptyRows={emptyRows(page, rowsPerPage, productBundles.length)}
+          <Card className='p-6 space-y-4 bg-white shadow-sm'>
+            <div className='flex justify-between items-center pb-2'>
+              <Input
+                placeholder='Search by name...'
+                value={filterState.name}
+                onChange={(e) =>
+                  handleFilterInputChange('name', e.target.value)
+                }
+                className='max-w-sm h-10 bg-gray-50'
               />
-            </tbody>
-          </Table>
+              <Button
+                onClick={() => handleModalOpen('add')}
+                size='sm'
+                className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
+              >
+                <Plus className='mr-2 w-4 h-4' />
+                Add Product Bundle
+              </Button>
+            </div>
 
-          <TableNoData isNotFound={isNotFound} />
-          <TableBodyLoading
-            isLoading={isLoading}
-            tableRowPerPage={rowsPerPage}
-          />
+            <Table>
+              <TableHeader
+                order={order}
+                orderBy={orderBy}
+                numSelected={selected.length}
+                rowCount={productBundles.length || 0}
+                handleSort={handleSort}
+                headerData={TABLE_HEAD}
+              />
+              <tbody>
+                {!isLoading &&
+                  productBundles.map((bundle, index) => (
+                    <ProductBundleTableRow
+                      key={bundle.id}
+                      bundle={bundle}
+                      index={(page - 1) * rowsPerPage + index + 1}
+                      handleModalOpen={handleModalOpen}
+                      onDelete={handleDelete}
+                    />
+                  ))}
+                <TableEmptyRows
+                  emptyRows={emptyRows(
+                    page,
+                    rowsPerPage,
+                    productBundles.length
+                  )}
+                />
+              </tbody>
+            </Table>
 
-          <Pagination
-            totalRows={data?.data?.productBundlesData?.totalItems || 0}
-            currentPage={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Card>
+            <TableNoData isNotFound={isNotFound} />
+            <TableBodyLoading
+              isLoading={isLoading}
+              tableRowPerPage={rowsPerPage}
+            />
+
+            <Pagination
+              totalRows={data?.data?.productBundlesData?.totalItems || 0}
+              currentPage={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Card>
+        </div>
+
+        <ProductBundleModal
+          open={modalState.open}
+          onClose={handleModalClose}
+          onSubmit={handleSubmit}
+          mode={modalState.mode}
+          bundle={selectedBundle || undefined}
+          isSubmitting={isCreating || isUpdating}
+        />
       </div>
-
-      <ProductBundleModal
-        open={modalState.open}
-        onClose={handleModalClose}
-        onSubmit={handleSubmit}
-        mode={modalState.mode}
-        bundle={selectedBundle || undefined}
-        isSubmitting={isCreating || isUpdating}
-      />
-    </div>
+    </Page>
   );
 }

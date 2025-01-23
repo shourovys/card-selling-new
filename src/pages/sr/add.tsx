@@ -1,3 +1,4 @@
+import Page from '@/components/HOC/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -172,268 +173,273 @@ export default function AddSR() {
   };
 
   return (
-    <div className='space-y-6'>
-      <Breadcrumbs icon={routeConfig.sr.icon} />
+    <Page>
+      <div className='space-y-6'>
+        <Breadcrumbs icon={routeConfig.sr.icon} />
 
-      <Card>
-        <CardContent className='p-10'>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-10'>
-              {/* Personal Information */}
-              <div className='space-y-6'>
-                <h3 className='text-lg font-semibold text-secondary'>
-                  Personal Information
-                </h3>
+        <Card>
+          <CardContent className='p-10'>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className='space-y-10'
+              >
+                {/* Personal Information */}
+                <div className='space-y-6'>
+                  <h3 className='text-lg font-semibold text-secondary'>
+                    Personal Information
+                  </h3>
 
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                  <InputField
-                    name='firstName'
-                    form={form}
-                    label='First Name'
-                    required
-                  />
-                  <InputField
-                    name='lastName'
-                    form={form}
-                    label='Last Name'
-                    required
-                  />
-                  <DatePickerField
-                    name='dateOfBirth'
-                    form={form}
-                    label='Date of Birth'
-                    required
-                  />
-                  <RadioGroupField
-                    name='gender'
-                    form={form}
-                    label='Gender'
-                    options={[
-                      { label: 'Male', value: 'male' },
-                      { label: 'Female', value: 'female' },
-                      { label: 'Other', value: 'other' },
-                    ]}
-                    required
-                  />
-                  <div className='col-span-2'>
-                    <FileUploadField
-                      name='photo'
-                      form={form}
-                      label='User Image'
-                      value={form.watch('photo')}
-                      onChange={(file) => {
-                        form.setValue('photo', file);
-                        form.trigger('photo');
-                      }}
-                      preview
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact Details */}
-              <div className='space-y-6'>
-                <h3 className='text-lg font-semibold text-secondary'>
-                  Contact Details
-                </h3>
-
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                  <InputField
-                    name='email'
-                    form={form}
-                    label='Email'
-                    type='email'
-                    required
-                  />
-                  <InputField
-                    name='phoneNumber'
-                    form={form}
-                    label='Phone Number'
-                    required
-                  />
-                  <SelectField
-                    name='countryId'
-                    form={form}
-                    label='Country'
-                    options={countries.map((country) => ({
-                      label: country.countryName,
-                      value: country.id,
-                    }))}
-                    required
-                  />
-                  <SelectField
-                    name='cityId'
-                    form={form}
-                    label='City'
-                    options={cities.map((city) => ({
-                      label: city.cityName,
-                      value: city.id,
-                    }))}
-                    disabled={!form.getValues('countryId')}
-                    required
-                  />
-                  <SelectField
-                    name='areaId'
-                    form={form}
-                    label='Area'
-                    options={areas.map((area) => ({
-                      label: area.areaName,
-                      value: area.id,
-                    }))}
-                    disabled={!form.getValues('cityId')}
-                    required
-                  />
-                  <InputField
-                    name='addressLine'
-                    form={form}
-                    label='Address'
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Verification Details */}
-              <div className='space-y-6'>
-                <h3 className='text-lg font-semibold text-secondary'>
-                  Verification Details
-                </h3>
-
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                  <SelectField
-                    name='level'
-                    form={form}
-                    label='Level'
-                    options={[
-                      {
-                        value: 'Own Mandop',
-                        label: 'Own Mandop',
-                      },
-                      {
-                        value: 'Freelance Mandop',
-                        label: 'Freelance Mandop',
-                      },
-                      {
-                        value: 'Main Agent',
-                        label: 'Main Agent',
-                      },
-                    ]}
-                    required
-                  />
-                  <SelectField
-                    name='verificationType'
-                    form={form}
-                    label='Verification Type'
-                    options={documentTypes.map((type) => ({
-                      label: type.value,
-                      value: type.id.toString(),
-                    }))}
-                    required
-                  />
-                  <div className='col-span-2'>
-                    <FileUploadField
-                      name='verificationDocument'
-                      form={form}
-                      label='Verification Document'
-                      value={form.watch('verificationDocument')}
-                      onChange={(file) => {
-                        form.setValue('verificationDocument', file);
-                        form.trigger('verificationDocument');
-                      }}
-                      preview
-                      required
-                    />
-                  </div>
-                  <DatePickerField
-                    name='issueDate'
-                    form={form}
-                    label='Issue Date'
-                    required
-                  />
-                  <DatePickerField
-                    name='expireDate'
-                    form={form}
-                    label='Expire Date'
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Account Details */}
-              <div className='space-y-6'>
-                <h3 className='text-lg font-semibold text-secondary'>
-                  Account Details
-                </h3>
-
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                  <SelectField
-                    name='distributorId'
-                    form={form}
-                    label='Distributor'
-                    options={distributors.map((distributor) => ({
-                      label: `${distributor.firstName} ${distributor.lastName}`,
-                      value: distributor.userId,
-                    }))}
-                    required
-                  />
-                  <SelectField
-                    name='subDistributorId'
-                    form={form}
-                    label='Sub Distributor'
-                    options={subDistributors.map((subDistributor) => ({
-                      label: `${subDistributor.firstName} ${subDistributor.lastName}`,
-                      value: subDistributor.userId,
-                    }))}
-                    required
-                  />
-                  <RadioGroupField
-                    name='status'
-                    form={form}
-                    label='Status'
-                    options={[
-                      { label: 'Active', value: 'active' },
-                      { label: 'Inactive', value: 'inactive' },
-                    ]}
-                    required
-                  />
-                  {/* {form.watch('status') === 'inactive' && ( */}
-                  <SelectField
-                    name='checkerId'
-                    form={form}
-                    label='Checker'
-                    options={checkers.map((checker) => ({
-                      label: checker.name,
-                      value: checker.userId,
-                    }))}
-                    required
-                  />
-                  {/* )} */}
-                  <div className='col-span-2'>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
                     <InputField
-                      name='remarks'
+                      name='firstName'
                       form={form}
-                      label='Remarks'
-                      rows={6}
-                      multiline
+                      label='First Name'
+                      required
+                    />
+                    <InputField
+                      name='lastName'
+                      form={form}
+                      label='Last Name'
+                      required
+                    />
+                    <DatePickerField
+                      name='dateOfBirth'
+                      form={form}
+                      label='Date of Birth'
+                      required
+                    />
+                    <RadioGroupField
+                      name='gender'
+                      form={form}
+                      label='Gender'
+                      options={[
+                        { label: 'Male', value: 'male' },
+                        { label: 'Female', value: 'female' },
+                        { label: 'Other', value: 'other' },
+                      ]}
+                      required
+                    />
+                    <div className='col-span-2'>
+                      <FileUploadField
+                        name='photo'
+                        form={form}
+                        label='User Image'
+                        value={form.watch('photo')}
+                        onChange={(file) => {
+                          form.setValue('photo', file);
+                          form.trigger('photo');
+                        }}
+                        preview
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Details */}
+                <div className='space-y-6'>
+                  <h3 className='text-lg font-semibold text-secondary'>
+                    Contact Details
+                  </h3>
+
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                    <InputField
+                      name='email'
+                      form={form}
+                      label='Email'
+                      type='email'
+                      required
+                    />
+                    <InputField
+                      name='phoneNumber'
+                      form={form}
+                      label='Phone Number'
+                      required
+                    />
+                    <SelectField
+                      name='countryId'
+                      form={form}
+                      label='Country'
+                      options={countries.map((country) => ({
+                        label: country.countryName,
+                        value: country.id,
+                      }))}
+                      required
+                    />
+                    <SelectField
+                      name='cityId'
+                      form={form}
+                      label='City'
+                      options={cities.map((city) => ({
+                        label: city.cityName,
+                        value: city.id,
+                      }))}
+                      disabled={!form.getValues('countryId')}
+                      required
+                    />
+                    <SelectField
+                      name='areaId'
+                      form={form}
+                      label='Area'
+                      options={areas.map((area) => ({
+                        label: area.areaName,
+                        value: area.id,
+                      }))}
+                      disabled={!form.getValues('cityId')}
+                      required
+                    />
+                    <InputField
+                      name='addressLine'
+                      form={form}
+                      label='Address'
+                      required
                     />
                   </div>
                 </div>
-              </div>
 
-              <div className='flex justify-end gap-4 pt-4'>
-                <Button
-                  type='button'
-                  variant='outline'
-                  onClick={() => navigate('/sr')}
-                >
-                  Clear
-                </Button>
-                <Button type='submit'>Create</Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+                {/* Verification Details */}
+                <div className='space-y-6'>
+                  <h3 className='text-lg font-semibold text-secondary'>
+                    Verification Details
+                  </h3>
+
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                    <SelectField
+                      name='level'
+                      form={form}
+                      label='Level'
+                      options={[
+                        {
+                          value: 'Own Mandop',
+                          label: 'Own Mandop',
+                        },
+                        {
+                          value: 'Freelance Mandop',
+                          label: 'Freelance Mandop',
+                        },
+                        {
+                          value: 'Main Agent',
+                          label: 'Main Agent',
+                        },
+                      ]}
+                      required
+                    />
+                    <SelectField
+                      name='verificationType'
+                      form={form}
+                      label='Verification Type'
+                      options={documentTypes.map((type) => ({
+                        label: type.value,
+                        value: type.id.toString(),
+                      }))}
+                      required
+                    />
+                    <div className='col-span-2'>
+                      <FileUploadField
+                        name='verificationDocument'
+                        form={form}
+                        label='Verification Document'
+                        value={form.watch('verificationDocument')}
+                        onChange={(file) => {
+                          form.setValue('verificationDocument', file);
+                          form.trigger('verificationDocument');
+                        }}
+                        preview
+                        required
+                      />
+                    </div>
+                    <DatePickerField
+                      name='issueDate'
+                      form={form}
+                      label='Issue Date'
+                      required
+                    />
+                    <DatePickerField
+                      name='expireDate'
+                      form={form}
+                      label='Expire Date'
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Account Details */}
+                <div className='space-y-6'>
+                  <h3 className='text-lg font-semibold text-secondary'>
+                    Account Details
+                  </h3>
+
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                    <SelectField
+                      name='distributorId'
+                      form={form}
+                      label='Distributor'
+                      options={distributors.map((distributor) => ({
+                        label: `${distributor.firstName} ${distributor.lastName}`,
+                        value: distributor.userId,
+                      }))}
+                      required
+                    />
+                    <SelectField
+                      name='subDistributorId'
+                      form={form}
+                      label='Sub Distributor'
+                      options={subDistributors.map((subDistributor) => ({
+                        label: `${subDistributor.firstName} ${subDistributor.lastName}`,
+                        value: subDistributor.userId,
+                      }))}
+                      required
+                    />
+                    <RadioGroupField
+                      name='status'
+                      form={form}
+                      label='Status'
+                      options={[
+                        { label: 'Active', value: 'active' },
+                        { label: 'Inactive', value: 'inactive' },
+                      ]}
+                      required
+                    />
+                    {/* {form.watch('status') === 'inactive' && ( */}
+                    <SelectField
+                      name='checkerId'
+                      form={form}
+                      label='Checker'
+                      options={checkers.map((checker) => ({
+                        label: checker.name,
+                        value: checker.userId,
+                      }))}
+                      required
+                    />
+                    {/* )} */}
+                    <div className='col-span-2'>
+                      <InputField
+                        name='remarks'
+                        form={form}
+                        label='Remarks'
+                        rows={6}
+                        multiline
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className='flex justify-end gap-4 pt-4'>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    onClick={() => navigate('/sr')}
+                  >
+                    Clear
+                  </Button>
+                  <Button type='submit'>Create</Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    </Page>
   );
 }

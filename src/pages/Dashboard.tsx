@@ -1,12 +1,12 @@
+import Page from '@/components/HOC/page';
 import useAuth from '@/hooks/useAuth';
 import React from 'react';
-import PageLayout from '../components/common/PageLayout';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   console.log('🚀 ~ user:', user);
   return (
-    <PageLayout showBreadcrumbs>
+    <Page>
       <div className='space-y-6'>
         <div className='overflow-hidden bg-white rounded-lg shadow'>
           <div className='px-4 py-5 sm:p-6'>
@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
       {/* <div className='container py-6'>
         <TestForm />
       </div> */}
-    </PageLayout>
+    </Page>
   );
 };
 

@@ -1,6 +1,7 @@
 'use client';
 import { fetcher } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
+import Page from '@/components/HOC/page';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
 import OrderTableRow from '@/components/pages/order/OrderTableRow';
 import OrderTableToolbar from '@/components/pages/order/OrderTableToolbar';
@@ -92,67 +93,72 @@ export default function Home() {
   const isNotFound = !data?.count && !isLoading && !error;
 
   return (
-    <div>
-      {/* Main Table Container */}
-      <div className='bg-white rounded-xl border border-primaryBorder shadow-table'>
-        {/* Order Table Toolbar */}
-        <OrderTableToolbar
-          data={data}
-          filterState={filterState}
-          handleFilterStateReset={handleFilterStateReset}
-          handleFilterInputChange={handleFilterInputChange}
-          setFilterState={handleFilterStateReset}
-        />
-
-        {/* Table and Table Headers */}
-        <Table>
-          <TableHeader
-            order={order}
-            orderBy={orderBy}
-            numSelected={selected.length}
-            rowCount={data?.orders.length || 0}
-            handleSort={handleSort}
-            selectAllRow={(isAllSelected) => {
-              if (data) {
-                handleSelectAllRows(
-                  isAllSelected,
-                  data.orders.map((order) => order._id.$oid)
-                );
-              }
-            }}
-            headerData={TABLE_HEAD}
+    <Page>
+      <div>
+        {/* Main Table Container */}
+        <div className='bg-white rounded-xl border border-primaryBorder shadow-table'>
+          {/* Order Table Toolbar */}
+          <OrderTableToolbar
+            data={data}
+            filterState={filterState}
+            handleFilterStateReset={handleFilterStateReset}
+            handleFilterInputChange={handleFilterInputChange}
+            setFilterState={handleFilterStateReset}
           />
 
-          {/* Table Body and Rows */}
-          <tbody className='divide-y divide-border-primaryBorder'>
-            {!isLoading &&
-              data?.orders.map((row) => (
-                <OrderTableRow
-                  key={row._id.$oid}
-                  row={row}
-                  selected={selected}
-                  handleSelectRow={handleSelectRow}
-                />
-              ))}
-            <TableEmptyRows
-              emptyRows={data ? emptyRows(page, rowsPerPage, data.count) : 0}
+          {/* Table and Table Headers */}
+          <Table>
+            <TableHeader
+              order={order}
+              orderBy={orderBy}
+              numSelected={selected.length}
+              rowCount={data?.orders.length || 0}
+              handleSort={handleSort}
+              selectAllRow={(isAllSelected) => {
+                if (data) {
+                  handleSelectAllRows(
+                    isAllSelected,
+                    data.orders.map((order) => order._id.$oid)
+                  );
+                }
+              }}
+              headerData={TABLE_HEAD}
             />
-          </tbody>
-        </Table>
 
-        {/* Loading and No Data States */}
-        <TableBodyLoading isLoading={isLoading} tableRowPerPage={rowsPerPage} />
-        <TableNoData isNotFound={isNotFound} />
+            {/* Table Body and Rows */}
+            <tbody className='divide-y divide-border-primaryBorder'>
+              {!isLoading &&
+                data?.orders.map((row) => (
+                  <OrderTableRow
+                    key={row._id.$oid}
+                    row={row}
+                    selected={selected}
+                    handleSelectRow={handleSelectRow}
+                  />
+                ))}
+              <TableEmptyRows
+                emptyRows={data ? emptyRows(page, rowsPerPage, data.count) : 0}
+              />
+            </tbody>
+          </Table>
+
+          {/* Loading and No Data States */}
+          <TableBodyLoading
+            isLoading={isLoading}
+            tableRowPerPage={rowsPerPage}
+          />
+          <TableNoData isNotFound={isNotFound} />
+        </div>
+
+        {/* Pagination Component */}
+        <Pagination
+          totalRows={data?.count || 0}
+          currentPage={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </div>
-
-      {/* Pagination Component */}
-      <Pagination
-        totalRows={data?.count || 0}
-        currentPage={page}
-        rowsPerPage={rowsPerPage}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-    </div>
+    </Page>
   );
 }
