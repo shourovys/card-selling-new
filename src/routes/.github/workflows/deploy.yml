@@ -1,0 +1,96 @@
+name: Unified CI/CD Pipeline
+on:
+  push:
+    branches:
+      - master
+      - dev
+jobs:
+  deploy-to-master:
+    ###this section is for master branch
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: NPM Install
+        run: |
+          npm install
+      - name: Development Build
+        run: |
+          CI= npm run build
+
+      - name: SCP files via ssh key
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSHKEY_PRIVATE }}
+          port: ${{ secrets.PORT }}
+          source: 'dist/'
+          target: '/home/ubuntu/cicd_master'
+
+      - name: Run multi-line script
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.SSHKEY_PRIVATE }}
+          script: |
+            cd /home/ubuntu/cicd
+            sudo cp -R dist/ /var/web/html_new/cardselling_v2_frontend
+            sudo chown -Rf nginx:cardselling /var/web/html_new/cardselling_v2_frontend
+            sudo chmod -Rf 770 /var/web/html_new/cardselling_v2_frontend
+            sudo chmod -Rf g+s /var/web/html_new/cardselling_v2_frontend
+
+  deploy-to-dev:
+    ###this section is for dev branch
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: NPM Install
+        run: |
+          npm install
+      - name: Development Build
+        run: |
+          CI= npm run build
+
+      - name: SCP files via ssh key
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSHKEY_PRIVATE }}
+          port: ${{ secrets.PORT }}
+          source: 'dist/'
+          target: '/home/ubuntu/cicd_dev'
+
+      - name: Run multi-line script
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.SSHKEY_PRIVATE }}
+          script: |
+            cd /home/ubuntu/cicd_dev
+            sudo cp -R dist/ /var/web/html_new/cardselling_v2_frontend_dev
+            sudo chown -Rf nginx:cardselling /var/web/html_new/cardselling_v2_frontend_dev
+            sudo chmod -Rf 770 /var/web/html_new/cardselling_v2_frontend_dev
+            sudo chmod -Rf g+s /var/web/html_new/cardselling_v2_frontend_dev
