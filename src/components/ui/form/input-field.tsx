@@ -61,7 +61,7 @@ export function InputField<T extends FieldValues>({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem className={className}>
+        <FormItem>
           {label && (
             <FormLabel className='flex gap-1 items-center'>
               {label}
