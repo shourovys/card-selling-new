@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const NotFound: React.FC = () => {
   return (
     <Page title='404'>
-      <div className='min-h-[80vh] flex items-center justify-center bg-white'>
+      <div className='min-h-[80vh] flex items-center justify-center bg-white text-green-600'>
         <div className='text-center'>
           <h1 className='text-6xl font-bold text-indigo-600'>404</h1>
           <h2 className='mt-4 text-3xl font-bold text-gray-900'>
