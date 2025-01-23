@@ -69,8 +69,12 @@ export default function CategoryTableRow({
               />
             </div>
             <div className='min-w-0'>
-              <p className='font-medium mb-0.5 truncate'>{category.name}</p>
-              <p className='text-xs truncate'>Category for {category.type}</p>
+              <p className='font-medium mb-0.5 max-w-[400px] truncate'>
+                {category.name}
+              </p>
+              <p className='text-xs max-w-[400px] truncate'>
+                {category?.description}
+              </p>
             </div>
           </div>
         </TableData>

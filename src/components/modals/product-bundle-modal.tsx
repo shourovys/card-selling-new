@@ -113,7 +113,7 @@ export function ProductBundleModal({
     IApiResponse<{
       currencies: { id: number; name: string; exchangeRate: number }[];
     }>
-  >(BACKEND_ENDPOINTS.CURRENCY.LIST);
+  >(BACKEND_ENDPOINTS.CURRENCY.LIST('status=true'));
 
   const currencies = currencyData?.data?.currencies || [];
 

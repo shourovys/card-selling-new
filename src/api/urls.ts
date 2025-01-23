@@ -81,7 +81,8 @@ const BACKEND_ENDPOINTS = {
   },
 
   CURRENCY: {
-    LIST: '/api/v1/private/all/currency',
+    LIST: (queryString: string) =>
+      `/api/v1/private/all/currency${queryString ? `?${queryString}` : ''}`,
   },
 
   SYSTEM_USER: {
