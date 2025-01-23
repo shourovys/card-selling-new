@@ -109,7 +109,7 @@ export function AdditionalCategoryModal({
           data.data.additionalCategoriesData.additionalCategories[0];
         form.setValue('position', {
           value: previousCategory.position.toString(),
-          label: previousCategory.name,
+          label: `${previousCategory.position} - ${previousCategory.name} `,
         });
       },
     }
@@ -188,7 +188,7 @@ export function AdditionalCategoryModal({
     return response.data.additionalCategoriesData.additionalCategories.map(
       (item) => ({
         value: item.position.toString(),
-        label: item.name,
+        label: `${item.position} - ${item.name} `,
       })
     );
   };

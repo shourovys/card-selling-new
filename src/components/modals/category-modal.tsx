@@ -191,7 +191,7 @@ export function CategoryModal({
                     options={categories
                       .filter((cat) => cat.id !== category?.id)
                       .map((cat) => ({
-                        label: cat.name,
+                        label: `${cat.position} - ${cat.name} `,
                         value: cat.id.toString(),
                       }))}
                     disabled={isViewMode}
