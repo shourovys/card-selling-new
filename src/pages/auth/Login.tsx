@@ -31,7 +31,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className='flex flex-col space-y-6'>
+    <div className='flex flex-col space-y-8'>
       <div className='flex flex-col space-y-2 text-center'>
         <h1 className='text-2xl font-semibold text-gray-900'>Welcome back</h1>
         <p className='text-sm text-gray-500'>
@@ -40,7 +40,7 @@ const Login: React.FC = () => {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
           <div className='relative'>
             <Mail className='absolute left-4 top-[37px] h-[18px] w-[18px] text-gray-400 pointer-events-none' />
             <InputField
