@@ -1,5 +1,5 @@
+import { routeConfig } from '@/config/routeConfig';
 import React, { lazy } from 'react';
-import { routePaths } from './routePaths';
 import type { AppRoute } from './routes';
 
 const PublicLayout = lazy(() => import('../layouts/PublicLayout'));
@@ -14,10 +14,8 @@ export const publicRoutes: AppRoute[] = [
     isLayout: true,
     children: [
       {
-        path: routePaths.unauthorized,
+        routePath: routeConfig.unauthorized.routePath,
         element: React.createElement(Unauthorized),
-        title: 'Unauthorized',
-        breadcrumb: 'Unauthorized',
       },
     ],
   },
@@ -26,10 +24,8 @@ export const publicRoutes: AppRoute[] = [
     isLayout: true,
     children: [
       {
-        path: routePaths.login,
+        routePath: routeConfig.login.routePath,
         element: React.createElement(Login),
-        title: 'Login',
-        breadcrumb: 'Login',
       },
     ],
   },

@@ -9,10 +9,10 @@ import TableNoData from '@/components/table/TableNoData';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { routeConfig } from '@/config/routeConfig';
 import { useFilter } from '@/hooks/useFilter';
 import useTable, { emptyRows } from '@/hooks/useTable';
 import { ISRResponse, SR } from '@/lib/validations/sr';
-import { routePaths } from '@/routes/routePaths';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
 import { Plus } from 'lucide-react';
@@ -84,7 +84,7 @@ export default function SRManagement() {
               className='max-w-sm h-10 bg-gray-50'
             />
             <Button
-              onClick={() => navigate(routePaths.srAdd)}
+              onClick={() => navigate(routeConfig.srAdd.path())}
               size='sm'
               className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
             >

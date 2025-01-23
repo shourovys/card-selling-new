@@ -1,7 +1,7 @@
+import { routeConfig } from '@/config/routeConfig';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import PageLayout from '../components/common/PageLayout';
-import { routePaths } from '../routes/routePaths';
 
 const NotFound: React.FC = () => {
   return (
@@ -17,7 +17,7 @@ const NotFound: React.FC = () => {
           </p>
           <div className='mt-8'>
             <Link
-              to={routePaths.dashboard}
+              to={routeConfig.dashboard.path()}
               className='inline-flex items-center px-4 py-2 text-base font-medium text-white bg-indigo-600 rounded-md border border-transparent shadow-sm hover:bg-indigo-700'
             >
               Return to Dashboard

@@ -1,6 +1,6 @@
+import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
 import authReducer, { initialState } from '@/reducers/authReducer';
-import { routePaths } from '@/routes/routePaths';
 import {
   IAuthState,
   IAuthStatus,
@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           description: 'You have successfully logged in.',
           variant: 'default',
         });
-        navigate(routePaths.dashboard);
+        navigate(routeConfig.dashboard.path());
       } catch (error) {
         const errorMessage =
           error instanceof Error
@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       dispatch({ type: 'LOGOUT_REQUEST' });
       await authService.logout();
       dispatch({ type: 'LOGOUT_SUCCESS' });
-      navigate(routePaths.login);
+      navigate(routeConfig.login.path());
       toast({
         title: 'Logout Success',
         description: 'Your session has been logged out.',

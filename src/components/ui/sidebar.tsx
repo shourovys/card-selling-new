@@ -43,7 +43,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
     };
 
     const hasActiveChild = (item: MenuItem): boolean => {
-      if (item.path && isActiveRoute(item.path)) return true;
+      if (item.path && isActiveRoute(item.path())) return true;
       if (item.subMenu) {
         return item.subMenu.some((subItem) => hasActiveChild(subItem));
       }
@@ -72,10 +72,10 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
 
       return (
         <Link
-          to={item.path}
+          to={item.path()}
           className={cn(
             'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
-            isActiveRoute(item.path)
+            isActiveRoute(item.path())
               ? 'bg-primary/10 text-primary'
               : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
             expanded && isSubmenu && 'ml-5',
@@ -88,14 +88,14 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         >
           <Icon className={cn('size-5', !expanded && !isSubmenu && 'size-7')} />
           <span className={cn(!expanded && !isSubmenu && 'hidden')}>
-            {item.label}
+            {item.title}
           </span>
         </Link>
       );
     };
 
     const MenuGroup = ({ item }: { item: MenuItem }) => {
-      const isOpen = openGroups.includes(item.label);
+      const isOpen = openGroups.includes(item.title);
       const isActive = hasActiveChild(item);
       const Icon = item.icon;
 
@@ -126,7 +126,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
             >
               <div className='flex flex-col gap-1'>
                 {item.subMenu.map((subItem) => (
-                  <MenuLink key={subItem.path} item={subItem} isSubmenu />
+                  <MenuLink key={subItem.title} item={subItem} isSubmenu />
                 ))}
               </div>
             </PopoverContent>
@@ -135,7 +135,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
       }
 
       return (
-        <Collapsible open={isOpen} onOpenChange={() => toggleGroup(item.label)}>
+        <Collapsible open={isOpen} onOpenChange={() => toggleGroup(item.title)}>
           <CollapsibleTrigger
             className={cn(
               'flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
@@ -146,7 +146,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           >
             <div className='flex items-center gap-3'>
               <Icon className='h-5 w-5' />
-              <span>{item.label}</span>
+              <span>{item.title}</span>
             </div>
             <ChevronDown
               className={cn(
@@ -157,7 +157,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           </CollapsibleTrigger>
           <CollapsibleContent className='py-2'>
             {item.subMenu.map((subItem) => (
-              <MenuLink key={subItem.path} item={subItem} isSubmenu />
+              <MenuLink key={subItem.title} item={subItem} isSubmenu />
             ))}
           </CollapsibleContent>
         </Collapsible>
@@ -316,7 +316,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         <div className='flex flex-col gap-1'>
           <nav className='flex flex-col gap-1 space-y-2'>
             {menuItems.map((item) => (
-              <MenuGroup key={item.path || item.label} item={item} />
+              <MenuGroup key={item.title} item={item} />
             ))}
           </nav>
         </div>

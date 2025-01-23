@@ -19,10 +19,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { SR } from '@/lib/validations/sr';
-import { routePaths } from '@/routes/routePaths';
 import { Edit, Eye, MoreVertical, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -87,7 +87,7 @@ export default function SRTableRow({ sr, index, onDelete }: SRTableRowProps) {
               variant='ghost'
               size='icon'
               className='w-8 h-8 hover:bg-gray-100'
-              onClick={() => navigate(routePaths.srEdit(sr.userId))}
+              onClick={() => navigate(routeConfig.srEdit.path(sr.userId))}
             >
               <Edit className='w-4 h-4 text-gray-500' />
             </Button>
@@ -100,7 +100,7 @@ export default function SRTableRow({ sr, index, onDelete }: SRTableRowProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='w-[160px]'>
                 <DropdownMenuItem
-                  onClick={() => navigate(routePaths.srView(sr.userId))}
+                  onClick={() => navigate(routeConfig.srView.path(sr.userId))}
                   className='text-sm'
                 >
                   <Eye className='mr-2 w-4 h-4 text-primary' />

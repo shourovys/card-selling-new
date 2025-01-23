@@ -1,5 +1,5 @@
+import { routeConfig } from '@/config/routeConfig';
 import { useLocation } from 'react-router-dom';
-import { routePaths } from '../routePaths';
 
 interface Breadcrumb {
   path: string;
@@ -26,7 +26,7 @@ export const useBreadcrumbs = (): Breadcrumb[] => {
 
     // Special case for nested dashboard routes
     if (currentPath.startsWith('/dashboard')) {
-      if (currentPath === routePaths.dashboard) {
+      if (currentPath === routeConfig.dashboard.path()) {
         label = 'Dashboard';
       }
     }

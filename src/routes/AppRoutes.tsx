@@ -3,7 +3,7 @@ import React, { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import ErrorBoundary from './ErrorBoundary';
 import RoleBasedRoute from './RoleBasedRoute';
-import { AppRoute, routeConfig } from './routes';
+import { AppRoute, reactRoutes } from './routes';
 
 const LoadingFallback = () => (
   <div className='flex justify-center items-center h-screen'>
@@ -49,8 +49,8 @@ const AppRoutes: React.FC = () => {
       // For regular routes
       return (
         <Route
-          key={route.path}
-          path={route.path}
+          key={route.routePath}
+          path={route.routePath}
           element={renderRouteElement(route)}
         >
           {route.children && renderRoutes(route.children)}
@@ -61,7 +61,7 @@ const AppRoutes: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <Routes>{renderRoutes(routeConfig)}</Routes>
+      <Routes>{renderRoutes(reactRoutes)}</Routes>
     </ErrorBoundary>
   );
 };

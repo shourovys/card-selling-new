@@ -15,6 +15,7 @@ import { FileUploadField } from '@/components/ui/form/file-upload-field';
 import { InputField } from '@/components/ui/form/input-field';
 import { RadioGroupField } from '@/components/ui/form/radio-group-field';
 import { SelectField } from '@/components/ui/form/select-field';
+import { routeConfig } from '@/config/routeConfig';
 import { useToast } from '@/hooks/use-toast';
 import { IDistributorResponse } from '@/lib/validations/distributor';
 import {
@@ -29,7 +30,6 @@ import {
   srFormSchema,
 } from '@/lib/validations/sr';
 import { ISubDistributorResponse } from '@/lib/validations/sub-distributor';
-import { routePaths } from '@/routes/routePaths';
 import { IApiRequestWithMetaData, IApiResponse } from '@/types/common';
 import fileToBase64 from '@/utils/fileToBase64';
 import { getMetaInfo } from '@/utils/getMetaInfo';
@@ -197,7 +197,7 @@ export default function EditSR() {
         title: 'Success',
         description: 'Sales representative updated successfully',
       });
-      navigate(routePaths.sr);
+      navigate(routeConfig.sr.path());
     } catch (error: unknown) {
       const err = error as Error;
       toast({

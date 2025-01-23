@@ -1,4 +1,4 @@
-import { routePaths } from '@/routes/routePaths';
+import { routeConfig } from '@/config/routeConfig';
 
 export type TPageRoutes = { href: string; text: string }[];
 
@@ -48,7 +48,7 @@ export default function generateBreadcrumbs(
 
   // Add in a default dashboard crumb if crumbList has only 1 link
   const updateCrumbList = [
-    { href: routePaths.dashboard, text: 'Dashboard' },
+    { href: routeConfig.dashboard.path(), text: 'Dashboard' },
     ...crumbList,
   ];
 
