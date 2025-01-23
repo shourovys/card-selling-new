@@ -1,7 +1,10 @@
 const BACKEND_ENDPOINTS = {
   // Auth
-  LOGIN: '/api/v1/public/auth/signin',
-  REFRESH_TOKEN: '/api/v1/public/auth/refresh-token',
+  AUTH: {
+    LOGIN: '/api/v1/public/auth/signin',
+    REFRESH_TOKEN: '/api/v1/public/auth/refresh-token',
+    LOGOUT: '/api/v1/private/auth/logout',
+  },
 
   // Role
   ROLE: {

@@ -35,7 +35,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
     const [openGroups, setOpenGroups] = React.useState<string[]>([]);
 
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
 
     const isActiveRoute = (path?: string) => {
       if (!path) return false;
@@ -198,6 +198,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           <Button
             variant='ghost'
             className='flex w-full items-center justify-start gap-2 px-2 py-1.5 text-sm text-destructive'
+            onClick={logout}
           >
             <LogOut className='h-5 w-5' />
             Log out

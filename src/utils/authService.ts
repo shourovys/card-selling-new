@@ -32,7 +32,7 @@ class AuthService {
   public async login(credentials: ILoginCredentials): Promise<IUser> {
     try {
       const response = await api.post<IApiResponse<ILoginResponse>>(
-        BACKEND_ENDPOINTS.LOGIN,
+        BACKEND_ENDPOINTS.AUTH.LOGIN,
         {
           metaInfo: getMetaInfo(),
           attributes: credentials,
@@ -97,7 +97,7 @@ class AuthService {
 
   public async logout(): Promise<void> {
     try {
-      // await this.axiosInstance.post(BACKEND_ENDPOINTS.LOGOUT);
+      await api.post(BACKEND_ENDPOINTS.AUTH.LOGOUT);
     } catch (error) {
       console.error('Error during logout:', error);
     } finally {
@@ -169,7 +169,7 @@ class AuthService {
 
     try {
       const response = await api.post<IApiResponse<IRefreshTokenResponse>>(
-        BACKEND_ENDPOINTS.REFRESH_TOKEN,
+        BACKEND_ENDPOINTS.AUTH.REFRESH_TOKEN,
         {
           attributes: {
             grant_type: 'refresh_token',
