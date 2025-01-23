@@ -20,7 +20,7 @@ api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   if (
     !accessToken ||
     !refreshToken ||
-    config.url === BACKEND_ENDPOINTS.REFRESH_TOKEN
+    config.url === BACKEND_ENDPOINTS.AUTH.REFRESH_TOKEN
   ) {
     return config;
   }
@@ -56,7 +56,7 @@ api.interceptors.response.use(
       !originalRequest ||
       !accessToken ||
       !refreshToken ||
-      originalRequest.url === BACKEND_ENDPOINTS.REFRESH_TOKEN
+      originalRequest.url === BACKEND_ENDPOINTS.AUTH.REFRESH_TOKEN
     ) {
       return Promise.reject(error);
     }
