@@ -100,9 +100,6 @@ export function RadioGroupField<T extends FieldValues>({
                     field.value !== option.value &&
                     'hover:border-input-borderHover',
                   disabled && 'cursor-not-allowed',
-                  field.value === option.value &&
-                    !disabled &&
-                    'hover:bg-secondary/90',
                   'focus-visible:ring-1 focus-visible:ring-offset-0',
                   disabled &&
                     field.value === option.value &&
