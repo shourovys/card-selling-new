@@ -222,9 +222,10 @@ export function MultiSelectField<T extends FieldValues>({
 
               {/* Transfer Buttons */}
               {!disabled && (
-                <div className='flex flex-col gap-2 justify-center'>
+                <div className='flex flex-col gap-4 justify-center'>
                   <Button
                     size='icon'
+                    variant='success'
                     onClick={() => handleTransfer('right')}
                     disabled={selectedAvailable.length === 0}
                     className='w-9 h-9 rounded-md shrink-0'
