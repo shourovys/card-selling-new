@@ -1,6 +1,7 @@
 import { IUserRole } from '@/types/auth.types';
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { routePaths } from './routePaths';
 
 interface RoleBasedRouteProps {
   isAuthenticated: boolean;
@@ -16,7 +17,7 @@ const RoleBasedRoute: React.FC<RoleBasedRouteProps> = ({
   children,
 }) => {
   if (!isAuthenticated) {
-    return <Navigate to='/unauthorized' replace />;
+    return <Navigate to={routePaths.login} replace />;
   }
 
   // If no roles are specified, allow access to authenticated users
