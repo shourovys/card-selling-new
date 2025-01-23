@@ -16,6 +16,7 @@ export const productBundleFormSchema = z
       message: 'Bundle Image is required',
     }),
     facePrice: z.string().min(1, { message: 'Face price is required' }),
+    facePriceIQD: z.string().optional(),
     purchasePrice: z.string().min(1, { message: 'Purchase price is required' }),
     salePrice: z.string(),
     currency: z.string().min(1, { message: 'Currency is required' }),
@@ -32,11 +33,11 @@ export const productBundleFormSchema = z
       .min(1, { message: 'Inventory Product ID is required' }),
   })
   .superRefine((data, ctx) => {
-    if (Number(data.facePrice) < Number(data.salePrice)) {
+    if (Number(data.facePriceIQD) < Number(data.salePrice)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Face price must be greater than sale price',
-        path: ['facePrice'],
+        message: 'Face price IQD must be greater than sale price',
+        path: ['facePriceIQD'],
       });
     }
   });

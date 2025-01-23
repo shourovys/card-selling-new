@@ -12,7 +12,6 @@ import {
 import { Form } from '@/components/ui/form';
 import { FileUploadField } from '@/components/ui/form/file-upload-field';
 import { InputField } from '@/components/ui/form/input-field';
-import { InputLabel } from '@/components/ui/form/input-label';
 import { RadioGroupField } from '@/components/ui/form/radio-group-field';
 import { SelectField } from '@/components/ui/form/select-field';
 import {
@@ -295,7 +294,18 @@ export function ProductBundleModal({
     if (salePrice) {
       form.setValue('salePrice', salePrice);
     }
-  }, [purchasePrice, gpType, gpValue, form, gpAmount, salePrice]);
+    if (iqdPriceValue) {
+      form.setValue('facePriceIQD', iqdPriceValue);
+    }
+  }, [
+    purchasePrice,
+    gpType,
+    gpValue,
+    form,
+    gpAmount,
+    salePrice,
+    iqdPriceValue,
+  ]);
 
   const handleSubmit = async (values: ProductBundleFormValues) => {
     if (isViewMode) return;
@@ -502,10 +512,10 @@ export function ProductBundleModal({
                   </div>
 
                   <div className='space-y-2'>
-                    <InputLabel
+                    <InputField
                       name='facePriceIQD'
+                      form={form}
                       label='Face Price (IQD)'
-                      value={iqdPriceValue}
                       type='number'
                       disabled
                       description={
