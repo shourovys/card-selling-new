@@ -1,4 +1,4 @@
-import { subDistributorApi } from '@/api/sub-distributor';
+import { sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import Page from '@/components/HOC/page';
@@ -14,34 +14,48 @@ import { Input } from '@/components/ui/input';
 import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
+import usePermissions from '@/hooks/usePermissions';
 import useTable from '@/hooks/useTable';
 import {
   ISubDistributorPayload,
-  ISubDistributorResponse,
   SubDistributor,
+  SubDistributorFormValues,
 } from '@/lib/validations/sub-distributor';
 import { IApiResponse } from '@/types/common';
 import { ITableHead } from '@/types/components/table';
+import { getMetaInfo } from '@/utils/getMetaInfo';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
+
+interface ISubDistributorResponse {
+  subDistributors: SubDistributor[];
+}
+
+interface SubDistributorFilter {
+  name: string;
+}
 
 export default function SubDistributorManagement() {
-  const { page, rowsPerPage, order, orderBy, selected, handleSort } = useTable(
-    {}
-  );
+  // Table state management
+  const { rowsPerPage, order, orderBy, selected, handleSort } = useTable({});
+  const { getActionPermissions } = usePermissions();
+  const { canCreate } = getActionPermissions('SUB_DISTRIBUTOR');
 
+  // Define table head columns
   const TABLE_HEAD: ITableHead[] = [
     { id: 'sno', label: 'S.NO', align: 'left' },
     { id: 'firstName', label: 'FIRST NAME', align: 'left' },
     { id: 'lastName', label: 'LAST NAME', align: 'left' },
-    { id: 'mobileNumber', label: 'PHONE NUMBER', align: 'left' },
+    { id: 'mobileNumber', label: 'MOBILE', align: 'left' },
     { id: 'emailAddress', label: 'EMAIL', align: 'left' },
     { id: 'sr', label: 'SR', align: 'left' },
     { id: 'status', label: 'STATUS', align: 'left' },
     { id: 'actions', label: 'ACTIONS', align: 'right' },
   ];
 
+  // Modal state
   const [selectedSubDistributor, setSelectedSubDistributor] =
     useState<SubDistributor | null>(null);
   const [modalState, setModalState] = useState<{
@@ -49,32 +63,35 @@ export default function SubDistributorManagement() {
     mode: 'add' | 'edit' | 'view';
   }>({ open: false, mode: 'add' });
 
-  const initialFilterState = {
-    search: '',
+  // Filter state management
+  const initialFilterState: SubDistributorFilter = {
+    name: '',
   };
 
   const { filterState, handleFilterInputChange } =
     useFilter(initialFilterState);
 
+  // Fetch sub distributors using SWR
   const { data, error, mutate, isLoading } = useSWR<
     IApiResponse<ISubDistributorResponse>
   >(BACKEND_ENDPOINTS.SUB_DISTRIBUTOR.LIST(''));
 
-  const subDistributors = data?.data?.distributors || [];
+  const subDistributors = data?.data?.subDistributors || [];
 
-  // Filter sub distributors based on search term
+  // Filter sub distributors based on name term
   const filteredSubDistributors = subDistributors.filter(
     (subDistributor: SubDistributor) => {
-      if (!filterState.search) return true;
+      if (!filterState.name) return true;
 
-      const searchTerm = filterState.search.toLowerCase();
+      const nameTerm = filterState.name.toLowerCase();
       const fullName =
         `${subDistributor.firstName} ${subDistributor.lastName}`.toLowerCase();
 
-      return fullName.includes(searchTerm);
+      return fullName.includes(nameTerm);
     }
   );
 
+  // Modal handlers
   const handleModalOpen = (
     mode: 'add' | 'edit' | 'view',
     subDistributor?: SubDistributor
@@ -88,22 +105,48 @@ export default function SubDistributorManagement() {
     setSelectedSubDistributor(null);
   };
 
-  const handleSubmit = async (payload: ISubDistributorPayload) => {
+  const { trigger: createTrigger, isMutating: isCreating } = useSWRMutation(
+    BACKEND_ENDPOINTS.SUB_DISTRIBUTOR.CREATE,
+    sendPostRequest
+  );
+
+  const { trigger: updateTrigger, isMutating: isUpdating } = useSWRMutation(
+    selectedSubDistributor?.userId
+      ? BACKEND_ENDPOINTS.SUB_DISTRIBUTOR.UPDATE(selectedSubDistributor.userId)
+      : null,
+    sendPutRequest
+  );
+
+  // API handlers
+  const handleSubmit = async (values: SubDistributorFormValues) => {
     try {
+      const payload: ISubDistributorPayload = {
+        metaInfo: getMetaInfo(),
+        attribute: {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          distributorId: values.distributorId,
+          status: values.status === 'active',
+          checkerId: values.status === 'active' ? null : values.checkerId,
+        },
+      };
+
       if (modalState.mode === 'edit' && selectedSubDistributor) {
-        await subDistributorApi.update(selectedSubDistributor.userId, payload);
+        await updateTrigger(payload);
         toast({
           title: 'Success',
           description: 'Sub distributor updated successfully',
         });
       } else {
-        await subDistributorApi.create(payload);
+        await createTrigger(payload);
         toast({
           title: 'Success',
           description: 'Sub distributor created successfully',
         });
       }
-      mutate();
+      mutate(); // Refresh the sub distributors list
       handleModalClose();
     } catch (error) {
       console.error('Error submitting sub distributor:', error);
@@ -115,20 +158,11 @@ export default function SubDistributorManagement() {
     }
   };
 
-  const handleDelete = async (subDistributor: SubDistributor) => {
-    try {
-      await subDistributorApi.delete(subDistributor.userId);
-      mutate();
-    } catch (error) {
-      console.error('Error deleting sub distributor:', error);
-      toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
-    }
+  const handleDelete = () => {
+    mutate(); // Refresh the sub distributors list
   };
 
+  // Check if no data is found
   const isNotFound = !filteredSubDistributors.length && !isLoading && !error;
 
   return (
@@ -140,21 +174,23 @@ export default function SubDistributorManagement() {
           <Card className='p-6 space-y-4 bg-white shadow-sm'>
             <div className='flex justify-between items-center pb-2'>
               <Input
-                placeholder='Search sub distributors...'
-                value={filterState.search}
+                placeholder='Search by name...'
+                value={filterState.name}
                 onChange={(e) =>
-                  handleFilterInputChange('search', e.target.value)
+                  handleFilterInputChange('name', e.target.value)
                 }
                 className='max-w-sm h-10 bg-gray-50'
               />
-              <Button
-                onClick={() => handleModalOpen('add')}
-                size='sm'
-                className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
-              >
-                <Plus className='mr-2 w-4 h-4' />
-                Add Sub Distributor
-              </Button>
+              {canCreate && (
+                <Button
+                  onClick={() => handleModalOpen('add')}
+                  size='sm'
+                  className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
+                >
+                  <Plus className='mr-2 w-4 h-4' />
+                  Add Sub Distributor
+                </Button>
+              )}
             </div>
 
             <Table>
@@ -162,7 +198,7 @@ export default function SubDistributorManagement() {
                 order={order}
                 orderBy={orderBy}
                 numSelected={selected.length}
-                rowCount={subDistributors.length || 0}
+                rowCount={filteredSubDistributors.length || 0}
                 handleSort={handleSort}
                 headerData={TABLE_HEAD}
               />
@@ -173,7 +209,7 @@ export default function SubDistributorManagement() {
                       <SubDistributorTableRow
                         key={subDistributor.id}
                         subDistributor={subDistributor}
-                        index={(page - 1) * rowsPerPage + index + 1}
+                        index={index + 1}
                         handleModalOpen={handleModalOpen}
                         onDelete={handleDelete}
                       />
@@ -182,6 +218,7 @@ export default function SubDistributorManagement() {
               </tbody>
             </Table>
 
+            {/* Loading and No Data States */}
             <TableNoData isNotFound={isNotFound} />
             <TableBodyLoading
               isLoading={isLoading}
@@ -196,7 +233,7 @@ export default function SubDistributorManagement() {
           onSubmit={handleSubmit}
           mode={modalState.mode}
           subDistributor={selectedSubDistributor || undefined}
-          isSubmitting={isLoading}
+          isSubmitting={isCreating || isUpdating}
         />
       </div>
     </Page>

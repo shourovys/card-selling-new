@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
+import usePermissions from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { ProductBundle } from '@/lib/validations/product-bundle';
 import { Edit, Eye, Trash2 } from 'lucide-react';
@@ -34,6 +35,9 @@ export default function ProductBundleTableRow({
   onDelete,
 }: ProductBundleTableRowProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { getActionPermissions } = usePermissions();
+  const { canView, canEdit, canDelete } =
+    getActionPermissions('PRODUCT_BUNDLE');
 
   const { trigger: deleteProductBundle, isMutating: isDeleting } =
     useSWRMutation(
@@ -46,16 +50,34 @@ export default function ProductBundleTableRow({
             description: 'Product bundle deleted successfully',
           });
           onDelete();
-          setDeleteDialogOpen(false);
         },
       }
     );
+
+  const actions = [
+    canEdit && {
+      label: 'Edit',
+      icon: <Edit className='w-4 h-4' />,
+      onClick: () => handleModalOpen('edit', bundle),
+    },
+    canView && {
+      label: 'View',
+      icon: <Eye className='w-4 h-4' />,
+      onClick: () => handleModalOpen('view', bundle),
+    },
+    canDelete && {
+      label: 'Delete',
+      icon: <Trash2 className='w-4 h-4' />,
+      onClick: () => setDeleteDialogOpen(true),
+      variant: 'destructive' as const,
+    },
+  ].filter(Boolean);
 
   return (
     <>
       <TableRow className='border-b hover:bg-gray-50/50'>
         <TableData className='pl-4 w-1/12'>{index + 1}</TableData>
-        <TableData className='w-1/4'>
+        <TableData className='w-1/2'>
           <div className='flex gap-4 items-center'>
             <div className='flex-shrink-0'>
               <img
@@ -69,33 +91,14 @@ export default function ProductBundleTableRow({
                 {bundle.name}
               </p>
               {bundle.description && (
-                <p className='truncate max-w-[400px]'>{bundle.description}</p>
+                <p className='text-xs truncate max-w-[400px]'>
+                  {bundle.description}
+                </p>
               )}
             </div>
           </div>
         </TableData>
-        <TableData className='w-1/6'>
-          <div className='space-y-1'>
-            <p className='font-medium'>
-              {/* {bundle.currency}  */}
-              {bundle.salePrice}
-            </p>
-            <p className=''>
-              Face:
-              {/* {bundle.currency}  */}
-              {bundle.facePrice}
-            </p>
-          </div>
-        </TableData>
-        <TableData className='w-1/6'>
-          <div className='space-y-1'>
-            <p className='font-medium'>
-              {bundle.gpAmount} ({bundle.gpType})
-            </p>
-            <p className=''>Value: {bundle.gpValue}</p>
-          </div>
-        </TableData>
-        <TableData className='w-1/12'>
+        <TableData>
           <div
             className={cn(
               'inline-flex items-center rounded-full px-1 py-1 text-xs font-semibold text-white w-[90px] justify-center',
@@ -105,30 +108,11 @@ export default function ProductBundleTableRow({
             {bundle.status ? 'Active' : 'Inactive'}
           </div>
         </TableData>
-        <TableData className='w-1/6'>
-          {new Date(bundle.createdAt).toLocaleString()}
-        </TableData>
-        <TableData className='pr-1 w-1/12'>
+        <TableData>{new Date(bundle.createdAt).toLocaleString()}</TableData>
+        <TableData className='pr-1'>
           <TableDataAction
             className='flex justify-end items-center'
-            actions={[
-              {
-                label: 'Edit',
-                icon: <Edit className='w-4 h-4' />,
-                onClick: () => handleModalOpen('edit', bundle),
-              },
-              {
-                label: 'View',
-                icon: <Eye className='w-4 h-4' />,
-                onClick: () => handleModalOpen('view', bundle),
-              },
-              {
-                label: 'Delete',
-                icon: <Trash2 className='w-4 h-4' />,
-                onClick: () => setDeleteDialogOpen(true),
-                variant: 'destructive',
-              },
-            ]}
+            actions={actions}
           />
         </TableData>
       </TableRow>

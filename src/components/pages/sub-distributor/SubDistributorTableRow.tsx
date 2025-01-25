@@ -2,6 +2,7 @@ import { sendDeleteRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import { SRListModal } from '@/components/modals/sr-list-modal';
 import TableData from '@/components/table/TableData';
+import TableDataAction from '@/components/table/TableDataAction';
 import TableRow from '@/components/table/TableRow';
 import {
   AlertDialog,
@@ -14,16 +15,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { toast } from '@/hooks/use-toast';
+import usePermissions from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { SubDistributor } from '@/lib/validations/sub-distributor';
-import { Edit, Eye, MoreVertical, Trash2, Users } from 'lucide-react';
+import { Edit, Eye, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
@@ -34,7 +30,7 @@ interface SubDistributorTableRowProps {
     mode: 'edit' | 'view',
     subDistributor: SubDistributor
   ) => void;
-  onDelete: (subDistributor: SubDistributor) => Promise<void>;
+  onDelete: () => void;
 }
 
 export default function SubDistributorTableRow({
@@ -45,6 +41,9 @@ export default function SubDistributorTableRow({
 }: SubDistributorTableRowProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [srModalOpen, setSrModalOpen] = useState(false);
+  const { getActionPermissions } = usePermissions();
+  const { canView, canEdit, canDelete } =
+    getActionPermissions('SUB_DISTRIBUTOR');
 
   const { trigger, isMutating: isDeleting } = useSWRMutation(
     BACKEND_ENDPOINTS.SUB_DISTRIBUTOR.DELETE(subDistributor.userId),
@@ -55,7 +54,7 @@ export default function SubDistributorTableRow({
           title: 'Success',
           description: 'Sub distributor deleted successfully',
         });
-        onDelete(subDistributor);
+        onDelete();
         setDeleteDialogOpen(false);
       },
       onError: () => {
@@ -67,6 +66,25 @@ export default function SubDistributorTableRow({
       },
     }
   );
+
+  const actions = [
+    canEdit && {
+      label: 'Edit',
+      icon: <Edit className='w-4 h-4' />,
+      onClick: () => handleModalOpen('edit', subDistributor),
+    },
+    canView && {
+      label: 'View',
+      icon: <Eye className='w-4 h-4' />,
+      onClick: () => handleModalOpen('view', subDistributor),
+    },
+    canDelete && {
+      label: 'Delete',
+      icon: <Trash2 className='w-4 h-4' />,
+      onClick: () => setDeleteDialogOpen(true),
+      variant: 'destructive' as const,
+    },
+  ].filter(Boolean);
 
   return (
     <>
@@ -80,8 +98,9 @@ export default function SubDistributorTableRow({
           <Button
             variant='outline'
             size='sm'
-            className='flex items-center gap-2'
+            className='flex gap-2 items-center'
             onClick={() => setSrModalOpen(true)}
+            disabled={!canView}
           >
             <Users className='w-4 h-4' />
             Show SR
@@ -97,41 +116,11 @@ export default function SubDistributorTableRow({
             {subDistributor.status ? 'Active' : 'Inactive'}
           </div>
         </TableData>
-        <TableData className='pr-1 text-right'>
-          <div className='flex gap-1 justify-end items-center'>
-            <Button
-              variant='ghost'
-              size='icon'
-              className='w-8 h-8 hover:bg-gray-100'
-              onClick={() => handleModalOpen('edit', subDistributor)}
-            >
-              <Edit className='w-4 h-4 text-gray-500' />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='ghost' className='w-8 h-8 hover:bg-gray-100'>
-                  <span className='sr-only'>Open menu</span>
-                  <MoreVertical className='w-4 h-4 text-gray-500' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-[160px]'>
-                <DropdownMenuItem
-                  onClick={() => handleModalOpen('view', subDistributor)}
-                  className='text-sm'
-                >
-                  <Eye className='mr-2 w-4 h-4 text-primary' />
-                  View
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setDeleteDialogOpen(true)}
-                  className='text-sm text-destructive focus:text-destructive'
-                >
-                  <Trash2 className='mr-2 w-4 h-4' />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        <TableData className='pr-1'>
+          <TableDataAction
+            className='flex justify-end items-center'
+            actions={actions}
+          />
         </TableData>
       </TableRow>
 

@@ -1,6 +1,7 @@
 import { sendDeleteRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import TableData from '@/components/table/TableData';
+import TableDataAction from '@/components/table/TableDataAction';
 import TableRow from '@/components/table/TableRow';
 import {
   AlertDialog,
@@ -12,16 +13,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { toast } from '@/hooks/use-toast';
+import usePermissions from '@/hooks/usePermissions';
 import { Role } from '@/lib/validations/role';
-import { Edit, Eye, MoreVertical, Trash2 } from 'lucide-react';
+import { Edit, Eye, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
@@ -39,8 +34,10 @@ export const RoleTableRow = ({
   onDelete,
 }: RoleTableRowProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { getActionPermissions } = usePermissions();
+  const { canView, canEdit, canDelete } = getActionPermissions('ROLE');
 
-  const { trigger, isMutating } = useSWRMutation(
+  const { trigger: deleteRole, isMutating } = useSWRMutation(
     BACKEND_ENDPOINTS.ROLE.DELETE(role.id),
     sendDeleteRequest,
     {
@@ -62,6 +59,25 @@ export const RoleTableRow = ({
       },
     }
   );
+
+  const actions = [
+    canEdit && {
+      label: 'Edit',
+      icon: <Edit className='w-4 h-4' />,
+      onClick: () => handleModalOpen('edit', role),
+    },
+    canView && {
+      label: 'View',
+      icon: <Eye className='w-4 h-4' />,
+      onClick: () => handleModalOpen('view', role),
+    },
+    canDelete && {
+      label: 'Delete',
+      icon: <Trash2 className='w-4 h-4' />,
+      onClick: () => setShowDeleteDialog(true),
+      variant: 'destructive' as const,
+    },
+  ];
 
   return (
     <>
@@ -95,41 +111,11 @@ export const RoleTableRow = ({
             day: 'numeric',
           })}
         </TableData>
-        <TableData className='pr-1 w-1/12 text-right'>
-          <div className='flex gap-1 justify-end items-center'>
-            <Button
-              variant='ghost'
-              size='icon'
-              className='w-8 h-8 hover:bg-gray-100'
-              onClick={() => handleModalOpen('edit', role)}
-            >
-              <Edit className='w-4 h-4 text-gray-500' />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='ghost' className='w-8 h-8 hover:bg-gray-100'>
-                  <span className='sr-only'>Open menu</span>
-                  <MoreVertical className='w-4 h-4 text-gray-500' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-[160px]'>
-                <DropdownMenuItem
-                  onClick={() => handleModalOpen('view', role)}
-                  className='text-sm'
-                >
-                  <Eye className='mr-2 w-4 h-4 text-primary' />
-                  View
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setShowDeleteDialog(true)}
-                  className='text-sm text-destructive focus:text-destructive'
-                >
-                  <Trash2 className='mr-2 w-4 h-4' />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        <TableData className='pr-1 w-1/12'>
+          <TableDataAction
+            className='flex justify-end items-center'
+            actions={actions}
+          />
         </TableData>
       </TableRow>
 
@@ -145,13 +131,13 @@ export const RoleTableRow = ({
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isMutating}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => trigger()}
+              onClick={() => deleteRole()}
               disabled={isMutating}
-              className='bg-red-600 focus:ring-red-600'
+              className='bg-destructive hover:bg-destructive/90'
             >
               {isMutating ? (
-                <span className='flex items-center gap-2'>
-                  <span className='h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent' />
+                <span className='flex gap-2 items-center'>
+                  <span className='w-4 h-4 rounded-full border-2 border-current animate-spin border-t-transparent' />
                   Deleting...
                 </span>
               ) : (

@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { SystemUser } from '@/lib/validations/system-user';
 import { Edit, Eye, Trash2 } from 'lucide-react';
@@ -34,6 +35,8 @@ export default function SystemUserTableRow({
   onDelete,
 }: SystemUserTableRowProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { getActionPermissions } = usePermissions();
+  const { canView, canEdit, canDelete } = getActionPermissions('SYSTEM_USER');
 
   const { trigger, isMutating: isDeleting } = useSWRMutation(
     BACKEND_ENDPOINTS.SYSTEM_USER.DELETE(user.userId),
@@ -80,17 +83,17 @@ export default function SystemUserTableRow({
           <TableDataAction
             className='flex justify-end items-center'
             actions={[
-              {
+              canEdit && {
                 label: 'Edit',
                 icon: <Edit className='w-4 h-4' />,
                 onClick: () => handleModalOpen('edit', user),
               },
-              {
+              canView && {
                 label: 'View',
                 icon: <Eye className='w-4 h-4' />,
                 onClick: () => handleModalOpen('view', user),
               },
-              {
+              canDelete && {
                 label: 'Delete',
                 icon: <Trash2 className='w-4 h-4' />,
                 onClick: () => setDeleteDialogOpen(true),

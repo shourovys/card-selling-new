@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
+import { usePermissions } from '@/hooks/usePermissions';
 import useTable, { emptyRows } from '@/hooks/useTable';
 import { Category } from '@/lib/validations/category';
 import {
@@ -31,6 +32,10 @@ import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 
 export default function ProductManagement() {
+  // Add permissions hook
+  const { getActionPermissions } = usePermissions();
+  const { canCreate } = getActionPermissions('PRODUCT');
+
   // Table state management
   const {
     page,
@@ -159,14 +164,16 @@ export default function ProductManagement() {
                 }
                 className='max-w-sm h-10 bg-gray-50'
               />
-              <Button
-                onClick={() => handleModalOpen('add')}
-                size='sm'
-                className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
-              >
-                <Plus className='mr-2 w-4 h-4' />
-                Add Product
-              </Button>
+              {canCreate && (
+                <Button
+                  onClick={() => handleModalOpen('add')}
+                  size='sm'
+                  className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
+                >
+                  <Plus className='mr-2 w-4 h-4' />
+                  Add Product
+                </Button>
+              )}
             </div>
 
             <Table>

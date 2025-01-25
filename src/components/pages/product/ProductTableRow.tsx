@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { Product } from '@/lib/validations/product';
 import { Edit, Eye, Trash2 } from 'lucide-react';
@@ -33,6 +34,8 @@ export default function ProductTableRow({
 }: ProductTableRowProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { getActionPermissions } = usePermissions();
+  const { canView, canEdit, canDelete } = getActionPermissions('PRODUCT');
 
   const handleDelete = async () => {
     try {
@@ -98,17 +101,17 @@ export default function ProductTableRow({
           <TableDataAction
             className='flex justify-end items-center'
             actions={[
-              {
+              canEdit && {
                 label: 'Edit',
                 icon: <Edit className='w-4 h-4' />,
                 onClick: () => handleModalOpen('edit', product),
               },
-              {
+              canView && {
                 label: 'View',
                 icon: <Eye className='w-4 h-4' />,
                 onClick: () => handleModalOpen('view', product),
               },
-              {
+              canDelete && {
                 label: 'Delete',
                 icon: <Trash2 className='w-4 h-4' />,
                 onClick: () => setDeleteDialogOpen(true),

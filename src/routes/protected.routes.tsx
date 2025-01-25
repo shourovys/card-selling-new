@@ -15,10 +15,10 @@ const PendingVirtualMoney = lazy(
   () => import('../pages/virtual-money/pending')
 );
 
-const SystemUserManagement = lazy(() => import('../pages/system-user/index'));
-const Distributor = lazy(() => import('../pages/distributor/index'));
-const SubDistributor = lazy(() => import('../pages/sub-distributor/index'));
-const SR = lazy(() => import('../pages/sr/index'));
+const SystemUserManagement = lazy(() => import('../pages/system-user'));
+const Distributor = lazy(() => import('../pages/distributor'));
+const SubDistributor = lazy(() => import('../pages/sub-distributor'));
+const SR = lazy(() => import('../pages/sr'));
 const AddSR = lazy(() => import('../pages/sr/add'));
 const EditSR = lazy(() => import('../pages/sr/edit'));
 

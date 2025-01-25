@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
+import usePermissions from '@/hooks/usePermissions';
 import useTable from '@/hooks/useTable';
 import {
   ISystemUserPayload,
@@ -31,6 +32,8 @@ export default function SystemUserManagement() {
   const { page, rowsPerPage, order, orderBy, selected, handleSort } = useTable(
     {}
   );
+  const { getActionPermissions } = usePermissions();
+  const { canCreate } = getActionPermissions('SYSTEM_USER');
 
   const TABLE_HEAD: ITableHead[] = [
     { id: 'sno', label: 'S.NO', align: 'left' },
@@ -142,14 +145,16 @@ export default function SystemUserManagement() {
                 }
                 className='max-w-sm h-10 bg-gray-50'
               />
-              <Button
-                onClick={() => handleModalOpen('add')}
-                size='sm'
-                className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
-              >
-                <Plus className='mr-2 w-4 h-4' />
-                Add System User
-              </Button>
+              {canCreate && (
+                <Button
+                  onClick={() => handleModalOpen('add')}
+                  size='sm'
+                  className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
+                >
+                  <Plus className='mr-2 w-4 h-4' />
+                  Add System User
+                </Button>
+              )}
             </div>
 
             <Table>

@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { Distributor } from '@/lib/validations/distributor';
 import { Edit, Eye, Trash2, Users } from 'lucide-react';
@@ -37,6 +38,8 @@ export default function DistributorTableRow({
 }: DistributorTableRowProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [subDistributorModalOpen, setSubDistributorModalOpen] = useState(false);
+  const { getActionPermissions } = usePermissions();
+  const { canView, canEdit, canDelete } = getActionPermissions('DISTRIBUTOR');
 
   const { trigger, isMutating: isDeleting } = useSWRMutation(
     BACKEND_ENDPOINTS.DISTRIBUTOR.DELETE(distributor.userId),
@@ -84,6 +87,7 @@ export default function DistributorTableRow({
             size='sm'
             className='flex items-center gap-2'
             onClick={() => setSubDistributorModalOpen(true)}
+            disabled={!canView}
           >
             <Users className='w-4 h-4' />
             Show Sub Distributors
@@ -93,17 +97,17 @@ export default function DistributorTableRow({
           <TableDataAction
             className='flex justify-end items-center'
             actions={[
-              {
+              canEdit && {
                 label: 'Edit',
                 icon: <Edit className='w-4 h-4' />,
                 onClick: () => handleModalOpen('edit', distributor),
               },
-              {
+              canView && {
                 label: 'View',
                 icon: <Eye className='w-4 h-4' />,
                 onClick: () => handleModalOpen('view', distributor),
               },
-              {
+              canDelete && {
                 label: 'Delete',
                 icon: <Trash2 className='w-4 h-4' />,
                 onClick: () => setDeleteDialogOpen(true),

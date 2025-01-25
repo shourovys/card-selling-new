@@ -12,8 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { hasPermission, IPermissionValue } from '@/config/permission';
-import useAuth from '@/hooks/useAuth';
+import { IPermissionValue } from '@/config/permission';
 import { cn } from '@/lib/utils';
 import { MoreVertical } from 'lucide-react';
 import { ReactNode, useMemo } from 'react';
@@ -33,21 +32,23 @@ export interface ActionItem {
   permission?: IPermissionValue;
 }
 
+type ActionOrFalse = ActionItem | false;
+
 interface IProps {
   selected?: boolean;
-  actions: ActionItem[];
+  actions: ActionOrFalse[];
   className?: string;
 }
 
-function TableDataAction({ selected, actions, className }: IProps) {
-  const { user } = useAuth();
+function isActionItem(action: ActionOrFalse): action is ActionItem {
+  return action !== false;
+}
 
+function TableDataAction({ selected, actions, className }: IProps) {
   // Filter actions based on permissions
   const filteredActions = useMemo(() => {
-    return actions.filter((action) =>
-      hasPermission(user?.permissions, action.permission)
-    );
-  }, [actions, user?.permissions]);
+    return actions.filter(isActionItem);
+  }, [actions]);
 
   const visibleActions = filteredActions.slice(
     0,

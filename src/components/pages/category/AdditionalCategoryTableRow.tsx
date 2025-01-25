@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { IAdditionalCategory } from '@/lib/validations/additional-category';
 import { Edit, Eye, Trash2 } from 'lucide-react';
@@ -36,6 +37,10 @@ export default function AdditionalCategoryTableRow({
   handleModalOpen,
   onDelete,
 }: AdditionalCategoryTableRowProps) {
+  const { getActionPermissions } = usePermissions();
+  const { canDelete, canEdit, canView } = getActionPermissions(
+    'ADDITIONAL_CATEGORY'
+  );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { trigger: deleteAddtionalCategory, isMutating: isDeleting } =
@@ -101,17 +106,17 @@ export default function AdditionalCategoryTableRow({
           <TableDataAction
             className='flex justify-end items-center'
             actions={[
-              {
+              canEdit && {
                 label: 'Edit',
                 icon: <Edit className='w-4 h-4' />,
                 onClick: () => handleModalOpen('edit', category),
               },
-              {
+              canView && {
                 label: 'View',
                 icon: <Eye className='w-4 h-4' />,
                 onClick: () => handleModalOpen('view', category),
               },
-              {
+              canDelete && {
                 label: 'Delete',
                 icon: <Trash2 className='w-4 h-4' />,
                 onClick: () => setDeleteDialogOpen(true),

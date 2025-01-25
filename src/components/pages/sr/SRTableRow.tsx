@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { SR } from '@/lib/validations/sr';
 import { Edit, Eye, Trash2 } from 'lucide-react';
@@ -31,6 +32,8 @@ interface SRTableRowProps {
 export default function SRTableRow({ sr, index, onDelete }: SRTableRowProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const { getActionPermissions } = usePermissions();
+  const { canView, canEdit, canDelete } = getActionPermissions('SR');
 
   const { trigger, isMutating: isDeleting } = useSWRMutation(
     BACKEND_ENDPOINTS.SR.DELETE(sr.userId),
@@ -53,6 +56,25 @@ export default function SRTableRow({ sr, index, onDelete }: SRTableRowProps) {
       },
     }
   );
+
+  const actions = [
+    canEdit && {
+      label: 'Edit',
+      icon: <Edit className='w-4 h-4' />,
+      onClick: () => navigate(routeConfig.srEdit.path(sr.userId)),
+    },
+    canView && {
+      label: 'View',
+      icon: <Eye className='w-4 h-4' />,
+      onClick: () => navigate(routeConfig.srView.path(sr.userId)),
+    },
+    canDelete && {
+      label: 'Delete',
+      icon: <Trash2 className='w-4 h-4' />,
+      onClick: () => setDeleteDialogOpen(true),
+      variant: 'destructive' as const,
+    },
+  ];
 
   return (
     <>
@@ -78,24 +100,7 @@ export default function SRTableRow({ sr, index, onDelete }: SRTableRowProps) {
         <TableData className='pr-1'>
           <TableDataAction
             className='flex justify-end items-center'
-            actions={[
-              {
-                label: 'Edit',
-                icon: <Edit className='w-4 h-4' />,
-                onClick: () => navigate(routeConfig.srEdit.path(sr.userId)),
-              },
-              {
-                label: 'View',
-                icon: <Eye className='w-4 h-4' />,
-                onClick: () => navigate(routeConfig.srView.path(sr.userId)),
-              },
-              {
-                label: 'Delete',
-                icon: <Trash2 className='w-4 h-4' />,
-                onClick: () => setDeleteDialogOpen(true),
-                variant: 'destructive',
-              },
-            ]}
+            actions={actions}
           />
         </TableData>
       </TableRow>

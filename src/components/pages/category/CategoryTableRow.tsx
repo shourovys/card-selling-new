@@ -13,8 +13,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { PERMISSIONS } from '@/config/permission';
 import { toast } from '@/hooks/use-toast';
+import usePermissions from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { Category } from '@/lib/validations/category';
 import { Edit, Eye, Trash2 } from 'lucide-react';
@@ -35,6 +35,8 @@ export default function CategoryTableRow({
   onDelete,
 }: CategoryTableRowProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { getActionPermissions } = usePermissions();
+  const { canView, canEdit, canDelete } = getActionPermissions('CATEGORY');
 
   const { trigger: deleteCategory, isMutating: isDeleting } = useSWRMutation(
     BACKEND_ENDPOINTS.CATEGORY.DELETE(category.id),
@@ -49,6 +51,25 @@ export default function CategoryTableRow({
       },
     }
   );
+
+  const actions = [
+    canEdit && {
+      label: 'Edit',
+      icon: <Edit className='w-4 h-4' />,
+      onClick: () => handleModalOpen('edit', category),
+    },
+    canView && {
+      label: 'View',
+      icon: <Eye className='w-4 h-4' />,
+      onClick: () => handleModalOpen('view', category),
+    },
+    canDelete && {
+      label: 'Delete',
+      icon: <Trash2 className='w-4 h-4' />,
+      onClick: () => setDeleteDialogOpen(true),
+      variant: 'destructive' as const,
+    },
+  ];
 
   return (
     <>
@@ -87,27 +108,7 @@ export default function CategoryTableRow({
         <TableData className='pr-1'>
           <TableDataAction
             className='flex justify-end items-center'
-            actions={[
-              {
-                label: 'Edit',
-                icon: <Edit className='w-4 h-4' />,
-                onClick: () => handleModalOpen('edit', category),
-                permission: PERMISSIONS.CATEGORY.EDIT,
-              },
-              {
-                label: 'View',
-                icon: <Eye className='w-4 h-4' />,
-                onClick: () => handleModalOpen('view', category),
-                permission: PERMISSIONS.CATEGORY.VIEW,
-              },
-              {
-                label: 'Delete',
-                icon: <Trash2 className='w-4 h-4' />,
-                onClick: () => setDeleteDialogOpen(true),
-                variant: 'destructive',
-                permission: PERMISSIONS.CATEGORY.DELETE,
-              },
-            ]}
+            actions={actions}
           />
         </TableData>
       </TableRow>
@@ -115,10 +116,10 @@ export default function CategoryTableRow({
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Additional Category</AlertDialogTitle>
+            <AlertDialogTitle>Delete Category</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this additional category? This
-              action cannot be undone.
+              Are you sure you want to delete this category? This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

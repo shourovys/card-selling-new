@@ -2,7 +2,6 @@ import { sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import Page from '@/components/HOC/page';
-import { PermissionElement } from '@/components/HOC/PermissionGuard';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
 import { CategoryModal } from '@/components/modals/category-modal';
 import CategoryTableRow from '@/components/pages/category/CategoryTableRow';
@@ -12,10 +11,10 @@ import TableNoData from '@/components/table/TableNoData';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { PERMISSIONS } from '@/config/permission';
 import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
+import usePermissions from '@/hooks/usePermissions';
 import useTable from '@/hooks/useTable';
 import { Category } from '@/lib/validations/category';
 import { IApiResponse } from '@/types/common';
@@ -34,6 +33,8 @@ import useSWRMutation from 'swr/mutation';
 export default function CategoryManagement() {
   // Table state management
   const { rowsPerPage, order, orderBy, selected, handleSort } = useTable({});
+  const { getActionPermissions } = usePermissions();
+  const { canCreate } = getActionPermissions('CATEGORY');
 
   // Define table head columns
   const TABLE_HEAD: ITableHead[] = [
@@ -68,13 +69,13 @@ export default function CategoryManagement() {
 
   const categories = data?.data?.categories || [];
 
-  // Filter sub distributors based on name term
+  // Filter categories based on name term
   const filteredCategories = categories.filter((category: Category) => {
     if (!filterState.name) return true;
 
     const nameTerm = filterState.name.toLowerCase();
 
-    return category.name.includes(nameTerm);
+    return category.name.toLowerCase().includes(nameTerm);
   });
 
   // Modal handlers
@@ -118,6 +119,7 @@ export default function CategoryManagement() {
         });
       }
       mutate(); // Refresh the categories list
+      handleModalClose();
     } catch (error) {
       console.error('Error submitting category:', error);
       toast({
@@ -151,9 +153,7 @@ export default function CategoryManagement() {
                 }
                 className='max-w-sm h-10 bg-gray-50'
               />
-              <PermissionElement
-                requiredPermissions={[PERMISSIONS.CATEGORY.CREATE]}
-              >
+              {canCreate && (
                 <Button
                   onClick={() => handleModalOpen('add')}
                   size='sm'
@@ -162,7 +162,7 @@ export default function CategoryManagement() {
                   <Plus className='mr-2 w-4 h-4' />
                   Add Category
                 </Button>
-              </PermissionElement>
+              )}
             </div>
 
             <Table>
@@ -185,11 +185,6 @@ export default function CategoryManagement() {
                       onDelete={onDelete}
                     />
                   ))}
-                {/* <TableEmptyRows
-                emptyRows={
-                  data ? emptyRows(page, rowsPerPage, categories.length) : 0
-                }
-              /> */}
               </tbody>
             </Table>
 
@@ -199,14 +194,6 @@ export default function CategoryManagement() {
               isLoading={isLoading}
               tableRowPerPage={rowsPerPage}
             />
-
-            {/* <Pagination
-            totalRows={categories.length || 0}
-            currentPage={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          /> */}
           </Card>
         </div>
 

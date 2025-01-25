@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
+import { usePermissions } from '@/hooks/usePermissions';
 import useTable, { emptyRows } from '@/hooks/useTable';
 import {
   IProductBundlePayload,
@@ -42,6 +43,8 @@ export default function ProductBundleManagement() {
     handleSort,
     handleChangeRowsPerPage,
   } = useTable({});
+  const { getActionPermissions } = usePermissions();
+  const { canCreate } = getActionPermissions('PRODUCT_BUNDLE');
 
   // Define table head columns
   const TABLE_HEAD: ITableHead[] = [
@@ -160,7 +163,7 @@ export default function ProductBundleManagement() {
 
   if (error) {
     return (
-      <div className='flex items-center justify-center min-h-screen'>
+      <div className='flex justify-center items-center min-h-screen'>
         <div className='text-center'>
           <h2 className='text-lg font-semibold text-gray-900'>
             Error Loading Data
@@ -187,14 +190,16 @@ export default function ProductBundleManagement() {
                 }
                 className='max-w-sm h-10 bg-gray-50'
               />
-              <Button
-                onClick={() => handleModalOpen('add')}
-                size='sm'
-                className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
-              >
-                <Plus className='mr-2 w-4 h-4' />
-                Add Product Bundle
-              </Button>
+              {canCreate && (
+                <Button
+                  onClick={() => handleModalOpen('add')}
+                  size='sm'
+                  className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
+                >
+                  <Plus className='mr-2 w-4 h-4' />
+                  Add Product Bundle
+                </Button>
+              )}
             </div>
 
             <Table>

@@ -14,13 +14,11 @@ import { SelectField } from '@/components/ui/form/select-field';
 import {
   ICheckerResponse,
   IDistributorResponse,
-  ISubDistributorPayload,
   SubDistributor,
   SubDistributorFormValues,
   subDistributorFormSchema,
 } from '@/lib/validations/sub-distributor';
 import { IApiResponse } from '@/types/common';
-import { getMetaInfo } from '@/utils/getMetaInfo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -29,7 +27,7 @@ import useSWR from 'swr';
 interface SubDistributorModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (values: ISubDistributorPayload) => Promise<void>;
+  onSubmit: (values: SubDistributorFormValues) => Promise<void>;
   mode: 'add' | 'edit' | 'view';
   subDistributor?: SubDistributor;
   isSubmitting: boolean;
@@ -107,20 +105,7 @@ export function SubDistributorModal({
     if (isViewMode) return;
 
     try {
-      const payload: ISubDistributorPayload = {
-        metaInfo: getMetaInfo(),
-        attribute: {
-          firstName: values.firstName,
-          lastName: values.lastName,
-          email: values.email,
-          phoneNumber: values.phoneNumber,
-          distributorId: values.distributorId,
-          status: values.status === 'active',
-          checkerId: values.status === 'active' ? null : values.checkerId,
-        },
-      };
-
-      await onSubmit(payload);
+      await onSubmit(values);
       onClose();
       form.reset();
     } catch (error) {

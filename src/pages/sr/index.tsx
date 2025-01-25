@@ -12,6 +12,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { routeConfig } from '@/config/routeConfig';
 import { useFilter } from '@/hooks/useFilter';
+import usePermissions from '@/hooks/usePermissions';
 import useTable, { emptyRows } from '@/hooks/useTable';
 import { ISRResponse, SR } from '@/lib/validations/sr';
 import { IApiResponse } from '@/types/common';
@@ -26,6 +27,9 @@ export default function SRManagement() {
   const { page, rowsPerPage, order, orderBy, selected, handleSort } = useTable(
     {}
   );
+
+  const { getActionPermissions } = usePermissions();
+  const { canCreate } = getActionPermissions('SR');
 
   const TABLE_HEAD: ITableHead[] = [
     { id: 'sno', label: 'S.NO', align: 'left' },
@@ -85,14 +89,16 @@ export default function SRManagement() {
                 }
                 className='max-w-sm h-10 bg-gray-50'
               />
-              <Button
-                onClick={() => navigate(routeConfig.srAdd.path())}
-                size='sm'
-                className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
-              >
-                <Plus className='mr-2 w-4 h-4' />
-                Add Sales Representative
-              </Button>
+              {canCreate && (
+                <Button
+                  onClick={() => navigate(routeConfig.srAdd.path())}
+                  size='sm'
+                  className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
+                >
+                  <Plus className='mr-2 w-4 h-4' />
+                  Add Sales Representative
+                </Button>
+              )}
             </div>
 
             <Table>

@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cn, formatAmount } from '@/lib/utils';
 import { Transaction } from '@/lib/validations/virtual-money';
 import { Check, Eye } from 'lucide-react';
@@ -35,6 +36,8 @@ export function VirtualMoneyTableRow({
   onApprove,
 }: VirtualMoneyTableRowProps) {
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const { getActionPermissions, can } = usePermissions();
+  const { canView } = getActionPermissions('VIRTUAL_MONEY');
 
   const { trigger, isMutating } = useSWRMutation(
     BACKEND_ENDPOINTS.VIRTUAL_MONEY.APPROVE,
@@ -52,22 +55,16 @@ export function VirtualMoneyTableRow({
   );
 
   const actions = [
-    {
-      label: 'View',
-      icon: <Eye className='w-4 h-4' />,
-      onClick: () => handleModalOpen('view', virtualMoney),
-    },
+    ...(canView
+      ? [
+          {
+            label: 'View',
+            icon: <Eye className='w-4 h-4' />,
+            onClick: () => handleModalOpen('view', virtualMoney),
+          },
+        ]
+      : []),
   ];
-
-  // if (virtualMoney.status.name === 'PENDING') {
-  //   actions.unshift({
-  //     label: 'Approve',
-  //     icon: <Check className='w-4 h-4' />,
-  //     onClick: () => setApproveDialogOpen(true),
-  //     variant: 'default',
-  //     className: 'bg-green-500 hover:bg-green-600 text-white',
-  //   });
-  // }
 
   return (
     <>
@@ -97,16 +94,17 @@ export function VirtualMoneyTableRow({
         </TableData>
         <TableData className='pr-1'>
           <div className='flex gap-2 justify-end items-center'>
-            {virtualMoney.status.name === 'PENDING' && (
-              <Button
-                size='sm'
-                variant='success'
-                onClick={() => setApproveDialogOpen(true)}
-              >
-                <Check className='w-4 h-4 text-white' />
-                Approve
-              </Button>
-            )}
+            {virtualMoney.status.name === 'PENDING' &&
+              can('approve_virtual_balance') && (
+                <Button
+                  size='sm'
+                  variant='success'
+                  onClick={() => setApproveDialogOpen(true)}
+                >
+                  <Check className='w-4 h-4 text-white' />
+                  Approve
+                </Button>
+              )}
             <TableDataAction
               className='flex justify-end items-center'
               actions={actions}

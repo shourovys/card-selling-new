@@ -29,7 +29,7 @@ export const PERMISSIONS = {
     APPROVE: 'approve_sr',
   },
   BALANCE: {
-    GENERATE: 'generate_virtual_balance',
+    GENERATE: 'generate_virtual_balance', // ask
     APPROVE: 'approve_virtual_balance',
   },
   CATEGORY: {
@@ -55,6 +55,17 @@ export const PERMISSIONS = {
     CREATE: 'create_product',
     EDIT: 'edit_product',
     DELETE: 'delete_product',
+  },
+
+  // ask
+  VIRTUAL_MONEY: {
+    VIEW: 'view_virtual_money',
+  },
+  SYSTEM_USER: {
+    VIEW: 'view_system_user',
+    CREATE: 'create_system_user',
+    EDIT: 'edit_system_user',
+    DELETE: 'delete_system_user',
   },
 } as const;
 
