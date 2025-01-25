@@ -1,6 +1,7 @@
 import { sendDeleteRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import TableData from '@/components/table/TableData';
+import TableDataAction from '@/components/table/TableDataAction';
 import TableRow from '@/components/table/TableRow';
 import {
   AlertDialog,
@@ -12,18 +13,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { SR } from '@/lib/validations/sr';
-import { Edit, Eye, MoreVertical, Trash2 } from 'lucide-react';
+import { Edit, Eye, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useSWRMutation from 'swr/mutation';
@@ -81,41 +75,28 @@ export default function SRTableRow({ sr, index, onDelete }: SRTableRowProps) {
             {sr.status ? 'Active' : 'Inactive'}
           </div>
         </TableData>
-        <TableData className='pr-1 text-right'>
-          <div className='flex gap-1 justify-end items-center'>
-            <Button
-              variant='ghost'
-              size='icon'
-              className='w-8 h-8 hover:bg-gray-100'
-              onClick={() => navigate(routeConfig.srEdit.path(sr.userId))}
-            >
-              <Edit className='w-4 h-4 text-gray-500' />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='ghost' className='w-8 h-8 hover:bg-gray-100'>
-                  <span className='sr-only'>Open menu</span>
-                  <MoreVertical className='w-4 h-4 text-gray-500' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-[160px]'>
-                <DropdownMenuItem
-                  onClick={() => navigate(routeConfig.srView.path(sr.userId))}
-                  className='text-sm'
-                >
-                  <Eye className='mr-2 w-4 h-4 text-primary' />
-                  View
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setDeleteDialogOpen(true)}
-                  className='text-sm text-destructive focus:text-destructive'
-                >
-                  <Trash2 className='mr-2 w-4 h-4' />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        <TableData className='pr-1'>
+          <TableDataAction
+            className='flex justify-end items-center'
+            actions={[
+              {
+                label: 'Edit',
+                icon: <Edit className='w-4 h-4' />,
+                onClick: () => navigate(routeConfig.srEdit.path(sr.userId)),
+              },
+              {
+                label: 'View',
+                icon: <Eye className='w-4 h-4' />,
+                onClick: () => navigate(routeConfig.srView.path(sr.userId)),
+              },
+              {
+                label: 'Delete',
+                icon: <Trash2 className='w-4 h-4' />,
+                onClick: () => setDeleteDialogOpen(true),
+                variant: 'destructive',
+              },
+            ]}
+          />
         </TableData>
       </TableRow>
 

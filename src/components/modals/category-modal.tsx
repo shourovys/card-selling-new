@@ -149,7 +149,7 @@ export function CategoryModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className='max-w-[800px] p-0'>
-        <DialogHeader className='py-6 px-8 border-b'>
+        <DialogHeader className='px-8 py-6 border-b'>
           <DialogTitle className='text-lg font-medium'>
             {modalTitle}
           </DialogTitle>
@@ -158,7 +158,7 @@ export function CategoryModal({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <div className='px-8 py-4 pb-8 max-h-[calc(100vh-200px)] overflow-y-auto'>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-10'>
+              <div className='grid grid-cols-1 gap-10 md:grid-cols-2'>
                 {/* Left Column */}
                 <div className='space-y-6'>
                   <InputField
@@ -183,11 +183,6 @@ export function CategoryModal({
                     form={form}
                     label='Display Order'
                     smallLabel='(Select previous category)'
-                    description={
-                      mode === 'edit'
-                        ? 'Leave empty to keep current position'
-                        : undefined
-                    }
                     options={categories
                       .filter((cat) => cat.id !== category?.id)
                       .map((cat) => ({
@@ -237,7 +232,7 @@ export function CategoryModal({
               </div>
             </div>
 
-            <DialogFooter className='py-6 px-8 border-t gap-2'>
+            <DialogFooter className='gap-2 px-8 py-6 border-t'>
               {isViewMode ? (
                 <Button
                   type='button'

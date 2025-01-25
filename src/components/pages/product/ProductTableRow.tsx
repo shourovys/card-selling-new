@@ -1,5 +1,6 @@
 import { productApi } from '@/api/product';
 import TableData from '@/components/table/TableData';
+import TableDataAction from '@/components/table/TableDataAction';
 import TableRow from '@/components/table/TableRow';
 import {
   AlertDialog,
@@ -11,17 +12,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Product } from '@/lib/validations/product';
-import { Edit, Eye, MoreVertical, Trash2 } from 'lucide-react';
+import { Edit, Eye, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface ProductTableRowProps {
@@ -100,41 +94,28 @@ export default function ProductTableRow({
         </TableData>
         <TableData>{product.category?.name}</TableData>
         <TableData>{new Date(product.createdAt).toLocaleString()}</TableData>
-        <TableData className='pr-1 text-right'>
-          <div className='flex gap-1 justify-end items-center'>
-            <Button
-              variant='ghost'
-              size='icon'
-              className='w-8 h-8 hover:bg-gray-100'
-              onClick={() => handleModalOpen('edit', product)}
-            >
-              <Edit className='w-4 h-4 text-gray-500' />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='ghost' className='w-8 h-8 hover:bg-gray-100'>
-                  <span className='sr-only'>Open menu</span>
-                  <MoreVertical className='w-4 h-4 text-gray-500' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-[160px]'>
-                <DropdownMenuItem
-                  onClick={() => handleModalOpen('view', product)}
-                  className='text-sm'
-                >
-                  <Eye className='mr-2 w-4 h-4 text-primary' />
-                  View
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setDeleteDialogOpen(true)}
-                  className='text-sm text-destructive focus:text-destructive'
-                >
-                  <Trash2 className='mr-2 w-4 h-4' />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        <TableData className='pr-1'>
+          <TableDataAction
+            className='flex justify-end items-center'
+            actions={[
+              {
+                label: 'Edit',
+                icon: <Edit className='w-4 h-4' />,
+                onClick: () => handleModalOpen('edit', product),
+              },
+              {
+                label: 'View',
+                icon: <Eye className='w-4 h-4' />,
+                onClick: () => handleModalOpen('view', product),
+              },
+              {
+                label: 'Delete',
+                icon: <Trash2 className='w-4 h-4' />,
+                onClick: () => setDeleteDialogOpen(true),
+                variant: 'destructive',
+              },
+            ]}
+          />
         </TableData>
       </TableRow>
 

@@ -1,6 +1,7 @@
 import { sendPostRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import TableData from '@/components/table/TableData';
+import TableDataAction from '@/components/table/TableDataAction';
 import TableRow from '@/components/table/TableRow';
 import {
   AlertDialog,
@@ -13,16 +14,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { toast } from '@/hooks/use-toast';
 import { cn, formatAmount } from '@/lib/utils';
 import { Transaction } from '@/lib/validations/virtual-money';
-import { Check, Eye, MoreVertical } from 'lucide-react';
+import { Check, Eye } from 'lucide-react';
 import { useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
@@ -56,6 +51,24 @@ export function VirtualMoneyTableRow({
     }
   );
 
+  const actions = [
+    {
+      label: 'View',
+      icon: <Eye className='w-4 h-4' />,
+      onClick: () => handleModalOpen('view', virtualMoney),
+    },
+  ];
+
+  // if (virtualMoney.status.name === 'PENDING') {
+  //   actions.unshift({
+  //     label: 'Approve',
+  //     icon: <Check className='w-4 h-4' />,
+  //     onClick: () => setApproveDialogOpen(true),
+  //     variant: 'default',
+  //     className: 'bg-green-500 hover:bg-green-600 text-white',
+  //   });
+  // }
+
   return (
     <>
       <TableRow className='border-b hover:bg-gray-50/50'>
@@ -82,35 +95,22 @@ export function VirtualMoneyTableRow({
         <TableData>
           {new Date(virtualMoney.createdAt).toLocaleString()}
         </TableData>
-        <TableData className='pr-1 text-right'>
+        <TableData className='pr-1'>
           <div className='flex gap-2 justify-end items-center'>
             {virtualMoney.status.name === 'PENDING' && (
               <Button
                 size='sm'
-                className='bg-green-500 hover:bg-green-600 border-green-600 text-white'
+                variant='success'
                 onClick={() => setApproveDialogOpen(true)}
               >
                 <Check className='w-4 h-4 text-white' />
                 Approve
               </Button>
             )}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='ghost' className='w-8 h-8 hover:bg-gray-100'>
-                  <span className='sr-only'>Open menu</span>
-                  <MoreVertical className='w-4 h-4 text-gray-500' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-[160px]'>
-                <DropdownMenuItem
-                  onClick={() => handleModalOpen('view', virtualMoney)}
-                  className='text-sm'
-                >
-                  <Eye className='mr-2 w-4 h-4 text-primary' />
-                  View
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <TableDataAction
+              className='flex justify-end items-center'
+              actions={actions}
+            />
           </div>
         </TableData>
       </TableRow>
