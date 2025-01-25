@@ -45,7 +45,7 @@ class AuthService {
         refresh_token: data.refresh_token,
         expires_in: data.expires_in,
         refresh_expires_in: data.refresh_expires_in,
-        role: [type],
+        permissions: [],
         name: type,
         email: credentials.email,
       };

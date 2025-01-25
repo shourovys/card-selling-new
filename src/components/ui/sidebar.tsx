@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { menuItems, type MenuItem } from '@/config/menu';
+import { hasAnyPermission } from '@/config/permission';
 import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { ChevronDown, ChevronLeft, LogOut, Menu, User } from 'lucide-react';
@@ -58,6 +59,16 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
       );
     };
 
+    const hasPermissionForItem = (item: MenuItem): boolean => {
+      if (!user?.permissions || !item.requiredPermissions?.length) return true;
+      return hasAnyPermission(user.permissions, item.requiredPermissions);
+    };
+
+    const hasPermissionForAnyChild = (item: MenuItem): boolean => {
+      if (!item.subMenu) return hasPermissionForItem(item);
+      return item.subMenu.some((subItem) => hasPermissionForItem(subItem));
+    };
+
     const MenuLink = ({
       item,
       isSubmenu = false,
@@ -67,7 +78,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
       isSubmenu?: boolean;
       onClick?: () => void;
     }) => {
-      if (!item.path) return null;
+      if (!item.path || !hasPermissionForItem(item)) return null;
       const Icon = item.icon;
 
       return (
@@ -99,6 +110,8 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
       const isActive = hasActiveChild(item);
       const Icon = item.icon;
 
+      if (!hasPermissionForAnyChild(item)) return null;
+
       if (!item.subMenu) {
         return <MenuLink item={item} />;
       }
@@ -109,7 +122,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
             <PopoverTrigger asChild>
               <button
                 className={cn(
-                  'w-full flex items-center justify-center rounded-lg p-2 transition-colors',
+                  'flex justify-center items-center p-2 w-full rounded-lg transition-colors',
                   isActive
                     ? 'text-primary'
                     : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
@@ -120,14 +133,16 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
             </PopoverTrigger>
             <PopoverContent
               side='right'
-              className='w-56 p-1'
+              className='p-1 w-56'
               align='start'
               alignOffset={-4}
             >
               <div className='flex flex-col gap-1'>
-                {item.subMenu.map((subItem) => (
-                  <MenuLink key={subItem.title} item={subItem} isSubmenu />
-                ))}
+                {item.subMenu
+                  .filter((subItem) => hasPermissionForItem(subItem))
+                  .map((subItem) => (
+                    <MenuLink key={subItem.title} item={subItem} isSubmenu />
+                  ))}
               </div>
             </PopoverContent>
           </Popover>
@@ -144,8 +159,8 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                 : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             )}
           >
-            <div className='flex items-center gap-3'>
-              <Icon className='h-5 w-5' />
+            <div className='flex gap-3 items-center'>
+              <Icon className='w-5 h-5' />
               <span>{item.title}</span>
             </div>
             <ChevronDown
@@ -156,9 +171,11 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
             />
           </CollapsibleTrigger>
           <CollapsibleContent className='py-2'>
-            {item.subMenu.map((subItem) => (
-              <MenuLink key={subItem.title} item={subItem} isSubmenu />
-            ))}
+            {item.subMenu
+              .filter((subItem) => hasPermissionForItem(subItem))
+              .map((subItem) => (
+                <MenuLink key={subItem.title} item={subItem} isSubmenu />
+              ))}
           </CollapsibleContent>
         </Collapsible>
       );
@@ -171,8 +188,8 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           !expanded && 'justify-center'
         )}
       >
-        <div className='flex items-center justify-center rounded-lg bg-background'>
-          <img src='/logo/full_logo.svg' alt='Logo' className='h-8 w-full' />
+        <div className='flex justify-center items-center rounded-lg bg-background'>
+          <img src='/logo/full_logo.svg' alt='Logo' className='w-full h-8' />
         </div>
       </div>
     );
@@ -180,27 +197,12 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
     const UserSection = () => {
       const UserActions = () => (
         <div className='flex flex-col gap-1 p-1'>
-          {/* <Button
-            variant='ghost'
-            className='flex w-full items-center justify-start gap-2 px-2 py-1.5 text-sm'
-          >
-            <User className='h-5 w-5' />
-            Account
-          </Button>
-          <Button
-            variant='ghost'
-            className='flex w-full items-center justify-start gap-2 px-2 py-1.5 text-sm'
-          >
-            <Settings className='h-5 w-5' />
-            Settings
-          </Button> */}
-          {/* <DropdownMenuSeparator /> */}
           <Button
             variant='ghost'
             className='flex w-full items-center justify-start gap-2 px-2 py-1.5 text-sm text-destructive'
             onClick={logout}
           >
-            <LogOut className='h-5 w-5' />
+            <LogOut className='w-5 h-5' />
             Log out
           </Button>
         </div>
@@ -208,33 +210,25 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
 
       if (!expanded) {
         return (
-          <div className='mt-auto border-t px-3 py-4'>
+          <div className='px-3 py-4 mt-auto border-t'>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant='ghost'
-                  className='h-auto w-full justify-center px-2 py-3'
+                  className='justify-center px-2 py-3 w-full h-auto'
                 >
-                  <div className='flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary'>
-                    {/* {user.avatar ? (
-                      <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className='h-10 w-10 rounded-full'
-                      />
-                    ) : ( */}
+                  <div className='flex justify-center items-center w-10 h-10 rounded-full bg-primary/10 text-primary'>
                     <User className='size-6' />
-                    {/* // )} */}
                   </div>
                 </Button>
               </PopoverTrigger>
               <PopoverContent
                 side='right'
-                className='w-56 p-0'
+                className='p-0 w-56'
                 align='start'
                 alignOffset={-4}
               >
-                <div className='border-b p-2'>
+                <div className='p-2 border-b'>
                   <div className='flex flex-col'>
                     <span className='text-sm font-medium'>{user?.name}</span>
                     <span className='text-xs text-muted-foreground'>
@@ -250,24 +244,16 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
       }
 
       return (
-        <div className='mt-auto border-t px-3 py-4'>
+        <div className='px-3 py-4 mt-auto border-t'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant='ghost'
-                className='h-auto w-full justify-start px-2 py-3'
+                className='justify-start px-2 py-3 w-full h-auto'
               >
-                <div className='flex items-center gap-3'>
-                  <div className='flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary'>
-                    {/* {user.avatar ? (
-                      <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className='h-10 w-10 rounded-full'
-                      />
-                    ) : ( */}
+                <div className='flex gap-3 items-center'>
+                  <div className='flex justify-center items-center w-10 h-10 rounded-full bg-primary/10 text-primary'>
                     <User className='size-6' />
-                    {/* )} */}
                   </div>
                   <div className='flex flex-col items-start text-left'>
                     <span className='text-sm font-medium'>{user?.name}</span>
@@ -292,16 +278,16 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           <SheetTrigger asChild>
             <Button
               variant='ghost'
-              className='mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden'
+              className='px-0 mr-2 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden'
             >
-              <Menu className='h-6 w-6' />
+              <Menu className='w-6 h-6' />
               <span className='sr-only'>Toggle Menu</span>
             </Button>
           </SheetTrigger>
           <SheetContent side='left' className='p-0'>
-            <div className='flex h-full flex-col'>
+            <div className='flex flex-col h-full'>
               <OrganizationHeader />
-              <div className='flex-1 overflow-auto px-3'>
+              <div className='overflow-auto flex-1 px-3'>
                 <SidebarContent />
               </div>
               <UserSection />
@@ -315,9 +301,11 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
       return (
         <div className='flex flex-col gap-1'>
           <nav className='flex flex-col gap-1 space-y-2'>
-            {menuItems.map((item) => (
-              <MenuGroup key={item.title} item={item} />
-            ))}
+            {menuItems
+              .filter((item) => hasPermissionForAnyChild(item))
+              .map((item) => (
+                <MenuGroup key={item.title} item={item} />
+              ))}
           </nav>
         </div>
       );
@@ -328,12 +316,12 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         <MobileNav />
         <aside
           className={cn(
-            'fixed left-0 top-0 z-40 hidden h-screen border-r bg-background/80 backdrop-blur-xl lg:block',
+            'hidden fixed top-0 left-0 z-40 h-screen border-r backdrop-blur-xl bg-background/80 lg:block',
             expanded ? 'w-64' : 'w-18',
             className
           )}
         >
-          <div className='flex h-full flex-col'>
+          <div className='flex flex-col h-full'>
             <div
               className={cn(
                 'flex items-center justify-between h-24 px-3 py-2',
@@ -355,7 +343,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                 />
               </Button>
             </div>
-            <div className='flex-1 overflow-auto px-3'>
+            <div className='overflow-auto flex-1 px-3'>
               <SidebarContent />
             </div>
             <UserSection />

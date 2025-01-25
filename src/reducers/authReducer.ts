@@ -8,7 +8,7 @@ import {
 export const initialState: IAuthState = {
   user: null,
   status: AUTH_STATUS.UNAUTHENTICATED,
-  userRoles: [],
+  userPermissions: [],
   isInitialized: false,
   isLoading: false,
   error: null,
@@ -45,7 +45,7 @@ const authReducer = (state: IAuthState, action: AuthAction): IAuthState => {
       return {
         ...state,
         user: action.payload.user,
-        userRoles: action.payload.user.role,
+        userPermissions: action.payload.user.permissions,
         status: AUTH_STATUS.AUTHENTICATED,
         isLoading: false,
         error: null,
@@ -82,7 +82,7 @@ const authReducer = (state: IAuthState, action: AuthAction): IAuthState => {
       return {
         ...state,
         user: action.payload.user,
-        userRoles: action.payload.user.role,
+        userPermissions: action.payload.user.permissions,
       };
 
     case 'SET_STATUS':

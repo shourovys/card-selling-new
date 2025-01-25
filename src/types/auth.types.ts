@@ -1,3 +1,5 @@
+import { IPermissionValue } from '@/config/permission';
+
 export interface ITokenData {
   access_token: string;
   refresh_token: string;
@@ -14,7 +16,7 @@ export interface IUser {
   // id: string;
   email: string;
   name: string;
-  role: IUserRole[];
+  permissions: IPermissionValue[];
   access_token: string;
   refresh_token: string;
   expires_in: number;
@@ -40,7 +42,7 @@ export type IUserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 export interface IAuthState {
   user: IUser | null;
   status: IAuthStatus;
-  userRoles: IUserRole[];
+  userPermissions: string[];
   isInitialized: boolean;
   isLoading: boolean;
   error: string | null;

@@ -2,7 +2,7 @@ import useAuth from '@/hooks/useAuth';
 import React, { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import ErrorBoundary from '../components/HOC/ErrorBoundary';
-import RoleBasedRoute from './RoleBasedRoute';
+import PermissionBasedRoute from './PermissionBasedRoute';
 import { AppRoute, reactRoutes } from './routes';
 
 const LoadingFallback = () => (
@@ -12,17 +12,17 @@ const LoadingFallback = () => (
 );
 
 const AppRoutes: React.FC = () => {
-  const { status, userRoles } = useAuth();
+  const { status, userPermissions } = useAuth();
 
   const renderRouteElement = (route: AppRoute) => {
     const element = route.auth ? (
-      <RoleBasedRoute
+      <PermissionBasedRoute
         isAuthenticated={status === 'AUTHENTICATED'}
-        userRoles={userRoles}
-        allowedRoles={route.roles || []}
+        userPermissions={userPermissions}
+        requiredPermissions={route.requiredPermissions || []}
       >
         {route.element}
-      </RoleBasedRoute>
+      </PermissionBasedRoute>
     ) : (
       route.element
     );

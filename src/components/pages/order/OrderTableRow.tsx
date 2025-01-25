@@ -1,8 +1,6 @@
 // OrderTableRow.tsx
 import TableData from '@/components/table/TableData';
-import TableDataAction from '@/components/table/TableDataAction';
 import TableRow from '@/components/table/TableRow';
-import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { IOrder } from '@/types/features/order';
 import { format } from 'date-fns';
@@ -18,7 +16,7 @@ interface IProps {
 const OrderTableRow: React.FC<IProps> = ({
   row,
   selected,
-  handleSelectRow,
+  // handleSelectRow,
 }) => {
   const [, setCopiedField] = useState<string | null>(null);
 
@@ -59,13 +57,13 @@ const OrderTableRow: React.FC<IProps> = ({
   return (
     <TableRow key={row._id.$oid} selected={selected.includes(row._id.$oid)}>
       {/* Checkbox for row selection */}
-      <TableDataAction selected={selected.includes(row._id.$oid)}>
+      {/* <TableDataAction selected={selected.includes(row._id.$oid)}>
         <Checkbox
           value={`select-row-${row._id.$oid}`}
           checked={selected.includes(row._id.$oid.toString())}
           onChange={() => handleSelectRow(row._id.$oid.toString())}
         />
-      </TableDataAction>
+      </TableDataAction> */}
 
       {/* Order ID with copy functionality */}
       <TableData>

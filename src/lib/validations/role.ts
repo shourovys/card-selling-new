@@ -35,6 +35,7 @@ export const permissionGroupSchema = z.object({
 });
 
 export const permissionSchema = z.object({
+  id: z.number(),
   permissionName: z.string(),
   displayName: z.string(),
   groupId: z.number(),

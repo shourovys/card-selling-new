@@ -1,5 +1,5 @@
+import type { IPermissionValue } from '@/config/permission';
 import { routeConfig } from '@/config/routeConfig';
-import { IUserRole } from '@/types/auth.types';
 import React, { lazy } from 'react';
 import { protectedRoutes } from './protected.routes';
 import { publicRoutes } from './public.routes';
@@ -10,7 +10,7 @@ type BaseRoute = {
   element?: React.ReactNode;
   title?: string;
   auth?: boolean;
-  roles?: IUserRole[];
+  requiredPermissions?: readonly IPermissionValue[];
   children?: AppRoute[];
 };
 

@@ -10,13 +10,16 @@ import {
   Users,
   Wallet,
 } from 'lucide-react';
+import { PERMISSIONS } from './permission';
 
-// Define roles for easy reference
-export const ROLES = {
-  SYSTEM_ADMIN: 'System Admin',
-  DISTRIBUTOR: 'Distributor',
-  SUB_DISTRIBUTOR: 'Sub Distributor',
-} as const;
+// interface RouteConfig {
+//   routePath: string;
+//   path: (id?: string) => string;
+//   title: string;
+//   icon?: React.ElementType;
+//   requiredPermissions?: IPermissionValue[];
+//   isPublic?: boolean;
+// }
 
 // Main route configuration
 export const routeConfig = {
@@ -39,126 +42,132 @@ export const routeConfig = {
     path: () => '/dashboard',
     title: 'Dashboard',
     icon: LayoutDashboard,
-    roles: [ROLES.SYSTEM_ADMIN, ROLES.DISTRIBUTOR, ROLES.SUB_DISTRIBUTOR],
+    requiredPermissions: [],
   },
+
   // Role Management
   role: {
     routePath: '/role',
     path: () => '/role',
     title: 'Role',
     icon: UserCog,
-    roles: [ROLES.SYSTEM_ADMIN],
+    requiredPermissions: [PERMISSIONS.ROLE.VIEW],
   },
-  // Virtual Money Section
 
+  // Virtual Money Section
   virtualMoneyRequest: {
     routePath: '/virtual-money/request',
     path: () => '/virtual-money/request',
     title: 'Request Virtual Money',
     icon: Wallet,
-    roles: [ROLES.SYSTEM_ADMIN, ROLES.DISTRIBUTOR, ROLES.SUB_DISTRIBUTOR],
+    requiredPermissions: [PERMISSIONS.BALANCE.GENERATE],
   },
   virtualMoneyPending: {
     routePath: '/virtual-money/pending',
     path: () => '/virtual-money/pending',
     title: 'Pending Virtual Money',
     icon: CircleDollarSign,
-    roles: [ROLES.SYSTEM_ADMIN, ROLES.DISTRIBUTOR, ROLES.SUB_DISTRIBUTOR],
+    requiredPermissions: [PERMISSIONS.BALANCE.APPROVE],
   },
   virtualMoneyHistory: {
     routePath: '/virtual-money',
     path: () => '/virtual-money',
     title: 'Virtual Money History',
     icon: Wallet,
-    roles: [ROLES.SYSTEM_ADMIN, ROLES.DISTRIBUTOR, ROLES.SUB_DISTRIBUTOR],
+    requiredPermissions: [
+      PERMISSIONS.BALANCE.GENERATE,
+      PERMISSIONS.BALANCE.APPROVE,
+    ],
   },
-  // User Management Section
 
+  // User Management Section
   systemUser: {
     routePath: '/system-user',
     path: () => '/system-user',
     title: 'System Users',
     icon: UserCog,
-    roles: [ROLES.SYSTEM_ADMIN],
+    requiredPermissions: [PERMISSIONS.ROLE.VIEW],
   },
   distributor: {
     routePath: '/distributor',
     path: () => '/distributor',
     title: 'Distributors',
     icon: Building2,
-    roles: [ROLES.SYSTEM_ADMIN],
+    requiredPermissions: [PERMISSIONS.DISTRIBUTOR.VIEW],
   },
   subDistributor: {
     routePath: '/sub-distributor',
     path: () => '/sub-distributor',
     title: 'Sub Distributors',
     icon: Store,
-    roles: [ROLES.SYSTEM_ADMIN],
+    requiredPermissions: [PERMISSIONS.SUB_DISTRIBUTOR.VIEW],
   },
   sr: {
     routePath: '/sales-representative',
     path: () => '/sales-representative',
     title: 'Sales Representatives (SR)',
     icon: Users,
-    roles: [ROLES.SYSTEM_ADMIN],
+    requiredPermissions: [PERMISSIONS.SR.VIEW],
   },
   srAdd: {
     routePath: '/sales-representative/add',
     path: () => '/sales-representative/add',
     title: 'Add Sales Representative (SR)',
     icon: Users,
-    roles: [ROLES.SYSTEM_ADMIN],
+    requiredPermissions: [PERMISSIONS.SR.CREATE],
   },
   srEdit: {
     routePath: '/sales-representative/edit/:id',
     path: (id?: string) => `/sales-representative/edit/${id}`,
     title: 'Edit Sales Representative (SR)',
     icon: Users,
-    roles: [ROLES.SYSTEM_ADMIN],
+    requiredPermissions: [PERMISSIONS.SR.EDIT],
   },
   srView: {
     routePath: '/sales-representative/view/:id',
     path: (id?: string) => `/sales-representative/view/${id}`,
     title: 'View Sales Representative (SR)',
     icon: Users,
-    roles: [ROLES.SYSTEM_ADMIN],
+    requiredPermissions: [PERMISSIONS.SR.VIEW],
   },
-  // Category Section
 
+  // Category Section
   category: {
     routePath: '/category',
     path: () => '/category',
     title: 'Categories',
     icon: Tags,
-    roles: [ROLES.SYSTEM_ADMIN, ROLES.DISTRIBUTOR, ROLES.SUB_DISTRIBUTOR],
+    requiredPermissions: [PERMISSIONS.CATEGORY.VIEW],
   },
   additionalCategory: {
     routePath: '/additional-category',
     path: () => '/additional-category',
     title: 'Additional Categories',
     icon: Tag,
-    roles: [ROLES.SYSTEM_ADMIN, ROLES.DISTRIBUTOR, ROLES.SUB_DISTRIBUTOR],
+    requiredPermissions: [PERMISSIONS.ADDITIONAL_CATEGORY.VIEW],
   },
-  // Product Section
 
+  // Product Section
   product: {
     routePath: '/product',
     path: () => '/product',
     title: 'Products',
     icon: Package,
-    roles: [ROLES.SYSTEM_ADMIN, ROLES.DISTRIBUTOR, ROLES.SUB_DISTRIBUTOR],
+    requiredPermissions: [PERMISSIONS.PRODUCT.VIEW],
   },
   productBundle: {
     routePath: '/product-bundle',
     path: () => '/product-bundle',
     title: 'Product Bundles',
     icon: Package,
-    roles: [ROLES.SYSTEM_ADMIN, ROLES.DISTRIBUTOR, ROLES.SUB_DISTRIBUTOR],
+    requiredPermissions: [PERMISSIONS.PRODUCT_BUNDLE.VIEW],
   },
+
   // Not Found Route
   notFound: {
     routePath: '*',
     path: () => '*',
     title: 'Not Found',
+    isPublic: true,
   },
 };

@@ -28,6 +28,7 @@ const AdditionalCategory = lazy(
 );
 const Product = lazy(() => import('../pages/product/product'));
 const ProductBundle = lazy(() => import('../pages/product/product-bundle'));
+
 export const protectedRoutes: AppRoute[] = [
   {
     element: React.createElement(DashboardLayout),
@@ -36,92 +37,95 @@ export const protectedRoutes: AppRoute[] = [
       {
         routePath: routeConfig.dashboard.routePath,
         element: React.createElement(Dashboard),
-        roles: routeConfig.dashboard.roles,
+        requiredPermissions: routeConfig.dashboard.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.virtualMoneyRequest.routePath,
         element: React.createElement(RequestVirtualMoney),
-        roles: routeConfig.virtualMoneyRequest.roles,
+        requiredPermissions:
+          routeConfig.virtualMoneyRequest.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.role.routePath,
         element: React.createElement(Role),
-        roles: routeConfig.role.roles,
+        requiredPermissions: routeConfig.role.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.virtualMoneyHistory.routePath,
         element: React.createElement(VirtualMoney),
-        roles: routeConfig.virtualMoneyHistory.roles,
+        requiredPermissions:
+          routeConfig.virtualMoneyHistory.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.virtualMoneyPending.routePath,
         element: React.createElement(PendingVirtualMoney),
-        roles: routeConfig.virtualMoneyPending.roles,
+        requiredPermissions:
+          routeConfig.virtualMoneyPending.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.systemUser.routePath,
         element: React.createElement(SystemUserManagement),
-        roles: routeConfig.systemUser.roles,
+        requiredPermissions: routeConfig.systemUser.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.distributor.routePath,
         element: React.createElement(Distributor),
-        roles: routeConfig.distributor.roles,
+        requiredPermissions: routeConfig.distributor.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.subDistributor.routePath,
         element: React.createElement(SubDistributor),
-        roles: routeConfig.subDistributor.roles,
+        requiredPermissions: routeConfig.subDistributor.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.sr.routePath,
         element: React.createElement(SR),
-        roles: routeConfig.sr.roles,
+        requiredPermissions: routeConfig.sr.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.srAdd.routePath,
         element: React.createElement(AddSR),
-        roles: routeConfig.srAdd.roles,
+        requiredPermissions: routeConfig.srAdd.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.srEdit.routePath,
         element: React.createElement(EditSR),
-        roles: routeConfig.srEdit.roles,
+        requiredPermissions: routeConfig.srEdit.requiredPermissions,
         auth: true,
       },
 
       {
         routePath: routeConfig.category.routePath,
         element: React.createElement(Category),
-        roles: routeConfig.category.roles,
+        requiredPermissions: routeConfig.category.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.additionalCategory.routePath,
         element: React.createElement(AdditionalCategory),
-        roles: routeConfig.additionalCategory.roles,
+        requiredPermissions: routeConfig.additionalCategory.requiredPermissions,
         auth: true,
       },
       {
-        routePath: '/product',
+        routePath: routeConfig.product.routePath,
         element: React.createElement(Product),
-        roles: routeConfig.product.roles,
+        requiredPermissions: routeConfig.product.requiredPermissions,
         auth: true,
       },
       {
         routePath: routeConfig.productBundle.routePath,
         element: React.createElement(ProductBundle),
-        roles: routeConfig.productBundle.roles,
+        requiredPermissions: routeConfig.productBundle.requiredPermissions,
         auth: true,
       },
     ],
