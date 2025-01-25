@@ -1,7 +1,7 @@
 import useAuth from '@/hooks/useAuth';
 import React, { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import ErrorBoundary from './ErrorBoundary';
+import ErrorBoundary from '../components/HOC/ErrorBoundary';
 import RoleBasedRoute from './RoleBasedRoute';
 import { AppRoute, reactRoutes } from './routes';
 
