@@ -20,7 +20,7 @@ import { hasAnyPermission } from '@/config/permission';
 import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { ChevronDown, ChevronLeft, LogOut, Menu, User } from 'lucide-react';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -38,74 +38,94 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
 
     const { user, logout } = useAuth();
 
-    const isActiveRoute = (path?: string) => {
-      if (!path) return false;
-      return location.pathname === path;
-    };
+    const isActiveRoute = useCallback(
+      (path?: string) => {
+        if (!path) return false;
+        return location.pathname === path;
+      },
+      [location.pathname]
+    );
 
-    const hasActiveChild = (item: MenuItem): boolean => {
-      if (item.path && isActiveRoute(item.path())) return true;
-      if (item.subMenu) {
-        return item.subMenu.some((subItem) => hasActiveChild(subItem));
-      }
-      return false;
-    };
+    const hasActiveChild = useCallback(
+      (item: MenuItem): boolean => {
+        if (item.path && isActiveRoute(item.path())) return true;
+        if (item.subMenu) {
+          return item.subMenu.some((subItem) => hasActiveChild(subItem));
+        }
+        return false;
+      },
+      [isActiveRoute]
+    );
 
-    const toggleGroup = (label: string) => {
+    const toggleGroup = useCallback((label: string) => {
       setOpenGroups((prev) =>
         prev.includes(label)
           ? prev.filter((t) => t !== label)
           : [...prev, label]
       );
-    };
+    }, []);
 
-    const hasPermissionForItem = (item: MenuItem): boolean => {
-      if (!user?.permissions || !item.requiredPermissions?.length) return true;
-      return hasAnyPermission(user.permissions, item.requiredPermissions);
-    };
+    const hasPermissionForItem = useCallback(
+      (item: MenuItem): boolean => {
+        if (!user?.permissions || !item.requiredPermissions?.length)
+          return true;
+        return hasAnyPermission(user.permissions, item.requiredPermissions);
+      },
+      [user?.permissions]
+    );
 
-    const hasPermissionForAnyChild = (item: MenuItem): boolean => {
-      if (!item.subMenu) return hasPermissionForItem(item);
-      return item.subMenu.some((subItem) => hasPermissionForItem(subItem));
-    };
+    const hasPermissionForAnyChild = useCallback(
+      (item: MenuItem): boolean => {
+        if (!item.subMenu) return hasPermissionForItem(item);
+        return item.subMenu.some((subItem) => hasPermissionForItem(subItem));
+      },
+      [hasPermissionForItem]
+    );
 
-    const MenuLink = ({
-      item,
-      isSubmenu = false,
-      onClick,
-    }: {
-      item: MenuItem;
-      isSubmenu?: boolean;
-      onClick?: () => void;
-    }) => {
-      if (!item.path || !hasPermissionForItem(item)) return null;
-      const Icon = item.icon;
+    const MenuLink = React.memo(
+      ({
+        item,
+        isSubmenu = false,
+        onClick,
+      }: {
+        item: MenuItem;
+        isSubmenu?: boolean;
+        onClick?: () => void;
+      }) => {
+        if (!item.path || !hasPermissionForItem(item)) return null;
+        const Icon = item.icon;
 
-      return (
-        <Link
-          to={item.path()}
-          className={cn(
-            'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
-            isActiveRoute(item.path())
-              ? 'bg-primary/10 text-primary'
-              : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
-            expanded && isSubmenu && 'ml-5',
-            !expanded && !isSubmenu && 'justify-center'
-          )}
-          onClick={() => {
-            onClick?.();
-            setIsMobileOpen(false);
-          }}
-        >
-          <Icon className={cn('size-5', !expanded && !isSubmenu && 'size-7')} />
-          <span className={cn(!expanded && !isSubmenu && 'hidden')}>
-            {item.title}
-          </span>
-        </Link>
-      );
-    };
+        return (
+          <Link
+            to={item.path()}
+            className={cn(
+              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
+              isActiveRoute(item.path())
+                ? 'bg-primary/10 text-primary'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
+              expanded && isSubmenu && 'ml-5',
+              !expanded && !isSubmenu && 'justify-center'
+            )}
+            onClick={() => {
+              onClick?.();
+              setIsMobileOpen(false);
+            }}
+            title={item.description}
+            role='menuitem'
+          >
+            <Icon
+              className={cn('size-5', !expanded && !isSubmenu && 'size-7')}
+              aria-hidden='true'
+            />
+            <span className={cn(!expanded && !isSubmenu && 'hidden')}>
+              {item.title}
+            </span>
+          </Link>
+        );
+      }
+    );
 
-    const MenuGroup = ({ item }: { item: MenuItem }) => {
+    const MenuGroup = React.memo(({ item }: { item: MenuItem }) => {
       const isOpen = openGroups.includes(item.title);
       const isActive = hasActiveChild(item);
       const Icon = item.icon;
@@ -127,8 +147,10 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                     ? 'text-primary'
                     : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                 )}
+                title={item.description}
+                aria-label={item.title}
               >
-                <Icon className='size-7' />
+                <Icon className='size-7' aria-hidden='true' />
               </button>
             </PopoverTrigger>
             <PopoverContent
@@ -137,7 +159,11 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
               align='start'
               alignOffset={-4}
             >
-              <div className='flex flex-col gap-1'>
+              <div
+                className='flex flex-col gap-1'
+                role='menu'
+                aria-label={`${item.title} submenu`}
+              >
                 {item.subMenu
                   .filter((subItem) => hasPermissionForItem(subItem))
                   .map((subItem) => (
@@ -158,9 +184,10 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                 ? 'text-primary'
                 : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             )}
+            title={item.description}
           >
             <div className='flex gap-3 items-center'>
-              <Icon className='w-5 h-5' />
+              <Icon className='w-5 h-5' aria-hidden='true' />
               <span>{item.title}</span>
             </div>
             <ChevronDown
@@ -168,20 +195,23 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                 'h-5 w-5 transition-transform',
                 isOpen && 'rotate-180'
               )}
+              aria-hidden='true'
             />
           </CollapsibleTrigger>
           <CollapsibleContent className='py-2'>
-            {item.subMenu
-              .filter((subItem) => hasPermissionForItem(subItem))
-              .map((subItem) => (
-                <MenuLink key={subItem.title} item={subItem} isSubmenu />
-              ))}
+            <div role='menu' aria-label={`${item.title} submenu`}>
+              {item.subMenu
+                .filter((subItem) => hasPermissionForItem(subItem))
+                .map((subItem) => (
+                  <MenuLink key={subItem.title} item={subItem} isSubmenu />
+                ))}
+            </div>
           </CollapsibleContent>
         </Collapsible>
       );
-    };
+    });
 
-    const OrganizationHeader = () => (
+    const OrganizationHeader = React.memo(() => (
       <div
         className={cn(
           'flex items-center gap-3 px-3 py-4',
@@ -192,9 +222,9 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           <img src='/logo/full_logo.svg' alt='Logo' className='w-full h-8' />
         </div>
       </div>
-    );
+    ));
 
-    const UserSection = () => {
+    const UserSection = React.memo(() => {
       const UserActions = () => (
         <div className='flex flex-col gap-1 p-1'>
           <Button
@@ -202,7 +232,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
             className='flex w-full items-center justify-start gap-2 px-2 py-1.5 text-sm text-destructive'
             onClick={logout}
           >
-            <LogOut className='w-5 h-5' />
+            <LogOut className='w-5 h-5' aria-hidden='true' />
             Log out
           </Button>
         </div>
@@ -216,9 +246,10 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                 <Button
                   variant='ghost'
                   className='justify-center px-2 py-3 w-full h-auto'
+                  aria-label='User menu'
                 >
                   <div className='flex justify-center items-center w-10 h-10 rounded-full bg-primary/10 text-primary'>
-                    <User className='size-6' />
+                    <User className='size-6' aria-hidden='true' />
                   </div>
                 </Button>
               </PopoverTrigger>
@@ -250,10 +281,11 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
               <Button
                 variant='ghost'
                 className='justify-start px-2 py-3 w-full h-auto'
+                aria-label='User menu'
               >
                 <div className='flex gap-3 items-center'>
                   <div className='flex justify-center items-center w-10 h-10 rounded-full bg-primary/10 text-primary'>
-                    <User className='size-6' />
+                    <User className='size-6' aria-hidden='true' />
                   </div>
                   <div className='flex flex-col items-start text-left'>
                     <span className='text-sm font-medium'>{user?.name}</span>
@@ -270,17 +302,18 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           </DropdownMenu>
         </div>
       );
-    };
+    });
 
-    const MobileNav = () => {
+    const MobileNav = React.memo(() => {
       return (
         <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
           <SheetTrigger asChild>
             <Button
               variant='ghost'
               className='px-0 mr-2 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden'
+              aria-label='Open menu'
             >
-              <Menu className='w-6 h-6' />
+              <Menu className='w-6 h-6' aria-hidden='true' />
               <span className='sr-only'>Toggle Menu</span>
             </Button>
           </SheetTrigger>
@@ -295,21 +328,31 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           </SheetContent>
         </Sheet>
       );
-    };
+    });
 
-    const SidebarContent = () => {
+    const SidebarContent = React.memo(() => {
+      const filteredMenuItems = useMemo(
+        () =>
+          menuItems.filter(
+            (item) => !item.isHidden && hasPermissionForAnyChild(item)
+          ),
+        [hasPermissionForAnyChild]
+      );
+
       return (
         <div className='flex flex-col gap-1'>
-          <nav className='flex flex-col gap-1 space-y-2'>
-            {menuItems
-              .filter((item) => hasPermissionForAnyChild(item))
-              .map((item) => (
-                <MenuGroup key={item.title} item={item} />
-              ))}
+          <nav
+            className='flex flex-col gap-1 space-y-2'
+            role='navigation'
+            aria-label='Main'
+          >
+            {filteredMenuItems.map((item) => (
+              <MenuGroup key={item.title} item={item} />
+            ))}
           </nav>
         </div>
       );
-    };
+    });
 
     return (
       <>
@@ -320,6 +363,8 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
             expanded ? 'w-64' : 'w-18',
             className
           )}
+          role='complementary'
+          aria-label='Sidebar'
         >
           <div className='flex flex-col h-full'>
             <div
@@ -334,12 +379,14 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                 size='icon'
                 className='size-9'
                 onClick={onToggle}
+                aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
               >
                 <ChevronLeft
                   className={cn(
                     'size-6 transition-transform',
                     !expanded && 'rotate-180'
                   )}
+                  aria-hidden='true'
                 />
               </Button>
             </div>
