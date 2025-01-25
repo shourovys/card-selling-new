@@ -86,9 +86,10 @@ const getCacheKey = (
 
 // Permission Check Utilities
 export const hasPermission = (
-  userPermissions: readonly string[],
-  requiredPermission: IPermissionValue
+  userPermissions: readonly string[] | undefined,
+  requiredPermission: IPermissionValue | undefined
 ): boolean => {
+  if (!userPermissions || !requiredPermission) return false;
   const cacheKey = getCacheKey(userPermissions, [requiredPermission], 'any');
 
   if (permissionCheckCache.has(cacheKey)) {

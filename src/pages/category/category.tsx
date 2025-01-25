@@ -2,6 +2,7 @@ import { sendPostRequest, sendPutRequest } from '@/api/swrConfig';
 import BACKEND_ENDPOINTS from '@/api/urls';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import Page from '@/components/HOC/page';
+import { PermissionElement } from '@/components/HOC/PermissionGuard';
 import TableBodyLoading from '@/components/loading/TableBodyLoading';
 import { CategoryModal } from '@/components/modals/category-modal';
 import CategoryTableRow from '@/components/pages/category/CategoryTableRow';
@@ -11,6 +12,7 @@ import TableNoData from '@/components/table/TableNoData';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PERMISSIONS } from '@/config/permission';
 import { routeConfig } from '@/config/routeConfig';
 import { toast } from '@/hooks/use-toast';
 import { useFilter } from '@/hooks/useFilter';
@@ -149,14 +151,18 @@ export default function CategoryManagement() {
                 }
                 className='max-w-sm h-10 bg-gray-50'
               />
-              <Button
-                onClick={() => handleModalOpen('add')}
-                size='sm'
-                className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
+              <PermissionElement
+                requiredPermissions={[PERMISSIONS.CATEGORY.CREATE]}
               >
-                <Plus className='mr-2 w-4 h-4' />
-                Add Category
-              </Button>
+                <Button
+                  onClick={() => handleModalOpen('add')}
+                  size='sm'
+                  className='px-4 h-10 text-white bg-rose-500 hover:bg-rose-600'
+                >
+                  <Plus className='mr-2 w-4 h-4' />
+                  Add Category
+                </Button>
+              </PermissionElement>
             </div>
 
             <Table>

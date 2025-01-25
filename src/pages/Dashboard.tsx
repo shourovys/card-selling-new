@@ -4,7 +4,7 @@ import React from 'react';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  console.log('🚀 ~ user:', user);
+
   return (
     <Page>
       <div className='space-y-6'>
@@ -12,7 +12,7 @@ const Dashboard: React.FC = () => {
           <div className='px-4 py-5 sm:p-6'>
             <h1 className='mb-4 text-3xl font-bold text-gray-900'>Dashboard</h1>
             <p className='text-lg text-gray-600'>
-              Welcome to your personalized dashboard!
+              Welcome {user?.name || 'User'} to your personalized dashboard!
             </p>
           </div>
         </div>

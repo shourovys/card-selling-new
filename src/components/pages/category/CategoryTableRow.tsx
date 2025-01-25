@@ -13,6 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { PERMISSIONS } from '@/config/permission';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Category } from '@/lib/validations/category';
@@ -91,17 +92,20 @@ export default function CategoryTableRow({
                 label: 'Edit',
                 icon: <Edit className='w-4 h-4' />,
                 onClick: () => handleModalOpen('edit', category),
+                permission: PERMISSIONS.CATEGORY.EDIT,
               },
               {
                 label: 'View',
                 icon: <Eye className='w-4 h-4' />,
                 onClick: () => handleModalOpen('view', category),
+                permission: PERMISSIONS.CATEGORY.VIEW,
               },
               {
                 label: 'Delete',
                 icon: <Trash2 className='w-4 h-4' />,
                 onClick: () => setDeleteDialogOpen(true),
                 variant: 'destructive',
+                permission: PERMISSIONS.CATEGORY.DELETE,
               },
             ]}
           />

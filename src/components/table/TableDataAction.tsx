@@ -1,3 +1,4 @@
+import { PermissionElement } from '@/components/HOC/PermissionGuard';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,9 +12,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { hasPermission, IPermissionValue } from '@/config/permission';
+import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { MoreVertical } from 'lucide-react';
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 
 export interface ActionItem {
   label: string;
@@ -27,6 +30,7 @@ export interface ActionItem {
     | 'secondary'
     | 'link';
   className?: string;
+  permission?: IPermissionValue;
 }
 
 interface IProps {
@@ -36,13 +40,93 @@ interface IProps {
 }
 
 function TableDataAction({ selected, actions, className }: IProps) {
-  const visibleActions = actions.slice(
+  const { user } = useAuth();
+
+  // Filter actions based on permissions
+  const filteredActions = useMemo(() => {
+    return actions.filter((action) =>
+      hasPermission(user?.permissions, action.permission)
+    );
+  }, [actions, user?.permissions]);
+
+  const visibleActions = filteredActions.slice(
     0,
-    actions.length <= 2 ? actions.length : 1
+    filteredActions.length <= 2 ? filteredActions.length : 1
   );
-  const dropdownActions = actions.slice(
-    actions.length <= 2 ? actions.length : 1
+  const dropdownActions = filteredActions.slice(
+    filteredActions.length <= 2 ? filteredActions.length : 1
   );
+
+  const renderActionButton = (action: ActionItem, index: number) => {
+    const button = (
+      <Tooltip key={index}>
+        <TooltipTrigger asChild>
+          <Button
+            variant={'ghost'}
+            size='icon'
+            className={cn(
+              'w-8 h-8 ',
+              action.variant === 'destructive'
+                ? 'text-destructive hover:text-destructive'
+                : 'text-gray-500 hover:text-gray-500',
+              action.className
+            )}
+            onClick={(event) => {
+              event.stopPropagation();
+              action.onClick();
+            }}
+          >
+            {action.icon}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{action.label}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+
+    return action.permission ? (
+      <PermissionElement key={index} requiredPermissions={[action.permission]}>
+        {button}
+      </PermissionElement>
+    ) : (
+      button
+    );
+  };
+
+  const renderDropdownItem = (action: ActionItem, index: number) => {
+    const menuItem = (
+      <DropdownMenuItem
+        key={index}
+        onClick={(event) => {
+          event.stopPropagation();
+          action.onClick();
+        }}
+        className={cn(
+          'text-sm flex items-center gap-3',
+          action.variant === 'destructive' &&
+            'text-destructive hover:text-destructive focus:text-destructive',
+          action.className
+        )}
+      >
+        {action.icon}
+        {action.label}
+      </DropdownMenuItem>
+    );
+
+    return action.permission ? (
+      <PermissionElement key={index} requiredPermissions={[action.permission]}>
+        {menuItem}
+      </PermissionElement>
+    ) : (
+      menuItem
+    );
+  };
+
+  // Don't render anything if no actions are available
+  if (filteredActions.length === 0) {
+    return null;
+  }
 
   return (
     <td
@@ -54,32 +138,9 @@ function TableDataAction({ selected, actions, className }: IProps) {
     >
       <TooltipProvider>
         <div className='flex gap-1 justify-start items-center'>
-          {visibleActions.map((action, index) => (
-            <Tooltip key={index}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={'ghost'}
-                  size='icon'
-                  className={cn(
-                    'w-8 h-8 ',
-                    action.variant === 'destructive'
-                      ? 'text-destructive hover:text-destructive'
-                      : 'text-gray-500 hover:text-gray-500',
-                    action.className
-                  )}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    action.onClick();
-                  }}
-                >
-                  {action.icon}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{action.label}</p>
-              </TooltipContent>
-            </Tooltip>
-          ))}
+          {visibleActions.map((action, index) =>
+            renderActionButton(action, index)
+          )}
 
           {dropdownActions.length > 0 && (
             <DropdownMenu>
@@ -100,24 +161,9 @@ function TableDataAction({ selected, actions, className }: IProps) {
                 </TooltipContent>
               </Tooltip>
               <DropdownMenuContent align='end' className='w-[160px]'>
-                {dropdownActions.map((action, index) => (
-                  <DropdownMenuItem
-                    key={index}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      action.onClick();
-                    }}
-                    className={cn(
-                      'text-sm flex items-center gap-3',
-                      action.variant === 'destructive' &&
-                        'text-destructive hover:text-destructive focus:text-destructive',
-                      action.className
-                    )}
-                  >
-                    {action.icon}
-                    {action.label}
-                  </DropdownMenuItem>
-                ))}
+                {dropdownActions.map((action, index) =>
+                  renderDropdownItem(action, index)
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           )}

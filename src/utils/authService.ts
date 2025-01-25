@@ -1,6 +1,7 @@
 import BACKEND_ENDPOINTS from '@/api/urls';
 import api from '@/config/apiConfig';
 import { CLIENT_ID, CLIENT_SECRET, LOCAL_STORAGE_KEYS } from '@/config/config';
+import { PERMISSIONS } from '@/config/permission';
 import {
   ILoginCredentials,
   ILoginResponse,
@@ -45,7 +46,12 @@ class AuthService {
         refresh_token: data.refresh_token,
         expires_in: data.expires_in,
         refresh_expires_in: data.refresh_expires_in,
-        permissions: [],
+        permissions: [
+          PERMISSIONS.CATEGORY.CREATE,
+          // PERMISSIONS.CATEGORY.EDIT,
+          PERMISSIONS.CATEGORY.VIEW,
+          // PERMISSIONS.CATEGORY.DELETE,
+        ],
         name: type,
         email: credentials.email,
       };
